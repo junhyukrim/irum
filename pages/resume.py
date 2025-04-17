@@ -14,11 +14,18 @@ def show_resume_page():
             """
             <style>
             /* 메인 컨테이너 width 조정 */
-            .block-container {
-                max-width: 95% !important;
-                padding-top: 1rem !important;
-                padding-right: 1rem !important;
-                padding-left: 1rem !important;
+            [data-testid="stSidebarContent"] {
+                width: 14rem;
+            }
+
+            [data-testid="stAppViewContainer"] > section:first-child {
+                width: calc(100% - 14rem);
+                padding: 1rem 2rem;
+            }
+
+            div[data-testid="stVerticalBlock"] {
+                width: 100%;
+                padding: 0;
             }
             
             /* 폼 스타일링 */
