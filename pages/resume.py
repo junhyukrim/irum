@@ -135,13 +135,19 @@ def show_resume_page():
                 font-size: 2rem !important;
                 font-weight: bold !important;
             }
+
+            /* h5 태그 여백 통일 */
+            h5.main-header {
+                margin-top: 1rem !important;
+                margin-bottom: 2rem !important;
+            }
             </style>
             """,
             unsafe_allow_html=True
         )
         
         # 인적사항 섹션
-        st.markdown('<h5>인적사항</h5>', unsafe_allow_html=True)
+        st.markdown('<h5 class="main-header">인적사항</h5>', unsafe_allow_html=True)
         
         # 한글이름/영문이름/국적/성별/생년월일 (2:2:2:1:1 = 8)
         cols = st.columns([2, 2, 2, 1, 1])
@@ -174,7 +180,7 @@ def show_resume_page():
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
         
         # 병역 및 보훈 섹션
-        st.markdown('<h5>병역 및 보훈</h5>', unsafe_allow_html=True)
+        st.markdown('<h5 class="main-header">병역 및 보훈</h5>', unsafe_allow_html=True)
         
         # 병역/군별/계급/보훈대상/복무시작일/복무종료일/전역유형 (1:1:1:1:1:1:1:1 = 8)
         cols = st.columns([1, 1, 1, 1, 1, 1, 2])
