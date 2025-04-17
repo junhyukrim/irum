@@ -313,17 +313,15 @@ def show_resume_page():
                 """
                 <style>
                 /* 메인 컨테이너 안의 일반 버튼 스타일 */
-                div[data-testid="stMainBlockContainer"] div.stButton > button {
+                div[data-testid="stMainBlockContainer"] button {
                     background-color: transparent !important;
                     color: #4285F4 !important;
                     border: 1px solid #4285F4 !important;
                 }
 
-                /* 저장 버튼 스타일 - 마지막 컬럼에 있는 버튼 */
-                div[data-testid="stMainBlockContainer"] div.row-widget:last-child div.stButton > button {
-                    background-color: #4285F4 !important;
-                    color: white !important;
-                    border: none !important;
+                /* 저장 버튼 스타일 */
+                div[data-testid="stMainBlockContainer"] button p {
+                    color: #4285F4 !important;
                 }
                 </style>
                 """,
@@ -360,14 +358,14 @@ def show_resume_page():
                 """
                 <style>
                 /* 메인 컨테이너 안의 일반 버튼 스타일 */
-                div[data-testid="stMainBlockContainer"] div.stButton > button {
+                div[data-testid="stMainBlockContainer"] button {
                     background-color: transparent !important;
                     color: #4285F4 !important;
                     border: 1px solid #4285F4 !important;
                 }
 
                 /* 저장 버튼은 원래 스타일 유지 */
-                div[data-testid="stMainBlockContainer"] div.stButton > button[data-testid="baseButton-secondary"] {
+                div[data-testid="stMainBlockContainer"] button[data-testid="baseButton-secondary"] {
                     background-color: #4285F4 !important;
                     color: white !important;
                     border: none !important;
@@ -473,14 +471,14 @@ def show_resume_page():
                 """
                 <style>
                 /* 메인 컨테이너 안의 일반 버튼 스타일 */
-                div[data-testid="stMainBlockContainer"] div.stButton > button {
+                div[data-testid="stMainBlockContainer"] button {
                     background-color: transparent !important;
                     color: #4285F4 !important;
                     border: 1px solid #4285F4 !important;
                 }
 
                 /* 저장 버튼 스타일 */
-                div[data-testid="stMainBlockContainer"] div.stButton > button:contains("저장") {
+                div[data-testid="stMainBlockContainer"] button[key="save_skill"] {
                     background-color: #4285F4 !important;
                     color: white !important;
                     border: none !important;
@@ -489,7 +487,7 @@ def show_resume_page():
                 """,
                 unsafe_allow_html=True
             )
-            if st.button("저장", key="save_skill", use_container_width=True):
+            if st.button("저장", key="save_skill", use_container_width=True, type="secondary"):
                 st.success("저장되었습니다!")
 
     # 경력 탭
