@@ -337,15 +337,32 @@ def main_screen():
             
             
             # 저장 버튼
-            col5, col6, col7 = st.columns([1, 1, 5])
-            with col5:
+            col1, col2 = st.columns([8, 1])
+            with col2:
                 if st.button("저장", use_container_width=True):
                     # TODO: 저장 로직 구현
                     st.success("저장되었습니다!")
-            with col6:
-                if st.button("취소", use_container_width=True):
-                    # TODO: 취소 로직 구현
-                    st.rerun()
+
+            st.markdown(
+                """
+                <style>
+                /* 저장 버튼 스타일링 */
+                [data-testid="stHorizontalBlock"] .stButton > button {
+                    background-color: #4285F4 !important;
+                    color: white !important;
+                    padding: 0.5rem 2rem !important;
+                    border-radius: 4px !important;
+                    width: auto !important;
+                    margin: 0 !important;
+                }
+
+                [data-testid="stHorizontalBlock"] .stButton > button:hover {
+                    background-color: #3367D6 !important;
+                }
+                </style>
+                """,
+                unsafe_allow_html=True
+            )
         
         # 학력 탭
         with tab2:
