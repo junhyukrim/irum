@@ -77,16 +77,7 @@ def login_screen():
         }
 
         /* 버튼 컨테이너 스타일 */
-        div.stElementContainer.element-container.st-emotion-cache-k6hex6.eu64p4t1 {
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-            padding-left: 4rem;
-            display: flex;
-            justify-content: flex-start;
-        }
-
-        div.stButton.st-emotion-cache-8atqhb.e1m1olm0 {
+        .stMainBlockContainer.block-container.st-emotion-cache-mtjnbi.eht7o1d4 > div > div > div > div:nth-child(3) > div {
             padding-left: 2rem;
         }
         </style>
