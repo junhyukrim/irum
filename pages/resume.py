@@ -479,8 +479,8 @@ def show_resume_page():
                     border: 1px solid #4285F4 !important;
                 }
 
-                /* 저장 버튼 스타일 - 마지막 컬럼에 있는 버튼 */
-                div[data-testid="stMainBlockContainer"] div.row-widget:last-child div.stButton > button {
+                /* 저장 버튼 스타일 */
+                div[data-testid="stMainBlockContainer"] div.stButton > button:contains("저장") {
                     background-color: #4285F4 !important;
                     color: white !important;
                     border: none !important;
