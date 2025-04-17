@@ -371,8 +371,95 @@ def main_screen():
         
         # 학력 탭
         with tab2:
-            st.header("학력")
-            st.write("여기에 학력 정보가 들어갑니다.")
+            st.markdown(
+                """
+                <style>
+                /* 학력 섹션 스타일링 */
+                .education-section {
+                    margin-bottom: 2rem;
+                }
+                
+                /* 입력란 스타일링 */
+                .stTextInput > label, .stSelectbox > label, .stDateInput > label {
+                    font-size: 1rem !important;
+                    font-weight: 500 !important;
+                }
+                
+                /* 구분선 스타일 */
+                hr {
+                    margin: 2rem 0;
+                    border: none;
+                    border-top: 1px solid rgba(49, 51, 63, 0.2);
+                }
+
+                /* 버튼 스타일링 */
+                .stButton > button {
+                    background-color: #4285F4 !important;
+                    color: white !important;
+                    padding: 0.5rem 2rem !important;
+                    border-radius: 4px !important;
+                    margin: 0 !important;
+                }
+
+                .stButton > button:hover {
+                    background-color: #3367D6 !important;
+                }
+                </style>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # 학력 카운터 초기화
+            if 'education_count' not in st.session_state:
+                st.session_state.education_count = 1
+
+            # 학력 추가 버튼
+            col1, col2 = st.columns([1, 5])
+            with col1:
+                if st.button("학력추가", use_container_width=True):
+                    st.session_state.education_count += 1
+                    st.rerun()
+
+            # 각 학력 정보 입력 폼
+            for i in range(st.session_state.education_count):
+                if i > 0:
+                    st.markdown("<hr>", unsafe_allow_html=True)
+                
+                st.markdown(f"<h5>학력 {i+1}</h5>", unsafe_allow_html=True)
+                
+                # 입학년월/졸업년월
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.date_input("입학년월", key=f"admission_date_{i}")
+                with col2:
+                    st.date_input("졸업년월", key=f"graduation_date_{i}")
+                
+                # 교육기관/학부 또는 분야
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.text_input("교육기관", key=f"institution_{i}")
+                with col2:
+                    st.text_input("학부 또는 분야", key=f"department_{i}")
+                
+                # 학과, 전공, 세부내용
+                st.text_input("학과, 전공, 세부내용", key=f"major_{i}")
+                
+                # 학위/성적
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.selectbox("학위", ["선택", "고등학교 졸업", "전문학사", "학사", "석사", "박사"], key=f"degree_{i}")
+                with col2:
+                    st.text_input("성적", placeholder="예: 4.0/4.3", key=f"gpa_{i}")
+                
+                # 비고
+                st.text_area("비고", key=f"notes_{i}", height=100)
+
+            # 저장 버튼
+            st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
+            col1, col2 = st.columns([5, 1])
+            with col2:
+                if st.button("저장", key="save_education", use_container_width=True):
+                    st.success("저장되었습니다!")
         
         # 역량 탭
         with tab3:
