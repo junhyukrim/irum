@@ -141,7 +141,8 @@ def main_screen():
             
             /* 사이드바 버튼 스타일 */
             .stButton > button {
-                width: 100%;
+                width: calc(100% + 4rem) !important;
+                margin-left: -2rem !important;
                 background-color: transparent !important;
                 border: none !important;
                 color: white !important;
