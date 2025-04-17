@@ -130,30 +130,32 @@ def show_resume_page():
         # 인적사항 섹션
         st.markdown('<h5>인적사항</h5>', unsafe_allow_html=True)
         
-        # 한글이름/영문이름/국적/성별/생년월일 (2:2:2:1:1)
-        col1, col2, col3, col4, col5 = st.columns([2, 2, 2, 1, 1])
-        with col1:
+        # 한글이름/영문이름/국적/성별/생년월일 (2:2:2:1:1 = 8)
+        cols = st.columns([2, 2, 2, 1, 1])
+        with cols[0]:
             name_kr = st.text_input("한글 이름", key="name_kr")
-        with col2:
+        with cols[1]:
             name_en = st.text_input("영문 이름", key="name_en")
-        with col3:
+        with cols[2]:
             nationality = st.text_input("국적", value="대한민국", key="nationality")
-        with col4:
+        with cols[3]:
             gender = st.selectbox("성별", ["선택", "남성", "여성"], key="gender")
-        with col5:
+        with cols[4]:
             birth_date = st.date_input("생년월일", key="birth_date")
         
-        # 주소/이메일/연락처 (4:2:2)
-        col1, col2, col3 = st.columns([4, 2, 2])
-        with col1:
+        # 주소/이메일/연락처 (4:2:2 = 8)
+        cols = st.columns([4, 2, 2])
+        with cols[0]:
             address = st.text_input("주소", key="address")
-        with col2:
+        with cols[1]:
             email = st.text_input("이메일", key="email")
-        with col3:
+        with cols[2]:
             phone = st.text_input("연락처", key="phone")
         
-        # 사진 링크
-        photo_url = st.text_input("사진 링크", key="photo_url")
+        # 사진 링크 (8 = 8)
+        cols = st.columns([8])
+        with cols[0]:
+            photo_url = st.text_input("사진 링크", key="photo_url")
         
         # 구분선 추가
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
@@ -161,29 +163,29 @@ def show_resume_page():
         # 병역 및 보훈 섹션
         st.markdown('<h5>병역 및 보훈</h5>', unsafe_allow_html=True)
         
-        # 병역/군별/계급/보훈대상/복무시작일/복무종료일/전역유형 (1:1:1:1:1:1:1:2)
-        col1, col2, col3, col4, col5, col6, col7, col8 = st.columns([1, 1, 1, 1, 1, 1, 1, 2])
-        with col1:
+        # 병역/군별/계급/보훈대상/복무시작일/복무종료일/전역유형 (1:1:1:1:1:1:1:1 = 8)
+        cols = st.columns([1, 1, 1, 1, 1, 1, 1, 1])
+        with cols[0]:
             military_service = st.selectbox("병역", ["선택", "군필", "미필", "면제", "해당없음"], key="military_service")
-        with col2:
+        with cols[1]:
             military_branch = st.selectbox("군별", ["선택", "육군", "해군", "공군", "해병대", "의경", "공익", "기타"], key="military_branch")
-        with col3:
+        with cols[2]:
             military_rank = st.selectbox("계급", ["선택", "이병", "일병", "상병", "병장", "하사", "중사", "상사", "원사", "준위", "소위", "중위", "대위", "소령", "중령", "대령"], key="military_rank")
-        with col4:
+        with cols[3]:
             veteran_status = st.selectbox("보훈대상", ["선택", "대상", "비대상"], key="veteran_status")
-        with col5:
+        with cols[4]:
             service_start = st.date_input("복무 시작일", key="service_start")
-        with col6:
+        with cols[5]:
             service_end = st.date_input("복무 종료일", key="service_end")
-        with col7:
+        with cols[6]:
             discharge_type = st.selectbox("전역 유형", ["선택", "만기전역", "의가사제대", "의병전역", "근무부적합", "기타"], key="discharge_type")
         
         # 구분선 추가
         st.markdown("<div style='margin: 5rem 0;'></div>", unsafe_allow_html=True)
 
-        # 저장 버튼 (우측 정렬, 7:1)
-        col1, col2 = st.columns([7, 1])
-        with col2:
+        # 저장 버튼 (우측 정렬, 7:1 = 8)
+        cols = st.columns([7, 1])
+        with cols[1]:
             if st.button("저장", use_container_width=True):
                 st.success("저장되었습니다!")
 
