@@ -514,9 +514,66 @@ def show_resume_page():
 
     # 기타활동 탭
     with tabs[5]:
-        st.header("기타활동")
-        st.write("여기에 기타활동 정보가 들어갑니다.")
-    
+        st.markdown('<h5 class="main-header">기타활동</h5>', unsafe_allow_html=True)
+        
+        # 활동 카운터 초기화
+        if 'activity_count' not in st.session_state:
+            st.session_state.activity_count = 1
+        
+        # 활동 데이터 초기화
+        if 'activity_data' not in st.session_state:
+            st.session_state.activity_data = list(range(st.session_state.activity_count))
+
+        # 각 활동 정보 입력 폼
+        for idx, i in enumerate(st.session_state.activity_data):
+            if idx > 0:
+                st.markdown("<hr>", unsafe_allow_html=True)
+            
+            # 활동명과 소속
+            col1, col2 = st.columns(2)
+            with col1:
+                st.text_input("활동명", key=f"activity_name_{i}")
+            with col2:
+                st.text_input("소속", key=f"activity_org_{i}")
+            
+            # 시작년월, 종료년월, 직책/역할
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.date_input("시작년월", key=f"activity_start_{i}")
+            with col2:
+                st.date_input("종료년월", key=f"activity_end_{i}")
+            with col3:
+                st.text_input("직책/역할", key=f"activity_role_{i}")
+            
+            # 활동세부내역
+            st.text_area("활동세부내역", key=f"activity_detail_{i}", height=100)
+            
+            # 링크
+            st.text_input("링크", key=f"activity_link_{i}", placeholder="관련 웹사이트나 문서 링크를 입력하세요")
+
+            # 활동 삭제 버튼
+            col1, col2 = st.columns([2, 5])
+            with col1:
+                if st.button("활동 삭제", key=f"delete_activity_{i}", use_container_width=True):
+                    st.session_state.activity_data.remove(i)
+                    if len(st.session_state.activity_data) == 0:
+                        st.session_state.activity_count = 1
+                        st.session_state.activity_data = [0]
+                    st.rerun()
+
+        # 버튼들 (활동 추가, 저장)
+        st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 1, 2])
+        with col1:
+            if st.button("활동 추가", use_container_width=True):
+                new_idx = max(st.session_state.activity_data) + 1 if st.session_state.activity_data else 0
+                st.session_state.activity_data.append(new_idx)
+                st.session_state.activity_count += 1
+                st.rerun()
+        with col2:
+            if st.button("저장", key="save_activity", use_container_width=True):
+                st.success("저장되었습니다!")
+
     # 자기소개 탭
     with tabs[6]:
         st.header("자기소개")
