@@ -289,26 +289,25 @@ def main_screen():
             # 병역 및 보훈 섹션
             st.markdown('<h5>병역 및 보훈</h5>', unsafe_allow_html=True)
             
-            # 병역/군별
-            mil_col1, mil_col2 = st.columns(2)
-            with mil_col1:
+            # 병역/군별/계급/보훈대상 (4등분)
+            mil_cols = st.columns(4)
+            with mil_cols[0]:
                 military_service = st.selectbox("병역", ["선택", "군필", "미필", "면제", "해당없음"], key="military_service")
-            with mil_col2:
+            with mil_cols[1]:
                 military_branch = st.selectbox("군별", ["선택", "육군", "해군", "공군", "해병대", "의경", "공익", "기타"], key="military_branch")
-            
-            # 계급/보훈대상
-            rank_col1, rank_col2 = st.columns(2)
-            with rank_col1:
+            with mil_cols[2]:
                 military_rank = st.selectbox("계급", ["선택", "이병", "일병", "상병", "병장", "하사", "중사", "상사", "원사", "준위", "소위", "중위", "대위", "소령", "중령", "대령"], key="military_rank")
-            with rank_col2:
+            with mil_cols[3]:
                 veteran_status = st.selectbox("보훈대상", ["선택", "대상", "비대상"], key="veteran_status")
             
-            # 복무 시작일/종료일
-            service_col1, service_col2 = st.columns(2)
-            with service_col1:
+            # 복무 시작일/종료일/전역유형 (1:1:2 비율)
+            service_cols = st.columns([1, 1, 2])
+            with service_cols[0]:
                 service_start = st.date_input("복무 시작일", key="service_start")
-            with service_col2:
+            with service_cols[1]:
                 service_end = st.date_input("복무 종료일", key="service_end")
+            with service_cols[2]:
+                discharge_type = st.selectbox("전역 유형", ["선택", "만기전역", "의가사제대", "의병전역", "근무부적합", "기타"], key="discharge_type")
             
             # 병역내용/특이사항
             detail_col1, detail_col2 = st.columns(2)
