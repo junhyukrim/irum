@@ -257,7 +257,7 @@ def show_resume_page():
 
         # 버튼들 (학력추가, 저장)
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-        col1, col2, col3 = st.columns([1, 1, 2])
+        col1, col2 = st.columns([2, 5])
         with col1:
             if st.button("학력 추가", use_container_width=True):
                 new_idx = max(st.session_state.education_data) + 1 if st.session_state.education_data else 0
@@ -265,7 +265,7 @@ def show_resume_page():
                 st.session_state.major_counts[new_idx] = 1
                 st.session_state.education_count += 1
                 st.rerun()
-        with col2:
+            st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
             if st.button("저장", key="save_education", use_container_width=True):
                 st.success("저장되었습니다!")
 
@@ -352,7 +352,7 @@ def show_resume_page():
 
         # 버튼들 (역량추가, 저장)
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-        col1, col2, col3 = st.columns([2, 1, 3])
+        col1, col2 = st.columns([2, 5])
         with col1:
             if st.button("역량 추가", use_container_width=True):
                 new_idx = max(st.session_state.skill_data) + 1 if st.session_state.skill_data else 0
@@ -361,7 +361,7 @@ def show_resume_page():
                 st.session_state.edu_counts[new_idx] = 1
                 st.session_state.skill_count += 1
                 st.rerun()
-        with col2:
+            st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
             if st.button("저장", key="save_skill", use_container_width=True):
                 st.success("저장되었습니다!")
 
@@ -467,7 +467,7 @@ def show_resume_page():
 
         # 버튼들 (경력추가, 저장)
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-        col1, col2, col3 = st.columns([2, 1, 3])
+        col1, col2 = st.columns([2, 5])
         with col1:
             if st.button("경력 추가", use_container_width=True):
                 new_idx = max(st.session_state.career_data) + 1 if st.session_state.career_data else 0
@@ -476,7 +476,7 @@ def show_resume_page():
                 st.session_state.task_counts[new_idx] = {0: 1}
                 st.session_state.career_count += 1
                 st.rerun()
-        with col2:
+            st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
             if st.button("저장", key="save_career", use_container_width=True):
                 st.success("저장되었습니다!")
 
@@ -521,14 +521,14 @@ def show_resume_page():
 
         # 버튼들 (수상내역 추가, 저장)
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-        col1, col2, col3 = st.columns([1, 1, 2])
+        col1, col2 = st.columns([2, 5])
         with col1:
             if st.button("수상내역 추가", use_container_width=True):
                 new_idx = max(st.session_state.award_data) + 1 if st.session_state.award_data else 0
                 st.session_state.award_data.append(new_idx)
                 st.session_state.award_count += 1
                 st.rerun()
-        with col2:
+            st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
             if st.button("저장", key="save_award", use_container_width=True):
                 st.success("저장되었습니다!")
 
@@ -583,14 +583,14 @@ def show_resume_page():
 
         # 버튼들 (활동 추가, 저장)
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-        col1, col2, col3 = st.columns([1, 1, 2])
+        col1, col2 = st.columns([2, 5])
         with col1:
             if st.button("활동 추가", use_container_width=True):
                 new_idx = max(st.session_state.activity_data) + 1 if st.session_state.activity_data else 0
                 st.session_state.activity_data.append(new_idx)
                 st.session_state.activity_count += 1
                 st.rerun()
-        with col2:
+            st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
             if st.button("저장", key="save_activity", use_container_width=True):
                 st.success("저장되었습니다!")
 
@@ -641,13 +641,13 @@ def show_resume_page():
 
         # 버튼들 (자기소개 추가, 저장)
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-        col1, col2, col3 = st.columns([1, 1, 2])
+        col1, col2 = st.columns([2, 5])
         with col1:
             if st.button("자기소개 추가", use_container_width=True):
                 new_idx = max(st.session_state.intro_data) + 1 if st.session_state.intro_data else 0
                 st.session_state.intro_data.append(new_idx)
                 st.session_state.intro_count += 1
                 st.rerun()
-        with col2:
+            st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
             if st.button("저장", key="save_intro", use_container_width=True):
                 st.success("저장되었습니다!") 
