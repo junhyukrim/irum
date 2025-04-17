@@ -122,33 +122,6 @@ def main_screen():
                 width: 250px !important;
             }
             
-            section[data-testid="stSidebar"] > div {
-                display: flex !important;
-                flex-direction: column !important;
-                height: 100vh !important;
-            }
-
-            section[data-testid="stSidebar"] > div > div {
-                flex: 1 !important;
-            }
-
-            /* 메뉴 컨테이너 */
-            .menu-container {
-                flex: 1 0 auto;
-            }
-
-            /* 로그아웃 컨테이너 */
-            .logout-container {
-                flex-shrink: 0;
-                margin-top: auto;
-                padding: 1rem;
-            }
-            
-            img {
-                width: 150px;
-                margin-bottom: 3rem;
-            }
-
             /* 사이드바 버튼 스타일 */
             .stButton > button {
                 width: 100%;
@@ -165,12 +138,10 @@ def main_screen():
             .stButton > button:hover {
                 background-color: rgba(255, 255, 255, 0.1) !important;
             }
-
-            /* 로그아웃 버튼 스타일 */
-            .logout-container .stButton > button {
-                border: 1px solid white !important;
-                border-radius: 4px !important;
-                justify-content: center !important;
+            
+            img {
+                width: 150px;
+                margin-bottom: 3rem;
             }
             </style>
             """,
@@ -181,7 +152,6 @@ def main_screen():
         st.image("https://i.imgur.com/thQZtYk.png")
         
         # 메뉴 버튼들
-        st.markdown('<div class="menu-container">', unsafe_allow_html=True)
         col1, col2, col3 = st.columns([0.1, 3, 0.1])
         with col2:
             if st.button('대시보드', key='dashboard', use_container_width=True):
@@ -192,12 +162,12 @@ def main_screen():
                 st.session_state.current_page = '공고관리'
             if st.button('서류관리', key='documents', use_container_width=True):
                 st.session_state.current_page = '서류관리'
-        st.markdown('</div>', unsafe_allow_html=True)
 
-        # 로그아웃 버튼
-        st.markdown('<div class="logout-container">', unsafe_allow_html=True)
-        st.button("로그아웃", key='logout', on_click=st.logout)
-        st.markdown('</div>', unsafe_allow_html=True)
+            # 빈 공간 추가
+            st.markdown("<div style='flex-grow: 1; min-height: calc(100vh - 500px);'></div>", unsafe_allow_html=True)
+            
+            # 로그아웃 버튼
+            st.button("로그아웃", key='logout', on_click=st.logout)
 
     # 메인 컨텐츠 영역 스타일
     st.markdown(
