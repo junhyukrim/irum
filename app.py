@@ -184,7 +184,7 @@ def main_screen():
             st.markdown('</div>', unsafe_allow_html=True)
 
             # 빈 공간 추가 (크기 조절)
-            st.markdown("<div style='flex-grow: 1; min-height: calc(100vh - 200px);'></div>", unsafe_allow_html=True)
+            st.markdown("<div style='flex-grow: 1; min-height: calc(100vh - 800px);'></div>", unsafe_allow_html=True)
             
             # 로그아웃 버튼
             st.button("로그아웃", key='logout', on_click=st.logout)
