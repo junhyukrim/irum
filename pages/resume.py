@@ -61,6 +61,11 @@ def show_resume_page():
                 align-items: center !important;
             }
 
+            /* 사이드바 버튼 스타일 */
+            section[data-testid="stSidebar"] .stButton > button {
+                justify-content: flex-start !important;
+            }
+
             .stButton > button:hover {
                 background-color: #3367D6 !important;
             }
