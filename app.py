@@ -111,6 +111,10 @@ def main_screen():
     # 현재 페이지 상태 관리
     if 'current_page' not in st.session_state:
         st.session_state.current_page = '대시보드'
+    
+    # 마지막으로 클릭된 버튼 상태 관리
+    if 'last_clicked_button' not in st.session_state:
+        st.session_state.last_clicked_button = 'dashboard'
 
     # 사이드바 설정
     with st.sidebar:
@@ -133,14 +137,9 @@ def main_screen():
                 width: 150px;
                 margin-bottom: 3rem;
             }
-
-            /* 버튼 컨테이너 전체 스타일 */
-            div.st-emotion-cache-8atqhb {
-                background-color: transparent;
-            }
             
-            /* 사이드바 버튼 스타일 */
-            .stButton > button {
+            /* 버튼 기본 스타일 */
+            div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"] button[kind="secondary"] {
                 width: calc(100% + 4rem) !important;
                 margin-left: -2rem !important;
                 background-color: transparent !important;
@@ -155,31 +154,18 @@ def main_screen():
                 border-radius: 0 !important;
             }
 
-            .stButton > button:hover {
+            /* 호버 스타일 */
+            div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"] button[kind="secondary"]:hover {
                 font-size: 2rem !important;
                 font-weight: bold !important;
                 background-color: rgba(255, 255, 255, 0.1) !important;
-                border-radius: 0 !important;
             }
 
-            /* 현재 선택된 버튼 스타일 */
-            .stButton > button[data-testid="stButton"]:active,
-            .stButton > button[aria-pressed="true"] {
+            /* 선택된 버튼 스타일 */
+            div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"] button[kind="secondary"][aria-selected="true"] {
+                background-color: #0051FF !important;
                 font-size: 2rem !important;
                 font-weight: bold !important;
-                background-color: rgba(255, 255, 255, 0.1) !important;
-                border-radius: 0 !important;
-            }
-            
-            /* columns 패딩 제거 */
-            div.row-widget.stButton {
-                padding: 0 !important;
-            }
-
-            /* 버튼 컨테이너 패딩 제거 */
-            div.stButton {
-                margin: 0 !important;
-                padding: 0 !important;
             }
             </style>
             """,
@@ -190,17 +176,29 @@ def main_screen():
         st.image("https://i.imgur.com/thQZtYk.png")
         
         # 메뉴 버튼들
-        if st.button('대시보드', key='dashboard', use_container_width=True):
+        if st.button('대시보드', key='dashboard', use_container_width=True, type='secondary'):
             st.session_state.current_page = '대시보드'
+            st.session_state.last_clicked_button = 'dashboard'
+            st.experimental_set_query_params(page='dashboard')
+            st.rerun()
 
-        if st.button('이력관리', key='resume', use_container_width=True):
+        if st.button('이력관리', key='resume', use_container_width=True, type='secondary'):
             st.session_state.current_page = '이력관리'
+            st.session_state.last_clicked_button = 'resume'
+            st.experimental_set_query_params(page='resume')
+            st.rerun()
 
-        if st.button('공고관리', key='jobs', use_container_width=True):
+        if st.button('공고관리', key='jobs', use_container_width=True, type='secondary'):
             st.session_state.current_page = '공고관리'
+            st.session_state.last_clicked_button = 'jobs'
+            st.experimental_set_query_params(page='jobs')
+            st.rerun()
 
-        if st.button('서류관리', key='documents', use_container_width=True):
+        if st.button('서류관리', key='documents', use_container_width=True, type='secondary'):
             st.session_state.current_page = '서류관리'
+            st.session_state.last_clicked_button = 'documents'
+            st.experimental_set_query_params(page='documents')
+            st.rerun()
 
         # 빈 공간 추가 (크기 조절)
         st.markdown("<div style='flex-grow: 1; min-height: calc(100vh - 800px);'></div>", unsafe_allow_html=True)
@@ -230,6 +228,71 @@ def main_screen():
         
     elif st.session_state.current_page == '이력관리':
         st.markdown('<h1 class="main-header">이력관리</h1>', unsafe_allow_html=True)
+        
+        # 탭 스타일 추가
+        st.markdown(
+            """
+            <style>
+            /* 탭 스타일링 */
+            .stTabs [data-baseweb="tab-list"] {
+                gap: 2px;
+            }
+            
+            .stTabs [data-baseweb="tab"] {
+                height: 50px;
+                white-space: pre-wrap;
+                background-color: #F5F5F5;
+                border-radius: 4px 4px 0 0;
+                gap: 2px;
+                padding: 10px 16px;
+            }
+            
+            .stTabs [aria-selected="true"] {
+                background-color: #0051FF !important;
+                color: white !important;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+        
+        # 탭 생성
+        tabs = st.tabs(['개인정보', '학력', '역량', '경력', '수상', '기타활동', '자기소개'])
+        
+        # 개인정보 탭
+        with tabs[0]:
+            st.subheader("개인정보")
+            # 여기에 개인정보 입력 폼 추가 예정
+        
+        # 학력 탭
+        with tabs[1]:
+            st.subheader("학력")
+            # 여기에 학력 정보 입력 폼 추가 예정
+        
+        # 역량 탭
+        with tabs[2]:
+            st.subheader("역량")
+            # 여기에 역량 정보 입력 폼 추가 예정
+        
+        # 경력 탭
+        with tabs[3]:
+            st.subheader("경력")
+            # 여기에 경력 정보 입력 폼 추가 예정
+        
+        # 수상 탭
+        with tabs[4]:
+            st.subheader("수상")
+            # 여기에 수상 정보 입력 폼 추가 예정
+        
+        # 기타활동 탭
+        with tabs[5]:
+            st.subheader("기타활동")
+            # 여기에 기타활동 정보 입력 폼 추가 예정
+        
+        # 자기소개 탭
+        with tabs[6]:
+            st.subheader("자기소개")
+            # 여기에 자기소개 입력 폼 추가 예정
         
     elif st.session_state.current_page == '공고관리':
         st.markdown('<h1 class="main-header">공고관리</h1>', unsafe_allow_html=True)
