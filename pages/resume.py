@@ -341,41 +341,22 @@ def show_resume_page():
                 """
                 <style>
                 /* 역량 탭의 버튼 스타일 (저장 버튼 제외) */
-                div[data-testid="stHorizontalBlock"] div.stButton > button {
+                div[data-testid="stHorizontalBlock"] div.stButton > button:not([data-testid="baseButton-secondary"]) {
                     background-color: transparent !important;
                     color: #4285F4 !important;
                     border: 1px solid #4285F4 !important;
                 }
 
-                div[data-testid="stHorizontalBlock"] div.stButton > button:hover {
+                div[data-testid="stHorizontalBlock"] div.stButton > button:not([data-testid="baseButton-secondary"]):hover {
                     background-color: #F8F9FA !important;
                     color: #1967D2 !important;
                     border-color: #1967D2 !important;
                 }
 
-                div[data-testid="stHorizontalBlock"] div.stButton > button:active {
+                div[data-testid="stHorizontalBlock"] div.stButton > button:not([data-testid="baseButton-secondary"]):active {
                     background-color: #F1F3F4 !important;
                     color: #1557B0 !important;
                     border-color: #1557B0 !important;
-                }
-
-                /* 저장 버튼 스타일 */
-                div.stButton > button[data-testid="baseButton-secondary"] {
-                    background-color: #4285F4 !important;
-                    color: white !important;
-                    border: none !important;
-                }
-
-                div.stButton > button[data-testid="baseButton-secondary"]:hover {
-                    background-color: #1967D2 !important;
-                    color: white !important;
-                    border: none !important;
-                }
-
-                div.stButton > button[data-testid="baseButton-secondary"]:active {
-                    background-color: #1557B0 !important;
-                    color: white !important;
-                    border: none !important;
                 }
                 </style>
                 """,
