@@ -309,12 +309,6 @@ def main_screen():
             with service_cols[2]:
                 discharge_type = st.selectbox("전역 유형", ["선택", "만기전역", "의가사제대", "의병전역", "근무부적합", "기타"], key="discharge_type")
             
-            # 병역내용/특이사항
-            detail_col1, detail_col2 = st.columns(2)
-            with detail_col1:
-                military_details = st.text_area("병역내용", height=100, key="military_details")
-            with detail_col2:
-                special_note = st.text_area("특이사항", height=100, key="special_note")
             
             # 저장 버튼
             col5, col6, col7 = st.columns([1, 1, 5])
