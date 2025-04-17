@@ -136,7 +136,7 @@ def main_screen():
 
             /* 버튼 컨테이너 전체 스타일 */
             div.st-emotion-cache-8atqhb {
-                background-color: rgba(255, 255, 255, 0.1);
+                background-color: transparent;
             }
             
             /* 사이드바 버튼 스타일 */
