@@ -358,6 +358,25 @@ def show_resume_page():
                     color: #1557B0 !important;
                     border-color: #1557B0 !important;
                 }
+
+                /* 저장 버튼 스타일 */
+                div.stButton > button[kind="primary"] {
+                    background-color: #4285F4 !important;
+                    color: white !important;
+                    border: none !important;
+                }
+
+                div.stButton > button[kind="primary"]:hover {
+                    background-color: #1967D2 !important;
+                    color: white !important;
+                    border: none !important;
+                }
+
+                div.stButton > button[kind="primary"]:active {
+                    background-color: #1557B0 !important;
+                    color: white !important;
+                    border: none !important;
+                }
                 </style>
                 """,
                 unsafe_allow_html=True
