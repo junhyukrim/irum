@@ -246,7 +246,7 @@ def show_resume_page():
                 st.markdown("<hr>", unsafe_allow_html=True)
             
             # 기술 및 역량
-            st.text_area("기술 및 역량", height=100, key=f"skill_desc_{i}")
+            st.text_input("기술 및 역량", key=f"skill_desc_{i}")
             
             # 자격증 섹션
             if i not in st.session_state.cert_counts:
@@ -278,7 +278,7 @@ def show_resume_page():
             for j in range(st.session_state.edu_counts[i]):
                 if j > 0:
                     st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
-                st.text_area("교육, 연수, 유학 등", height=100, key=f"education_{i}_{j}")
+                st.text_input("교육, 연수, 유학 등", key=f"education_{i}_{j}")
 
             col1, col2 = st.columns([3, 5])
             with col1:
