@@ -657,48 +657,53 @@ def show_resume_page():
             if idx > 0:
                 st.markdown("<hr>", unsafe_allow_html=True)
             
-            # 활동명과 소속
-            col1, col2 = st.columns(2)
-            with col1:
+            # 활동명/소속/시작년월/종료년월/직책/역할/삭제 버튼 (2:2:1:1:1:1)
+            cols = st.columns([2, 2, 1, 1, 1, 1])
+            with cols[0]:
                 st.text_input("활동명", key=f"activity_name_{i}")
-            with col2:
+            with cols[1]:
                 st.text_input("소속", key=f"activity_org_{i}")
-            
-            # 시작년월, 종료년월, 직책/역할
-            col1, col2, col3 = st.columns(3)
-            with col1:
+            with cols[2]:
                 st.date_input("시작년월", key=f"activity_start_{i}")
-            with col2:
+            with cols[3]:
                 st.date_input("종료년월", key=f"activity_end_{i}")
-            with col3:
+            with cols[4]:
                 st.text_input("직책/역할", key=f"activity_role_{i}")
+            with cols[5]:
+                st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
+                if len(st.session_state.activity_data) > 1:
+                    if st.button("활동 삭제", key=f"delete_activity_{i}", use_container_width=True):
+                        st.session_state.activity_data.remove(i)
+                        if len(st.session_state.activity_data) == 0:
+                            st.session_state.activity_count = 1
+                            st.session_state.activity_data = [0]
+                        st.rerun()
             
-            # 활동세부내역
-            st.text_area("활동세부내역", key=f"activity_detail_{i}", height=100)
+            st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
             
-            # 링크
-            st.text_input("링크", key=f"activity_link_{i}", placeholder="관련 웹사이트나 문서 링크를 입력하세요")
+            # 링크와 활동 세부내역 (4:4)
+            cols = st.columns([4, 4])
+            with cols[0]:
+                st.text_input("링크", key=f"activity_link_{i}", placeholder="관련 웹사이트나 문서 링크를 입력하세요")
+            with cols[1]:
+                st.text_input("활동세부내역", key=f"activity_detail_{i}")
 
-            # 활동 삭제 버튼
-            col1, col2 = st.columns([2, 5])
-            with col1:
-                if st.button("활동 삭제", key=f"delete_activity_{i}", use_container_width=True):
-                    st.session_state.activity_data.remove(i)
-                    if len(st.session_state.activity_data) == 0:
-                        st.session_state.activity_count = 1
-                        st.session_state.activity_data = [0]
-                    st.rerun()
-
-        # 버튼들 (활동 추가, 저장)
+        # 활동 추가 버튼 (1:7)
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-        col1, col2 = st.columns([2, 5])
-        with col1:
+        cols = st.columns(8)
+        with cols[0]:
             if st.button("활동 추가", use_container_width=True):
                 new_idx = max(st.session_state.activity_data) + 1 if st.session_state.activity_data else 0
                 st.session_state.activity_data.append(new_idx)
                 st.session_state.activity_count += 1
                 st.rerun()
-            st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
+
+        # 저장 버튼 (7:1)
+        st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
+        cols = st.columns(8)
+        for i in range(7):  # 처음 7개 컬럼은 빈 공간
+            cols[i].empty()
+        with cols[7]:  # 마지막 컬럼에 버튼 배치
             if st.button("저장", key="save_activity", use_container_width=True):
                 st.success("저장되었습니다!")
 
