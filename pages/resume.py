@@ -462,8 +462,8 @@ def show_resume_page():
                 border: 1px solid #4285F4 !important;
             }
 
-            /* primary 키를 가진 저장 버튼 스타일 */
-            div[data-testid="stMainBlockContainer"] button[kind="primary"] {
+            /* 저장 버튼 스타일 */
+            div[data-testid="stMainBlockContainer"] button[data-testid="baseButton-primary_save_skill"] {
                 background-color: #4285F4 !important;
                 color: white !important;
                 border: none !important;
