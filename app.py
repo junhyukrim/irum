@@ -431,7 +431,7 @@ def main_screen():
             
             # 전공 카운터 초기화
             if 'major_counts' not in st.session_state:
-                st.session_state.major_counts = {0: 1}  # {학력인덱스: 전공개수}
+                st.session_state.major_counts = {0: 1}
 
             # 학력 데이터 초기화
             if 'education_data' not in st.session_state:
@@ -489,10 +489,10 @@ def main_screen():
                 with col1:
                     if st.button("학력 삭제", key=f"delete_education_{i}", use_container_width=True):
                         st.session_state.education_data.remove(i)
-                        if len(st.session_state.education_data) == 0:  # 모든 학력이 삭제된 경우
+                        if len(st.session_state.education_data) == 0:
                             st.session_state.education_count = 1
                             st.session_state.education_data = [0]
-                            st.session_state.major_counts = {0: 1} 
+                            st.session_state.major_counts = {0: 1}
                         st.rerun()
 
             # 버튼들 (학력추가, 저장)
@@ -509,65 +509,6 @@ def main_screen():
                 if st.button("저장", key="save_education", use_container_width=True):
                     st.success("저장되었습니다!")
 
-            st.markdown(
-                """
-                <style>
-                /* 입력란 스타일링 */
-                .stTextInput > label, .stSelectbox > label, .stDateInput > label {
-                    font-size: 1rem !important;
-                    font-weight: 500 !important;
-                }
-                
-                /* 구분선 스타일 */
-                hr {
-                    margin: 2rem 0;
-                    border: none;
-                    border-top: 1px solid rgba(49, 51, 63, 0.2);
-                }
-
-                /* 버튼 스타일링 */
-                .stButton > button {
-                    background-color: #4285F4 !important;
-                    color: white !important;
-                    padding: 0.5rem 2rem !important;
-                    border-radius: 4px !important;
-                    margin: 0 !important;
-                }
-
-                .stButton > button:hover {
-                    background-color: #3367D6 !important;
-                }
-
-                /* 입력란 배경색 조정 */
-                .stTextInput > div > div > input,
-                .stSelectbox > div > div > div,
-                .stDateInput > div > div > input,
-                div[data-baseweb="input"] > input,
-                div[data-baseweb="input"],
-                div[data-baseweb="base-input"] {
-                    background-color: #F8F9FA !important;
-                }
-
-                /* 입력란 호버/포커스 시 배경색 */
-                .stTextInput > div > div > input:hover,
-                .stSelectbox > div > div > div:hover,
-                .stDateInput > div > div > input:hover,
-                div[data-baseweb="input"] > input:hover,
-                div[data-baseweb="input"]:hover,
-                div[data-baseweb="base-input"]:hover,
-                .stTextInput > div > div > input:focus,
-                .stSelectbox > div > div > div:focus,
-                .stDateInput > div > div > input:focus,
-                div[data-baseweb="input"] > input:focus,
-                div[data-baseweb="input"]:focus-within,
-                div[data-baseweb="base-input"]:focus-within {
-                    background-color: #FFFFFF !important;
-                }
-                </style>
-                """,
-                unsafe_allow_html=True
-            )
-        
         # 역량 탭
         with tab3:
             st.markdown('<h5 class="main-header">역량</h5>', unsafe_allow_html=True)
@@ -664,65 +605,6 @@ def main_screen():
                 if st.button("저장", key="save_skill", use_container_width=True):
                     st.success("저장되었습니다!")
 
-            st.markdown(
-                """
-                <style>
-                /* 입력란 스타일링 */
-                .stTextInput > label, .stSelectbox > label, .stDateInput > label {
-                    font-size: 1rem !important;
-                    font-weight: 500 !important;
-                }
-                
-                /* 구분선 스타일 */
-                hr {
-                    margin: 2rem 0;
-                    border: none;
-                    border-top: 1px solid rgba(49, 51, 63, 0.2);
-                }
-
-                /* 버튼 스타일링 */
-                .stButton > button {
-                    background-color: #4285F4 !important;
-                    color: white !important;
-                    padding: 0.5rem 2rem !important;
-                    border-radius: 4px !important;
-                    margin: 0 !important;
-                }
-
-                .stButton > button:hover {
-                    background-color: #3367D6 !important;
-                }
-
-                /* 입력란 배경색 조정 */
-                .stTextInput > div > div > input,
-                .stSelectbox > div > div > div,
-                .stDateInput > div > div > input,
-                div[data-baseweb="input"] > input,
-                div[data-baseweb="input"],
-                div[data-baseweb="base-input"] {
-                    background-color: #F8F9FA !important;
-                }
-
-                /* 입력란 호버/포커스 시 배경색 */
-                .stTextInput > div > div > input:hover,
-                .stSelectbox > div > div > div:hover,
-                .stDateInput > div > div > input:hover,
-                div[data-baseweb="input"] > input:hover,
-                div[data-baseweb="input"]:hover,
-                div[data-baseweb="base-input"]:hover,
-                .stTextInput > div > div > input:focus,
-                .stSelectbox > div > div > div:focus,
-                .stDateInput > div > div > input:focus,
-                div[data-baseweb="input"] > input:focus,
-                div[data-baseweb="input"]:focus-within,
-                div[data-baseweb="base-input"]:focus-within {
-                    background-color: #FFFFFF !important;
-                }
-                </style>
-                """,
-                unsafe_allow_html=True
-            )
-        
         # 경력 탭
         with tab4:
             st.header("경력")
