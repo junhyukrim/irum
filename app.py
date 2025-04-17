@@ -123,8 +123,16 @@ def main_screen():
             }
             
             section[data-testid="stSidebar"] > div {
-                height: 100vh;
-                padding-bottom: 70px;  /* 로그아웃 버튼 높이만큼 여백 */
+                position: relative;
+                min-height: 100vh;
+            }
+
+            section[data-testid="stSidebar"] .element-container:last-child {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                padding: 1rem;
             }
             
             img {
@@ -149,19 +157,8 @@ def main_screen():
                 background-color: rgba(255, 255, 255, 0.1) !important;
             }
 
-            /* 로그아웃 버튼 컨테이너 */
-            .logout-container {
-                position: fixed !important;
-                bottom: 0 !important;
-                left: 0 !important;
-                width: 250px !important;
-                padding: 1rem !important;
-                background-color: #4285F4 !important;
-                z-index: 1000 !important;
-            }
-
             /* 로그아웃 버튼 스타일 */
-            .logout-container .stButton > button {
+            section[data-testid="stSidebar"] .element-container:last-child .stButton > button {
                 border: 1px solid white !important;
                 border-radius: 4px !important;
                 justify-content: center !important;
@@ -187,9 +184,7 @@ def main_screen():
                 st.session_state.current_page = '서류관리'
 
         # 로그아웃 버튼
-        st.markdown('<div class="logout-container">', unsafe_allow_html=True)
         st.button("로그아웃", key='logout', on_click=st.logout)
-        st.markdown('</div>', unsafe_allow_html=True)
 
     # 메인 컨텐츠 영역 스타일
     st.markdown(
