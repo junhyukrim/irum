@@ -55,8 +55,7 @@ def show_resume_page():
             .stDateInput > div > div > input,
             div[data-baseweb="input"] > input,
             div[data-baseweb="input"],
-            div[data-baseweb="base-input"],
-            #tabs-bui222-tabpanel-0 > div > div > div > div:nth-child(4) > div:nth-child(2) > div > div > div > div > div:nth-child(2) > div > div > div > div > div > div > div > div {
+            div[data-baseweb="base-input"] {
                 background-color: #F8F9FA !important;
             }
 
@@ -67,28 +66,33 @@ def show_resume_page():
             div[data-baseweb="input"] > input:hover,
             div[data-baseweb="input"]:hover,
             div[data-baseweb="base-input"]:hover,
-            #tabs-bui222-tabpanel-0 > div > div > div > div:nth-child(4) > div:nth-child(2) > div > div > div > div > div:nth-child(2) > div > div > div > div > div > div > div > div:hover,
             .stTextInput > div > div > input:focus,
             .stSelectbox > div > div > div:focus,
             .stDateInput > div > div > input:focus,
             div[data-baseweb="input"] > input:focus,
             div[data-baseweb="input"]:focus-within,
-            div[data-baseweb="base-input"]:focus-within,
-            #tabs-bui222-tabpanel-0 > div > div > div > div:nth-child(4) > div:nth-child(2) > div > div > div > div > div:nth-child(2) > div > div > div > div > div > div > div > div:focus-within {
+            div[data-baseweb="base-input"]:focus-within {
                 background-color: #FFFFFF !important;
             }
             
             /* 저장 버튼 스타일링 */
-            [data-testid="stButton"] > button {
+            div.stButton {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            div.stButton > button {
                 width: 100% !important;
                 height: 42px !important;
+                margin: 0 !important;
+                padding: 0.5rem !important;
                 background-color: #4285F4 !important;
                 color: white !important;
                 font-size: 14px !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-                padding: 0.5rem !important;
                 border-radius: 4px !important;
             }
 
