@@ -3,11 +3,13 @@ import streamlit as st
 def show_resume_page():
     st.markdown('<h3 class="main-header">이력관리</h3>', unsafe_allow_html=True)
     
-    # 탭 생성
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["개인정보", "학력", "역량", "경력", "수상", "기타활동", "자기소개"])
+    # 탭 생성 - 각 탭에 고유한 키 부여
+    tabs = st.tabs([
+        "개인정보", "학력", "역량", "경력", "수상", "기타활동", "자기소개"
+    ])
     
     # 개인정보 탭
-    with tab1:
+    with tabs[0]:
         st.markdown(
             """
             <style>
@@ -46,8 +48,9 @@ def show_resume_page():
                 background-color: #FFFFFF !important;
             }
             
-            /* 버튼 스타일링 */
-            .stButton > button {
+            /* 개인정보 탭 내의 버튼 스타일링 */
+            [data-testid="stHorizontalBlock"] .stButton > button,
+            [data-testid="baseButton-secondary"] {
                 background-color: #4285F4 !important;
                 color: white !important;
                 padding: 0.5rem 2rem !important;
@@ -56,8 +59,32 @@ def show_resume_page():
                 margin: 0 !important;
             }
 
-            .stButton > button:hover {
-                background-color: #3367D6 !important;
+            /* 사이드바 버튼 스타일 보존 */
+            [data-testid="stSidebar"] .stButton > button {
+                background-color: transparent !important;
+                border: none !important;
+                color: white !important;
+                font-size: 1.1rem !important;
+                padding: 0.5rem 2rem !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
+                transition: all 0.2s ease !important;
+                border-radius: 0 !important;
+                width: calc(100% + 4rem) !important;
+                margin-left: -2rem !important;
+            }
+
+            [data-testid="stSidebar"] .stButton > button:hover {
+                font-size: 2rem !important;
+                font-weight: bold !important;
+                background-color: rgba(255, 255, 255, 0.1) !important;
+            }
+
+            [data-testid="stSidebar"] .stButton > button[aria-pressed="true"] {
+                background-color: #0051FF !important;
+                font-size: 2rem !important;
+                font-weight: bold !important;
             }
             </style>
             """,
@@ -135,7 +162,7 @@ def show_resume_page():
                 st.success("저장되었습니다!")
 
     # 학력 탭
-    with tab2:
+    with tabs[1]:
         st.markdown('<h5 class="main-header">학력</h5>', unsafe_allow_html=True)
         
         # 학력 카운터 초기화
@@ -223,7 +250,7 @@ def show_resume_page():
                 st.success("저장되었습니다!")
 
     # 역량 탭
-    with tab3:
+    with tabs[2]:
         st.markdown('<h5 class="main-header">역량</h5>', unsafe_allow_html=True)
         
         # 역량 카운터 초기화
@@ -319,7 +346,7 @@ def show_resume_page():
                 st.success("저장되었습니다!")
 
     # 경력 탭
-    with tab4:
+    with tabs[3]:
         st.markdown('<h5 class="main-header">경력</h5>', unsafe_allow_html=True)
         
         # 경력 카운터 초기화
@@ -434,16 +461,16 @@ def show_resume_page():
                 st.success("저장되었습니다!")
 
     # 수상 탭
-    with tab5:
+    with tabs[4]:
         st.header("수상")
         st.write("여기에 수상 정보가 들어갑니다.")
     
     # 기타활동 탭
-    with tab6:
+    with tabs[5]:
         st.header("기타활동")
         st.write("여기에 기타활동 정보가 들어갑니다.")
     
     # 자기소개 탭
-    with tab7:
+    with tabs[6]:
         st.header("자기소개")
         st.write("여기에 자기소개 내용이 들어갑니다.") 
