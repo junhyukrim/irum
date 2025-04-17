@@ -724,43 +724,52 @@ def show_resume_page():
             if idx > 0:
                 st.markdown("<hr>", unsafe_allow_html=True)
             
-            # 자기소개분야와 주제
-            col1, col2 = st.columns([1, 3])
-            with col1:
+            # 자기소개분야/주제/삭제 버튼 (2:5:1)
+            cols = st.columns([2, 5, 1])
+            with cols[0]:
                 st.selectbox(
                     "자기소개분야",
                     ["자기소개분야1", "자기소개분야2", "자기소개분야3"],
                     key=f"intro_category_{i}"
                 )
-            with col2:
+            with cols[1]:
                 st.selectbox(
                     "주제",
                     ["주제1", "주제2", "주제3"],
                     key=f"intro_topic_{i}"
                 )
+            with cols[2]:
+                st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
+                if len(st.session_state.intro_data) > 1:
+                    if st.button("자기소개 삭제", key=f"delete_intro_{i}", use_container_width=True):
+                        st.session_state.intro_data.remove(i)
+                        if len(st.session_state.intro_data) == 0:
+                            st.session_state.intro_count = 1
+                            st.session_state.intro_data = [0]
+                        st.rerun()
             
-            # 답변란
-            st.text_area("답변", height=200, key=f"intro_answer_{i}")
+            st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
+            
+            # 자기소개문 (8)
+            cols = st.columns([8])
+            with cols[0]:
+                st.text_area("자기소개문", height=200, key=f"intro_answer_{i}")
 
-            # 자기소개 삭제 버튼
-            col1, col2 = st.columns([2, 5])
-            with col1:
-                if st.button("자기소개 삭제", key=f"delete_intro_{i}", use_container_width=True):
-                    st.session_state.intro_data.remove(i)
-                    if len(st.session_state.intro_data) == 0:
-                        st.session_state.intro_count = 1
-                        st.session_state.intro_data = [0]
-                    st.rerun()
-
-        # 버튼들 (자기소개 추가, 저장)
+        # 자기소개 추가 버튼 (1:7)
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-        col1, col2 = st.columns([2, 5])
-        with col1:
+        cols = st.columns(8)
+        with cols[0]:
             if st.button("자기소개 추가", use_container_width=True):
                 new_idx = max(st.session_state.intro_data) + 1 if st.session_state.intro_data else 0
                 st.session_state.intro_data.append(new_idx)
                 st.session_state.intro_count += 1
                 st.rerun()
-            st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
+
+        # 저장 버튼 (7:1)
+        st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
+        cols = st.columns(8)
+        for i in range(7):  # 처음 7개 컬럼은 빈 공간
+            cols[i].empty()
+        with cols[7]:  # 마지막 컬럼에 버튼 배치
             if st.button("저장", key="save_intro", use_container_width=True):
                 st.success("저장되었습니다!") 
