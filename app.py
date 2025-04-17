@@ -243,7 +243,8 @@ def main_screen():
                 div[data-baseweb="input"],
                 div[class*="st-emotion-cache"] div[data-baseweb="input"],
                 div[class*="st-emotion-cache"] div[data-baseweb="input"] > input,
-                #tabs-bui222-tabpanel-0 > div > div > div > div:nth-child(4) > div:nth-child(2) > div > div > div > div > div:nth-child(2) > div > div > div > div > div > div > div > div {
+                #tabs-bui222-tabpanel-0 > div > div > div > div:nth-child(4) > div:nth-child(2) > div > div > div > div > div:nth-child(2) > div > div > div > div > div > div > div > div,
+                #tabs-bui222-tabpanel-0 > div > div > div > div:nth-child(11) > div:nth-child(2) > div > div > div > div > div > div > div > div {
                     background-color: #F8F9FA !important;
                 }
 
@@ -256,6 +257,7 @@ def main_screen():
                 div[class*="st-emotion-cache"] div[data-baseweb="input"]:hover,
                 div[class*="st-emotion-cache"] div[data-baseweb="input"] > input:hover,
                 #tabs-bui222-tabpanel-0 > div > div > div > div:nth-child(4) > div:nth-child(2) > div > div > div > div > div:nth-child(2) > div > div > div > div > div > div > div > div:hover,
+                #tabs-bui222-tabpanel-0 > div > div > div > div:nth-child(11) > div:nth-child(2) > div > div > div > div > div > div > div > div:hover,
                 .stTextInput > div > div > input:focus,
                 .stSelectbox > div > div > div:focus,
                 .stDateInput > div > div > input:focus,
@@ -263,7 +265,8 @@ def main_screen():
                 div[data-baseweb="input"]:focus-within,
                 div[class*="st-emotion-cache"] div[data-baseweb="input"]:focus-within,
                 div[class*="st-emotion-cache"] div[data-baseweb="input"] > input:focus,
-                #tabs-bui222-tabpanel-0 > div > div > div > div:nth-child(4) > div:nth-child(2) > div > div > div > div > div:nth-child(2) > div > div > div > div > div > div > div > div:focus-within {
+                #tabs-bui222-tabpanel-0 > div > div > div > div:nth-child(4) > div:nth-child(2) > div > div > div > div > div:nth-child(2) > div > div > div > div > div > div > div > div:focus-within,
+                #tabs-bui222-tabpanel-0 > div > div > div > div:nth-child(11) > div:nth-child(2) > div > div > div > div > div > div > div > div:focus-within {
                     background-color: #FFFFFF !important;
                 }
                 
