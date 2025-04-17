@@ -52,8 +52,10 @@ def show_resume_page():
                 color: white !important;
                 padding: 0.5rem 2rem !important;
                 border-radius: 4px !important;
-                width: auto !important;
+                width: 120px !important;
                 margin: 0 !important;
+                min-width: 120px !important;
+                max-width: 120px !important;
             }
 
             .stButton > button:hover {
