@@ -139,7 +139,7 @@ def main_screen():
             }
             
             /* 버튼 기본 스타일 */
-            div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"] button[kind="secondary"] {
+            .stButton > button {
                 width: calc(100% + 4rem) !important;
                 margin-left: -2rem !important;
                 background-color: transparent !important;
@@ -155,14 +155,14 @@ def main_screen():
             }
 
             /* 호버 스타일 */
-            div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"] button[kind="secondary"]:hover {
+            .stButton > button:hover {
                 font-size: 2rem !important;
                 font-weight: bold !important;
                 background-color: rgba(255, 255, 255, 0.1) !important;
             }
 
             /* 선택된 버튼 스타일 */
-            div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"] button[kind="secondary"][aria-selected="true"] {
+            .stButton > button[aria-pressed="true"] {
                 background-color: #0051FF !important;
                 font-size: 2rem !important;
                 font-weight: bold !important;
@@ -176,28 +176,20 @@ def main_screen():
         st.image("https://i.imgur.com/thQZtYk.png")
         
         # 메뉴 버튼들
-        if st.button('대시보드', key='dashboard', use_container_width=True, type='secondary'):
+        if st.button('대시보드', key='dashboard', use_container_width=True):
             st.session_state.current_page = '대시보드'
-            st.session_state.last_clicked_button = 'dashboard'
-            st.experimental_set_query_params(page='dashboard')
             st.rerun()
 
-        if st.button('이력관리', key='resume', use_container_width=True, type='secondary'):
+        if st.button('이력관리', key='resume', use_container_width=True):
             st.session_state.current_page = '이력관리'
-            st.session_state.last_clicked_button = 'resume'
-            st.experimental_set_query_params(page='resume')
             st.rerun()
 
-        if st.button('공고관리', key='jobs', use_container_width=True, type='secondary'):
+        if st.button('공고관리', key='jobs', use_container_width=True):
             st.session_state.current_page = '공고관리'
-            st.session_state.last_clicked_button = 'jobs'
-            st.experimental_set_query_params(page='jobs')
             st.rerun()
 
-        if st.button('서류관리', key='documents', use_container_width=True, type='secondary'):
+        if st.button('서류관리', key='documents', use_container_width=True):
             st.session_state.current_page = '서류관리'
-            st.session_state.last_clicked_button = 'documents'
-            st.experimental_set_query_params(page='documents')
             st.rerun()
 
         # 빈 공간 추가 (크기 조절)
