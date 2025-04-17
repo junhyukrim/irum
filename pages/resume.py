@@ -339,23 +339,18 @@ def show_resume_page():
             st.markdown(
                 """
                 <style>
-                /* 역량 탭의 버튼 스타일 (저장 버튼 제외) */
-                div[data-testid="stHorizontalBlock"] div.stButton > button:not([data-testid="baseButton-secondary"]) {
+                /* 메인 컨테이너 안의 일반 버튼 스타일 */
+                div[data-testid="stMainBlockContainer"] div.stButton > button {
                     background-color: transparent !important;
                     color: #4285F4 !important;
                     border: 1px solid #4285F4 !important;
                 }
 
-                div[data-testid="stHorizontalBlock"] div.stButton > button:not([data-testid="baseButton-secondary"]):hover {
-                    background-color: #F8F9FA !important;
-                    color: #1967D2 !important;
-                    border-color: #1967D2 !important;
-                }
-
-                div[data-testid="stHorizontalBlock"] div.stButton > button:not([data-testid="baseButton-secondary"]):active {
-                    background-color: #F1F3F4 !important;
-                    color: #1557B0 !important;
-                    border-color: #1557B0 !important;
+                /* 저장 버튼은 원래 스타일 유지 */
+                div[data-testid="stMainBlockContainer"] div.stButton > button[data-testid="baseButton-secondary"] {
+                    background-color: #4285F4 !important;
+                    color: white !important;
+                    border: none !important;
                 }
                 </style>
                 """,
