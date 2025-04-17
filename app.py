@@ -432,7 +432,7 @@ def main_screen():
             st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
             col1, col2, col3 = st.columns([3, 2, 1])
             with col2:
-                if st.button("학력추가", use_container_width=True):
+                if st.button("학력 추가", use_container_width=True):
                     st.session_state.education_count += 1
                     st.session_state.major_counts[st.session_state.education_count - 1] = 1
                     st.rerun()
