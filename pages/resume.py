@@ -247,6 +247,7 @@ def show_resume_page():
             with cols[2]:
                 st.text_input("교육기관", key=f"institution_{i}")
             with cols[3]:
+                st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
                 if len(st.session_state.education_data) > 1:
                     if st.button("학력 삭제", key=f"delete_education_{i}", use_container_width=True):
                         st.session_state.education_data.remove(i)
