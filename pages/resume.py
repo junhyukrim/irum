@@ -237,10 +237,26 @@ def show_resume_page():
                 st.text_input("교육기관", key=f"institution_{i}")
             with cols[3]:
                 if len(st.session_state.education_data) > 1:
+                    st.markdown(
+                        """
+                        <style>
+                        div[data-testid="column"]:nth-child(4) {
+                            display: flex;
+                            align-items: flex-start;
+                            min-height: 80px;
+                        }
+                        </style>
+                        """,
+                        unsafe_allow_html=True
+                    )
                     if st.button("학력 삭제", key=f"delete_education_{i}", use_container_width=True):
                         st.session_state.education_data.remove(i)
                         if i in st.session_state.major_counts:
                             del st.session_state.major_counts[i]
+                        if len(st.session_state.education_data) == 0:
+                            st.session_state.education_count = 1
+                            st.session_state.education_data = [0]
+                            st.session_state.major_counts = {0: 1}
                         st.rerun()
             
             # 전공 정보 (여러 개 추가 가능)
@@ -262,11 +278,37 @@ def show_resume_page():
                 with cols[3]:
                     st.text_input("성적", placeholder="예: 4.0/4.3", key=f"gpa_{i}_{j}")
                 with cols[4]:
+                    st.markdown(
+                        """
+                        <style>
+                        div[data-testid="column"]:nth-child(5) {
+                            display: flex;
+                            align-items: flex-end;
+                            min-height: 80px;
+                        }
+                        </style>
+                        """,
+                        unsafe_allow_html=True
+                    )
                     if st.session_state.major_counts[i] > 1:
                         if st.button("전공 삭제", key=f"delete_major_{i}_{j}", use_container_width=True):
+                            # 해당 전공 데이터 삭제 로직
+                            # 전공 카운트 감소
                             st.session_state.major_counts[i] -= 1
                             st.rerun()
                 with cols[5]:
+                    st.markdown(
+                        """
+                        <style>
+                        div[data-testid="column"]:nth-child(6) {
+                            display: flex;
+                            align-items: flex-end;
+                            min-height: 80px;
+                        }
+                        </style>
+                        """,
+                        unsafe_allow_html=True
+                    )
                     if st.button("전공 추가", key=f"add_major_{i}_{j}", use_container_width=True):
                         st.session_state.major_counts[i] += 1
                         st.rerun()
