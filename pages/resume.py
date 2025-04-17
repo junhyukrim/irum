@@ -231,13 +231,8 @@ def show_resume_page():
             st.markdown(
                 """
                 <style>
-                div.element-container div.row-widget.stButton {
-                    position: fixed;
-                    bottom: 10px;
-                }
-                
-                div.element-container {
-                    min-height: 100px;
+                div.stButton > button:first-child {
+                    margin-top: 40px;
                 }
                 </style>
                 """,
