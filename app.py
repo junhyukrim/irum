@@ -229,70 +229,43 @@ def main_screen():
     elif st.session_state.current_page == '이력관리':
         st.markdown('<h1 class="main-header">이력관리</h1>', unsafe_allow_html=True)
         
-        # 탭 스타일 추가
-        st.markdown(
-            """
-            <style>
-            /* 탭 스타일링 */
-            .stTabs [data-baseweb="tab-list"] {
-                gap: 2px;
-            }
-            
-            .stTabs [data-baseweb="tab"] {
-                height: 50px;
-                white-space: pre-wrap;
-                background-color: #F5F5F5;
-                border-radius: 4px 4px 0 0;
-                gap: 2px;
-                padding: 10px 16px;
-            }
-            
-            .stTabs [aria-selected="true"] {
-                background-color: #0051FF !important;
-                color: white !important;
-            }
-            </style>
-            """,
-            unsafe_allow_html=True
-        )
-        
         # 탭 생성
-        tabs = st.tabs(['개인정보', '학력', '역량', '경력', '수상', '기타활동', '자기소개'])
+        tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["개인정보", "학력", "역량", "경력", "수상", "기타활동", "자기소개"])
         
         # 개인정보 탭
-        with tabs[0]:
-            st.subheader("개인정보")
-            # 여기에 개인정보 입력 폼 추가 예정
+        with tab1:
+            st.header("개인정보")
+            st.write("여기에 개인정보 내용이 들어갑니다.")
         
         # 학력 탭
-        with tabs[1]:
-            st.subheader("학력")
-            # 여기에 학력 정보 입력 폼 추가 예정
+        with tab2:
+            st.header("학력")
+            st.write("여기에 학력 정보가 들어갑니다.")
         
         # 역량 탭
-        with tabs[2]:
-            st.subheader("역량")
-            # 여기에 역량 정보 입력 폼 추가 예정
+        with tab3:
+            st.header("역량")
+            st.write("여기에 역량 정보가 들어갑니다.")
         
         # 경력 탭
-        with tabs[3]:
-            st.subheader("경력")
-            # 여기에 경력 정보 입력 폼 추가 예정
+        with tab4:
+            st.header("경력")
+            st.write("여기에 경력 정보가 들어갑니다.")
         
         # 수상 탭
-        with tabs[4]:
-            st.subheader("수상")
-            # 여기에 수상 정보 입력 폼 추가 예정
+        with tab5:
+            st.header("수상")
+            st.write("여기에 수상 정보가 들어갑니다.")
         
         # 기타활동 탭
-        with tabs[5]:
-            st.subheader("기타활동")
-            # 여기에 기타활동 정보 입력 폼 추가 예정
+        with tab6:
+            st.header("기타활동")
+            st.write("여기에 기타활동 정보가 들어갑니다.")
         
         # 자기소개 탭
-        with tabs[6]:
-            st.subheader("자기소개")
-            # 여기에 자기소개 입력 폼 추가 예정
+        with tab7:
+            st.header("자기소개")
+            st.write("여기에 자기소개 내용이 들어갑니다.")
         
     elif st.session_state.current_page == '공고관리':
         st.markdown('<h1 class="main-header">공고관리</h1>', unsafe_allow_html=True)
