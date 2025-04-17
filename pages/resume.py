@@ -56,6 +56,9 @@ def show_resume_page():
                 margin: 0 !important;
                 min-width: 150px !important;
                 max-width: 150px !important;
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
             }
 
             .stButton > button:hover {
