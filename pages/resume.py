@@ -46,14 +46,18 @@ def show_resume_page():
                 background-color: #FFFFFF !important;
             }
             
-            /* 개인정보 탭 내의 버튼 스타일링 */
-            [data-testid="stHorizontalBlock"] .stButton > button {
-                background-color: #0051FF !important;
+            /* 버튼 스타일링 */
+            .stButton > button {
+                background-color: #4285F4 !important;
                 color: white !important;
                 padding: 0.5rem 2rem !important;
                 border-radius: 4px !important;
                 width: auto !important;
                 margin: 0 !important;
+            }
+
+            .stButton > button:hover {
+                background-color: #3367D6 !important;
             }
             </style>
             """,
