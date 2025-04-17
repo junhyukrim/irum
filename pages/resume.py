@@ -164,7 +164,7 @@ def show_resume_page():
         st.markdown('<h5>병역 및 보훈</h5>', unsafe_allow_html=True)
         
         # 병역/군별/계급/보훈대상/복무시작일/복무종료일/전역유형 (1:1:1:1:1:1:1:1 = 8)
-        cols = st.columns([1, 1, 1, 1, 1, 1, 1, 2])
+        cols = st.columns([1, 1, 1, 1, 1, 1, 1, 1])
         with cols[0]:
             military_service = st.selectbox("병역", ["선택", "군필", "미필", "면제", "해당없음"], key="military_service")
         with cols[1]:
