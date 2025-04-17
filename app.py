@@ -190,6 +190,31 @@ def main_screen():
         st.image("https://i.imgur.com/thQZtYk.png")
         
         # 메뉴 버튼들
+        dashboard_style = "background-color: #0051FF !important;" if st.session_state.current_page == '대시보드' else ""
+        resume_style = "background-color: #0051FF !important;" if st.session_state.current_page == '이력관리' else ""
+        jobs_style = "background-color: #0051FF !important;" if st.session_state.current_page == '공고관리' else ""
+        documents_style = "background-color: #0051FF !important;" if st.session_state.current_page == '서류관리' else ""
+
+        st.markdown(
+            f"""
+            <style>
+            #dashboard {{
+                {dashboard_style}
+            }}
+            #resume {{
+                {resume_style}
+            }}
+            #jobs {{
+                {jobs_style}
+            }}
+            #documents {{
+                {documents_style}
+            }}
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+        
         if st.button('대시보드', key='dashboard', use_container_width=True):
             st.session_state.current_page = '대시보드'
 
