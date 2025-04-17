@@ -215,11 +215,11 @@ def main_screen():
 
     # 현재 페이지에 따른 컨텐츠 표시
     if st.session_state.current_page == '대시보드':
-        st.markdown('<h1 class="main-header">대시보드</h1>', unsafe_allow_html=True)
+        st.markdown('<h3 class="main-header">대시보드</h3>', unsafe_allow_html=True)
         st.write("환영합니다, " + st.experimental_user.name + "님!")
         
     elif st.session_state.current_page == '이력관리':
-        st.markdown('<h1 class="main-header">이력관리</h1>', unsafe_allow_html=True)
+        st.markdown('<h3 class="main-header">이력관리</h3>', unsafe_allow_html=True)
         
         # 탭 생성
         tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["개인정보", "학력", "역량", "경력", "수상", "기타활동", "자기소개"])
@@ -327,10 +327,10 @@ def main_screen():
             st.write("여기에 자기소개 내용이 들어갑니다.")
         
     elif st.session_state.current_page == '공고관리':
-        st.markdown('<h1 class="main-header">공고관리</h1>', unsafe_allow_html=True)
+        st.markdown('<h3 class="main-header">공고관리</h3>', unsafe_allow_html=True)
         
     elif st.session_state.current_page == '서류관리':
-        st.markdown('<h1 class="main-header">서류관리</h1>', unsafe_allow_html=True)
+        st.markdown('<h3 class="main-header">서류관리</h3>', unsafe_allow_html=True)
 
 if not st.experimental_user.is_logged_in:
     login_screen()
