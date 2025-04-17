@@ -123,15 +123,24 @@ def main_screen():
             }
             
             section[data-testid="stSidebar"] > div {
-                position: relative;
-                min-height: 100vh;
+                display: flex !important;
+                flex-direction: column !important;
+                height: 100vh !important;
             }
 
-            section[data-testid="stSidebar"] .element-container:last-child {
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
+            section[data-testid="stSidebar"] > div > div {
+                flex: 1 !important;
+            }
+
+            /* 메뉴 컨테이너 */
+            .menu-container {
+                flex: 1 0 auto;
+            }
+
+            /* 로그아웃 컨테이너 */
+            .logout-container {
+                flex-shrink: 0;
+                margin-top: auto;
                 padding: 1rem;
             }
             
@@ -158,7 +167,7 @@ def main_screen():
             }
 
             /* 로그아웃 버튼 스타일 */
-            section[data-testid="stSidebar"] .element-container:last-child .stButton > button {
+            .logout-container .stButton > button {
                 border: 1px solid white !important;
                 border-radius: 4px !important;
                 justify-content: center !important;
@@ -172,6 +181,7 @@ def main_screen():
         st.image("https://i.imgur.com/thQZtYk.png")
         
         # 메뉴 버튼들
+        st.markdown('<div class="menu-container">', unsafe_allow_html=True)
         col1, col2, col3 = st.columns([0.1, 3, 0.1])
         with col2:
             if st.button('대시보드', key='dashboard', use_container_width=True):
@@ -182,9 +192,12 @@ def main_screen():
                 st.session_state.current_page = '공고관리'
             if st.button('서류관리', key='documents', use_container_width=True):
                 st.session_state.current_page = '서류관리'
+        st.markdown('</div>', unsafe_allow_html=True)
 
         # 로그아웃 버튼
+        st.markdown('<div class="logout-container">', unsafe_allow_html=True)
         st.button("로그아웃", key='logout', on_click=st.logout)
+        st.markdown('</div>', unsafe_allow_html=True)
 
     # 메인 컨텐츠 영역 스타일
     st.markdown(
