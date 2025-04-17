@@ -108,6 +108,10 @@ def login_screen():
     st.button("Google로 로그인", on_click=st.login)
 
 def main_screen():
+    # 현재 페이지 상태 관리
+    if 'current_page' not in st.session_state:
+        st.session_state.current_page = '대시보드'
+
     # 사이드바 설정
     with st.sidebar:
         st.markdown(
@@ -138,20 +142,54 @@ def main_screen():
                 color: white;
                 font-size: 1.1rem;
                 padding: 0.5rem 0;
+                cursor: pointer;
             }
             </style>
             """,
             unsafe_allow_html=True
         )
         
-        st.markdown('<div class="sidebar-menu">대시보드</div>', unsafe_allow_html=True)
-        st.markdown('<div class="sidebar-menu">이력관리</div>', unsafe_allow_html=True)
-        st.markdown('<div class="sidebar-menu">공고관리</div>', unsafe_allow_html=True)
-        st.markdown('<div class="sidebar-menu">서류관리</div>', unsafe_allow_html=True)
+        # 메뉴 클릭 이벤트 처리
+        if st.button('대시보드', key='dashboard', use_container_width=True):
+            st.session_state.current_page = '대시보드'
+        if st.button('이력관리', key='resume', use_container_width=True):
+            st.session_state.current_page = '이력관리'
+        if st.button('공고관리', key='jobs', use_container_width=True):
+            st.session_state.current_page = '공고관리'
+        if st.button('서류관리', key='documents', use_container_width=True):
+            st.session_state.current_page = '서류관리'
 
-    # 메인 컨텐츠
-    st.header(f"환영합니다, {st.experimental_user.name}님!")
-    st.button("로그아웃", on_click=st.logout)
+    # 메인 컨텐츠 영역 스타일
+    st.markdown(
+        """
+        <style>
+        .main-header {
+            font-size: 2rem;
+            font-weight: 500;
+            margin-bottom: 2rem;
+            color: #333;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # 현재 페이지에 따른 컨텐츠 표시
+    if st.session_state.current_page == '대시보드':
+        st.markdown('<h1 class="main-header">대시보드</h1>', unsafe_allow_html=True)
+        st.write("환영합니다, " + st.experimental_user.name + "님!")
+        
+    elif st.session_state.current_page == '이력관리':
+        st.markdown('<h1 class="main-header">이력관리</h1>', unsafe_allow_html=True)
+        
+    elif st.session_state.current_page == '공고관리':
+        st.markdown('<h1 class="main-header">공고관리</h1>', unsafe_allow_html=True)
+        
+    elif st.session_state.current_page == '서류관리':
+        st.markdown('<h1 class="main-header">서류관리</h1>', unsafe_allow_html=True)
+
+    # 로그아웃 버튼
+    st.sidebar.button("로그아웃", on_click=st.logout)
 
 if not st.experimental_user.is_logged_in:
     login_screen()
