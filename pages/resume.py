@@ -243,7 +243,8 @@ def show_resume_page():
                         div[data-testid="column"]:nth-child(4) {
                             display: flex;
                             align-items: flex-start;
-                            min-height: 80px;
+                            min-height: 85px;
+                            padding-top: 1.5rem;
                         }
                         </style>
                         """,
@@ -268,6 +269,30 @@ def show_resume_page():
                     st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
                 
                 # 학부/전공/학위/성적/삭제/추가 버튼 (2:2:1:1:1:1 = 8)
+                st.markdown(
+                    """
+                    <style>
+                    [data-testid="stVerticalBlock"] > [data-testid="stHorizontalBlock"] {
+                        position: relative;
+                        min-height: 85px;
+                    }
+                    div[data-testid="column"]:nth-child(5),
+                    div[data-testid="column"]:nth-child(6) {
+                        position: absolute;
+                        bottom: 0;
+                        padding-bottom: 0;
+                    }
+                    div[data-testid="column"]:nth-child(5) {
+                        right: 12.5%;  /* 1/8 of container width */
+                    }
+                    div[data-testid="column"]:nth-child(6) {
+                        right: 0;
+                    }
+                    </style>
+                    """,
+                    unsafe_allow_html=True
+                )
+                
                 cols = st.columns([2, 2, 1, 1, 1, 1])
                 with cols[0]:
                     st.text_input("학부 또는 분야", key=f"department_{i}_{j}")
@@ -278,37 +303,11 @@ def show_resume_page():
                 with cols[3]:
                     st.text_input("성적", placeholder="예: 4.0/4.3", key=f"gpa_{i}_{j}")
                 with cols[4]:
-                    st.markdown(
-                        """
-                        <style>
-                        div[data-testid="column"]:nth-child(5) {
-                            display: flex;
-                            align-items: flex-end;
-                            min-height: 80px;
-                        }
-                        </style>
-                        """,
-                        unsafe_allow_html=True
-                    )
                     if st.session_state.major_counts[i] > 1:
                         if st.button("전공 삭제", key=f"delete_major_{i}_{j}", use_container_width=True):
-                            # 해당 전공 데이터 삭제 로직
-                            # 전공 카운트 감소
                             st.session_state.major_counts[i] -= 1
                             st.rerun()
                 with cols[5]:
-                    st.markdown(
-                        """
-                        <style>
-                        div[data-testid="column"]:nth-child(6) {
-                            display: flex;
-                            align-items: flex-end;
-                            min-height: 80px;
-                        }
-                        </style>
-                        """,
-                        unsafe_allow_html=True
-                    )
                     if st.button("전공 추가", key=f"add_major_{i}_{j}", use_container_width=True):
                         st.session_state.major_counts[i] += 1
                         st.rerun()
