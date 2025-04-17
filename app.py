@@ -251,39 +251,73 @@ def main_screen():
             
             # 인적사항 섹션
             st.markdown('<h5>인적사항</h5>', unsafe_allow_html=True)
-            col1, col2 = st.columns(2)
             
-            with col1:
-                name_kr = st.text_input("한글 이름")
-                nationality = st.text_input("국적", value="대한민국")
-                birth_date = st.date_input("생년월일")
-                email = st.text_input("이메일")
-                photo_url = st.text_input("사진 링크")
+            # 한글/영문 이름
+            name_col1, name_col2 = st.columns(2)
+            with name_col1:
+                name_kr = st.text_input("한글 이름", key="name_kr")
+            with name_col2:
+                name_en = st.text_input("영문 이름", key="name_en")
             
-            with col2:
-                name_en = st.text_input("영문 이름")
-                gender = st.selectbox("성별", ["선택", "남성", "여성"])
-                address = st.text_input("주소")
-                phone = st.text_input("연락처")
+            # 국적/성별
+            nat_col1, nat_col2 = st.columns(2)
+            with nat_col1:
+                nationality = st.text_input("국적", value="대한민국", key="nationality")
+            with nat_col2:
+                gender = st.selectbox("성별", ["선택", "남성", "여성"], key="gender")
+            
+            # 생년월일/주소
+            birth_col1, birth_col2 = st.columns(2)
+            with birth_col1:
+                birth_date = st.date_input("생년월일", key="birth_date")
+            with birth_col2:
+                address = st.text_input("주소", key="address")
+            
+            # 이메일/연락처
+            contact_col1, contact_col2 = st.columns(2)
+            with contact_col1:
+                email = st.text_input("이메일", key="email")
+            with contact_col2:
+                phone = st.text_input("연락처", key="phone")
+            
+            # 사진 링크
+            photo_col1, photo_col2 = st.columns(2)
+            with photo_col1:
+                photo_url = st.text_input("사진 링크", key="photo_url")
             
             # 구분선 추가
             st.markdown("---")
             
             # 병역 및 보훈 섹션
             st.markdown('<h5>병역 및 보훈</h5>', unsafe_allow_html=True)
-            col3, col4 = st.columns(2)
             
-            with col3:
-                military_service = st.selectbox("병역", ["선택", "군필", "미필", "면제", "해당없음"])
-                military_branch = st.selectbox("군별", ["선택", "육군", "해군", "공군", "해병대", "의경", "공익", "기타"])
-                military_rank = st.selectbox("계급", ["선택", "이병", "일병", "상병", "병장", "하사", "중사", "상사", "원사", "준위", "소위", "중위", "대위", "소령", "중령", "대령"])
-                veteran_status = st.selectbox("보훈대상", ["선택", "대상", "비대상"])
+            # 병역/군별
+            mil_col1, mil_col2 = st.columns(2)
+            with mil_col1:
+                military_service = st.selectbox("병역", ["선택", "군필", "미필", "면제", "해당없음"], key="military_service")
+            with mil_col2:
+                military_branch = st.selectbox("군별", ["선택", "육군", "해군", "공군", "해병대", "의경", "공익", "기타"], key="military_branch")
             
-            with col4:
-                service_start = st.date_input("복무 시작일")
-                service_end = st.date_input("복무 종료일")
-                military_details = st.text_area("병역내용", height=100)
-                special_note = st.text_area("특이사항", height=100)
+            # 계급/보훈대상
+            rank_col1, rank_col2 = st.columns(2)
+            with rank_col1:
+                military_rank = st.selectbox("계급", ["선택", "이병", "일병", "상병", "병장", "하사", "중사", "상사", "원사", "준위", "소위", "중위", "대위", "소령", "중령", "대령"], key="military_rank")
+            with rank_col2:
+                veteran_status = st.selectbox("보훈대상", ["선택", "대상", "비대상"], key="veteran_status")
+            
+            # 복무 시작일/종료일
+            service_col1, service_col2 = st.columns(2)
+            with service_col1:
+                service_start = st.date_input("복무 시작일", key="service_start")
+            with service_col2:
+                service_end = st.date_input("복무 종료일", key="service_end")
+            
+            # 병역내용/특이사항
+            detail_col1, detail_col2 = st.columns(2)
+            with detail_col1:
+                military_details = st.text_area("병역내용", height=100, key="military_details")
+            with detail_col2:
+                special_note = st.text_area("특이사항", height=100, key="special_note")
             
             # 저장 버튼
             col5, col6, col7 = st.columns([1, 1, 5])
