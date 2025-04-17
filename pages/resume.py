@@ -45,6 +45,20 @@ def show_resume_page():
             #tabs-bui222-tabpanel-0 > div > div > div > div:nth-child(4) > div:nth-child(2) > div > div > div > div > div:nth-child(2) > div > div > div > div > div > div > div > div:focus-within {
                 background-color: #FFFFFF !important;
             }
+            
+            /* 버튼 스타일링 */
+            .stButton > button {
+                background-color: #4285F4 !important;
+                color: white !important;
+                padding: 0.5rem 2rem !important;
+                border-radius: 4px !important;
+                width: auto !important;
+                margin: 0 !important;
+            }
+
+            .stButton > button:hover {
+                background-color: #3367D6 !important;
+            }
             </style>
             """,
             unsafe_allow_html=True

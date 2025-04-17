@@ -119,89 +119,62 @@ def main_screen():
     if 'last_clicked_button' not in st.session_state:
         st.session_state.last_clicked_button = 'dashboard'
 
-    # 전역 스타일 설정
-    st.markdown(
-        """
-        <style>
-        /* 사이드바 설정 */
-        section[data-testid="stSidebar"] {
-            background-color: #4285F4;
-            width: 250px !important;
-        }
-        
-        /* 이미지 컨테이너 스타일 */
-        div.element-container:has(img) {
-            padding: 0 !important;
-            display: flex !important;
-            justify-content: center !important;
-        }
-        
-        img {
-            width: 150px;
-            margin-bottom: 3rem;
-        }
-        
-        /* 사이드바 버튼 스타일링 */
-        section[data-testid="stSidebar"] .stButton > button {
-            width: calc(100% + 4rem) !important;
-            margin-left: -2rem !important;
-            background-color: transparent !important;
-            border: none !important;
-            color: white !important;
-            font-size: 1.1rem !important;
-            padding: 0.5rem 2rem !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: flex-start !important;
-            transition: all 0.2s ease !important;
-            border-radius: 0 !important;
-        }
-
-        /* 사이드바 호버 스타일 */
-        section[data-testid="stSidebar"] .stButton > button:hover {
-            font-size: 2rem !important;
-            font-weight: bold !important;
-            background-color: rgba(255, 255, 255, 0.1) !important;
-        }
-
-        /* 사이드바 선택된 버튼 스타일 */
-        section[data-testid="stSidebar"] .stButton > button[aria-pressed="true"] {
-            background-color: #0051FF !important;
-            font-size: 2rem !important;
-            font-weight: bold !important;
-        }
-
-        /* 메인 영역 버튼 스타일링 */
-        div[data-testid="stVerticalBlock"] .stButton > button {
-            background-color: #4285F4 !important;
-            color: white !important;
-            padding: 0.5rem 2rem !important;
-            border-radius: 4px !important;
-            width: auto !important;
-            margin: 0 !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-        }
-
-        div[data-testid="stVerticalBlock"] .stButton > button:hover {
-            background-color: #3367D6 !important;
-        }
-
-        /* 메인 헤더 스타일 */
-        .main-header {
-            font-size: 2rem;
-            font-weight: 500;
-            margin-bottom: 2rem;
-            color: #333;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
     # 사이드바 설정
     with st.sidebar:
+        st.markdown(
+            """
+            <style>
+            section[data-testid="stSidebar"] {
+                background-color: #4285F4;
+                width: 250px !important;
+            }
+            
+            /* 이미지 컨테이너 스타일 */
+            div.element-container:has(img) {
+                padding: 0 !important;
+                display: flex !important;
+                justify-content: center !important;
+            }
+            
+            img {
+                width: 150px;
+                margin-bottom: 3rem;
+            }
+            
+            /* 버튼 기본 스타일 */
+            .stButton > button {
+                width: calc(100% + 4rem) !important;
+                margin-left: -2rem !important;
+                background-color: transparent !important;
+                border: none !important;
+                color: white !important;
+                font-size: 1.1rem !important;
+                padding: 0.5rem 2rem !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
+                transition: all 0.2s ease !important;
+                border-radius: 0 !important;
+            }
+
+            /* 호버 스타일 */
+            .stButton > button:hover {
+                font-size: 2rem !important;
+                font-weight: bold !important;
+                background-color: rgba(255, 255, 255, 0.1) !important;
+            }
+
+            /* 선택된 버튼 스타일 */
+            .stButton > button[aria-pressed="true"] {
+                background-color: #0051FF !important;
+                font-size: 2rem !important;
+                font-weight: bold !important;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+        
         # 로고 추가
         st.image("https://i.imgur.com/thQZtYk.png")
         
