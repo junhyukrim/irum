@@ -85,21 +85,19 @@ def login_screen():
         }
 
         /* Streamlit 기본 정렬 재정의 */
-        .st-emotion-cache-16txtl3 {
+        .st-emotion-cache-mtjnbi {
             padding: 0 !important;
-            display: flex;
-            justify-content: flex-start !important;
         }
 
-        .st-emotion-cache-16txtl3 > div {
+        .st-emotion-cache-mtjnbi > div {
+            display: flex !important;
+            justify-content: flex-start !important;
+            width: 100% !important;
+        }
+
+        .st-emotion-cache-mtjnbi > div > div {
+            width: auto !important;
             flex: none !important;
-            width: auto !important;
-        }
-
-        .st-emotion-cache-16txtl3 > div > div {
-            display: flex;
-            justify-content: flex-start !important;
-            width: auto !important;
         }
         </style>
         """,
