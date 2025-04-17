@@ -335,6 +335,8 @@ def main_screen():
             with service_cols[2]:
                 discharge_type = st.selectbox("전역 유형", ["선택", "만기전역", "의가사제대", "의병전역", "근무부적합", "기타"], key="discharge_type")
             
+            # 구분선 추가
+            st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
             
             # 저장 버튼
             col1, col2 = st.columns([5, 1])
