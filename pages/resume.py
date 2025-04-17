@@ -576,5 +576,58 @@ def show_resume_page():
 
     # 자기소개 탭
     with tabs[6]:
-        st.header("자기소개")
-        st.write("여기에 자기소개 내용이 들어갑니다.") 
+        st.markdown('<h5 class="main-header">자기소개</h5>', unsafe_allow_html=True)
+        
+        # 자기소개 카운터 초기화
+        if 'intro_count' not in st.session_state:
+            st.session_state.intro_count = 1
+        
+        # 자기소개 데이터 초기화
+        if 'intro_data' not in st.session_state:
+            st.session_state.intro_data = list(range(st.session_state.intro_count))
+
+        # 각 자기소개 정보 입력 폼
+        for idx, i in enumerate(st.session_state.intro_data):
+            if idx > 0:
+                st.markdown("<hr>", unsafe_allow_html=True)
+            
+            # 자기소개분야와 주제
+            col1, col2 = st.columns([1, 3])
+            with col1:
+                st.selectbox(
+                    "자기소개분야",
+                    ["자기소개분야1", "자기소개분야2", "자기소개분야3"],
+                    key=f"intro_category_{i}"
+                )
+            with col2:
+                st.selectbox(
+                    "주제",
+                    ["주제1", "주제2", "주제3"],
+                    key=f"intro_topic_{i}"
+                )
+            
+            # 답변란
+            st.text_area("답변", height=200, key=f"intro_answer_{i}")
+
+            # 자기소개 삭제 버튼
+            col1, col2 = st.columns([2, 5])
+            with col1:
+                if st.button("자기소개 삭제", key=f"delete_intro_{i}", use_container_width=True):
+                    st.session_state.intro_data.remove(i)
+                    if len(st.session_state.intro_data) == 0:
+                        st.session_state.intro_count = 1
+                        st.session_state.intro_data = [0]
+                    st.rerun()
+
+        # 버튼들 (자기소개 추가, 저장)
+        st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 1, 2])
+        with col1:
+            if st.button("자기소개 추가", use_container_width=True):
+                new_idx = max(st.session_state.intro_data) + 1 if st.session_state.intro_data else 0
+                st.session_state.intro_data.append(new_idx)
+                st.session_state.intro_count += 1
+                st.rerun()
+        with col2:
+            if st.button("저장", key="save_intro", use_container_width=True):
+                st.success("저장되었습니다!") 
