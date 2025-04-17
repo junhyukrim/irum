@@ -241,9 +241,7 @@ def main_screen():
                 .stDateInput > div > div > input,
                 div[data-baseweb="input"] > input,
                 div[data-baseweb="input"],
-                div[data-baseweb="select"],
-                div[data-baseweb="popover"],
-                div[data-baseweb="calendar"] {
+                #tabs-bui222-tabpanel-0 > div > div > div > div:nth-child(4) > div:nth-child(2) > div > div > div > div > div:nth-child(2) > div > div > div > div > div > div > div > div {
                     background-color: #F8F9FA !important;
                 }
 
@@ -253,17 +251,13 @@ def main_screen():
                 .stDateInput > div > div > input:hover,
                 div[data-baseweb="input"] > input:hover,
                 div[data-baseweb="input"]:hover,
-                div[data-baseweb="select"]:hover,
-                div[data-baseweb="popover"]:hover,
-                div[data-baseweb="calendar"]:hover,
+                #tabs-bui222-tabpanel-0 > div > div > div > div:nth-child(4) > div:nth-child(2) > div > div > div > div > div:nth-child(2) > div > div > div > div > div > div > div > div:hover,
                 .stTextInput > div > div > input:focus,
                 .stSelectbox > div > div > div:focus,
                 .stDateInput > div > div > input:focus,
                 div[data-baseweb="input"] > input:focus,
                 div[data-baseweb="input"]:focus-within,
-                div[data-baseweb="select"]:focus-within,
-                div[data-baseweb="popover"]:focus-within,
-                div[data-baseweb="calendar"]:focus-within {
+                #tabs-bui222-tabpanel-0 > div > div > div > div:nth-child(4) > div:nth-child(2) > div > div > div > div > div:nth-child(2) > div > div > div > div > div > div > div > div:focus-within {
                     background-color: #FFFFFF !important;
                 }
                 
