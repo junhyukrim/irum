@@ -371,7 +371,7 @@ def main_screen():
         
         # 학력 탭
         with tab2:
-            st.markdown('<h3 class="main-header">학력</h3>', unsafe_allow_html=True)
+            # st.markdown('<h3 class="main-header">학력</h3>', unsafe_allow_html=True)
             
             # 학력 카운터 초기화
             if 'education_count' not in st.session_state:
