@@ -525,8 +525,16 @@ def show_resume_page():
                     st.date_input("취임년월", key=f"position_start_{i}_{j}")
                 with cols[2]:
                     st.date_input("퇴임년월", key=f"position_end_{i}_{j}")
-                with cols[3]:
-                    st.text_input("업무내용", key=f"task_{i}_{j}")
+                
+                # 업무 내용 입력란
+                if j not in st.session_state.task_counts[i]:
+                    st.session_state.task_counts[i][j] = 1
+
+                for k in range(st.session_state.task_counts[i][j]):
+                    if k > 0:
+                        st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
+                    with cols[3]:
+                        st.text_input("업무내용", key=f"task_{i}_{j}_{k}")
                 
                 # 버튼들 (4:1:1:1:1)
                 cols = st.columns([4, 1, 1, 1, 1])
