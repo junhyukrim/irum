@@ -235,6 +235,14 @@ def main_screen():
                     font-weight: 500 !important;
                 }
                 
+                /* 섹션 제목 스타일링 */
+                .section-title {
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                    margin-bottom: 1rem;
+                    color: #333;
+                }
+                
                 /* 개인정보 탭 내의 버튼 스타일링 */
                 [data-testid="stHorizontalBlock"] .stButton > button {
                     background-color: #0051FF !important;
@@ -250,7 +258,7 @@ def main_screen():
             )
             
             # 인적사항 섹션
-            st.subheader("인적사항")
+            st.markdown('<p class="section-title">인적사항</p>', unsafe_allow_html=True)
             col1, col2 = st.columns(2)
             
             with col1:
@@ -270,7 +278,7 @@ def main_screen():
             st.markdown("---")
             
             # 병역 및 보훈 섹션
-            st.subheader("병역 및 보훈")
+            st.markdown('<p class="section-title">병역 및 보훈</p>', unsafe_allow_html=True)
             col3, col4 = st.columns(2)
             
             with col3:
