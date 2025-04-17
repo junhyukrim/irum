@@ -125,7 +125,7 @@ def main_screen():
             /* 버튼 컨테이너 전체 스타일 */
             div.st-emotion-cache-8atqhb {
                 margin: 0 -2rem !important;
-                width: calc(100% + 0rem) !important;
+                width: calc(100% + 4rem) !important;
             }
             
             /* 사이드바 버튼 스타일 */
