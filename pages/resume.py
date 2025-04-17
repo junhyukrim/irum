@@ -94,18 +94,17 @@ def show_resume_page():
                 align-items: center !important;
                 justify-content: center !important;
                 border-radius: 4px !important;
-                transition: background-color 0.2s ease !important;
+                transition: all 0.2s ease !important;
+                border: 1px solid #4285F4 !important;
             }
 
             div.stButton > button:hover {
                 background-color: #1967D2 !important;
-                color: white !important;
                 border-color: #1967D2 !important;
             }
 
             div.stButton > button:active {
                 background-color: #1557B0 !important;
-                color: white !important;
                 border-color: #1557B0 !important;
             }
 
@@ -338,6 +337,33 @@ def show_resume_page():
                 st.markdown("<hr>", unsafe_allow_html=True)
             
             # 기술 및 역량 (2:1:4:1)
+            st.markdown(
+                """
+                <style>
+                /* 아웃라인 버튼 스타일 */
+                div.element-container div.stButton > button {
+                    background-color: transparent !important;
+                    color: #4285F4 !important;
+                    border: 1px solid #4285F4 !important;
+                }
+
+                div.element-container div.stButton > button:hover {
+                    background-color: #F8F9FA !important;
+                    color: #1967D2 !important;
+                    border-color: #1967D2 !important;
+                }
+
+                /* 저장 버튼은 기존 스타일 유지 */
+                div.element-container div.stButton > button[data-testid="baseButton-secondary"] {
+                    background-color: #4285F4 !important;
+                    color: white !important;
+                    border: none !important;
+                }
+                </style>
+                """,
+                unsafe_allow_html=True
+            )
+            
             cols = st.columns([2, 1, 4, 1])
             with cols[0]:
                 st.text_input("기술 및 역량", key=f"skill_desc_{i}")
