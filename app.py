@@ -151,12 +151,14 @@ def main_screen():
                 align-items: center !important;
                 justify-content: flex-start !important;
                 transition: all 0.2s ease !important;
+                border-radius: 0 !important;
             }
 
             .stButton > button:hover {
                 font-size: 2rem !important;
                 font-weight: bold !important;
                 background-color: rgba(255, 255, 255, 0.1) !important;
+                border-radius: 0 !important;
             }
 
             /* 현재 선택된 버튼 스타일 */
@@ -165,6 +167,7 @@ def main_screen():
                 font-size: 2rem !important;
                 font-weight: bold !important;
                 background-color: rgba(255, 255, 255, 0.1) !important;
+                border-radius: 0 !important;
             }
             
             /* columns 패딩 제거 */
