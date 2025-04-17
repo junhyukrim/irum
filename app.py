@@ -84,20 +84,9 @@ def login_screen():
             padding: 0 2rem;
         }
 
-        /* Streamlit 기본 정렬 재정의 */
-        .st-emotion-cache-mtjnbi {
-            padding: 0 !important;
-        }
-
-        .st-emotion-cache-mtjnbi > div {
-            display: flex !important;
-            justify-content: flex-start !important;
-            width: 100% !important;
-        }
-
-        .st-emotion-cache-mtjnbi > div > div {
-            width: auto !important;
-            flex: none !important;
+        div.stButton {
+            display: flex;
+            justify-content: flex-start;
         }
         </style>
         """,
