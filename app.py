@@ -84,14 +84,10 @@ def login_screen():
             padding: 0 2rem;
         }
 
-        .block-container > div > div > div > div:nth-child(3) {
+        div.stButton.st-emotion-cache-8atqhb.e1m1olm0 {
             display: flex;
             justify-content: flex-start;
-            padding-left: 2rem;
-        }
-
-        .block-container > div > div > div > div:nth-child(3) > div {
-            width: auto !important;
+            width: 100%;
         }
         </style>
         """,
