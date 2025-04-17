@@ -342,8 +342,8 @@ def main_screen():
             st.markdown("<div style='margin: 5rem 0;'></div>", unsafe_allow_html=True)
 
             # 저장 버튼
-            col1, col2 = st.columns([5, 1])
-            with col2:
+            col1, col2 = st.columns([2, 5])
+            with col1:
                 if st.button("저장", use_container_width=True):
                     # TODO: 저장 로직 구현
                     st.success("저장되었습니다!")
