@@ -122,10 +122,19 @@ def main_screen():
                 width: 250px !important;
             }
             
+            /* 이미지 컨테이너 스타일 */
+            div.element-container:has(img) {
+                padding: 0 2rem !important;
+            }
+            
+            img {
+                width: 150px;
+                margin-bottom: 3rem;
+            }
+
             /* 버튼 컨테이너 전체 스타일 */
             div.st-emotion-cache-8atqhb {
-                margin: 0 -2rem !important;
-                width: calc(100% + 4rem) !important;
+                background-color: rgba(255, 255, 255, 0.1);
             }
             
             /* 사이드바 버튼 스타일 */
@@ -145,12 +154,15 @@ def main_screen():
             .stButton > button:hover {
                 font-size: 2rem !important;
                 font-weight: bold !important;
+                background-color: rgba(255, 255, 255, 0.1) !important;
             }
 
             /* 현재 선택된 버튼 스타일 */
-            .selected-button button {
+            .stButton > button[data-testid="stButton"]:active,
+            .stButton > button[aria-pressed="true"] {
                 font-size: 2rem !important;
                 font-weight: bold !important;
+                background-color: rgba(255, 255, 255, 0.1) !important;
             }
             
             /* columns 패딩 제거 */
@@ -162,11 +174,6 @@ def main_screen():
             div.stButton {
                 margin: 0 !important;
                 padding: 0 !important;
-            }
-            
-            img {
-                width: 150px;
-                margin-bottom: 3rem;
             }
             </style>
             """,
