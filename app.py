@@ -1,6 +1,52 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
+def login_container():
+    st.markdown(
+        """
+        <style>
+        .login-container {
+            background-color: #4285F4;
+            padding: 2rem;
+            border-radius: 10px;
+            color: white;
+            margin: 2rem auto;
+            max-width: 800px;
+        }
+        
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        
+        .logo-container img {
+            width: 200px;
+            height: auto;
+        }
+
+        .login-header {
+            color: white !important;
+            text-align: center;
+        }
+
+        .login-subheader {
+            color: white !important;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        </style>
+        <div class="login-container">
+            <div class="logo-container">
+                <img src="https://i.imgur.com/thQZtYk.png" alt="Logo">
+            </div>
+            <h1 class="login-header">이 앱은 비공개입니다.</h1>
+            <h3 class="login-subheader">로그인이 필요합니다.</h3>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
 def google_button():
     st.write(
         """
@@ -131,12 +177,12 @@ def google_button():
     )
 
 def login_screen():
-    st.header("이 앱은 비공개입니다.")
-    st.subheader("로그인이 필요합니다.")
+    login_container()
     google_button()
 
-if not st.experimental_user.is_logged_in:
-    login_screen()
-else:
-    st.header(f"환영합니다, {st.experimental_user.name}님!")
-    st.button("로그아웃", on_click=st.logout) 
+if __name__ == "__main__":
+    if not st.experimental_user.is_logged_in:
+        login_screen()
+    else:
+        st.header(f"환영합니다, {st.experimental_user.name}님!")
+        st.button("로그아웃", on_click=st.logout) 
