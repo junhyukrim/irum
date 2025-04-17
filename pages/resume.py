@@ -483,23 +483,29 @@ def show_resume_page():
             if idx > 0:
                 st.markdown("<hr>", unsafe_allow_html=True)
             
-            # 회사명과 입사/퇴사년월
-            col1, col2, col3 = st.columns([2, 1, 1])
-            with col1:
+            # 회사명/입사년월/퇴사년월/퇴사사유/경력삭제 (2:1:1:3:1)
+            cols = st.columns([2, 1, 1, 3, 1])
+            with cols[0]:
                 st.text_input("회사명", key=f"company_{i}")
-            with col2:
+            with cols[1]:
                 st.date_input("입사년월", key=f"join_date_{i}")
-            with col3:
+            with cols[2]:
                 st.date_input("퇴사년월", key=f"leave_date_{i}")
+            with cols[3]:
+                st.text_input("퇴사사유", key=f"leave_reason_{i}")
+            with cols[4]:
+                st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
+                if len(st.session_state.career_data) > 1:
+                    if st.button("경력 삭제", key=f"delete_career_{i}", use_container_width=True):
+                        st.session_state.career_data.remove(i)
+                        if len(st.session_state.career_data) == 0:
+                            st.session_state.career_count = 1
+                            st.session_state.career_data = [0]
+                            st.session_state.position_counts = {0: 1}
+                            st.session_state.task_counts = {0: {0: 1}}
+                        st.rerun()
             
-            # 입사/퇴사 사유
-            col1, col2 = st.columns(2)
-            with col1:
-                st.text_input("입사 사유", key=f"join_reason_{i}")
-            with col2:
-                st.text_input("퇴사 사유", key=f"leave_reason_{i}")
-            
-            st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
+            st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
             
             # 직위/직책 정보
             if i not in st.session_state.position_counts:
@@ -509,74 +515,51 @@ def show_resume_page():
 
             for j in range(st.session_state.position_counts[i]):
                 if j > 0:
-                    st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
+                    st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
                 
-                # 직위/직책과 취임/퇴임년월
-                col1, col2, col3 = st.columns([2, 1, 1])
-                with col1:
+                # 직위/직책/취임년월/퇴임년월/업무내용 (2:1:1:4)
+                cols = st.columns([2, 1, 1, 4])
+                with cols[0]:
                     st.text_input("직위/직책", key=f"position_{i}_{j}")
-                with col2:
+                with cols[1]:
                     st.date_input("취임년월", key=f"position_start_{i}_{j}")
-                with col3:
+                with cols[2]:
                     st.date_input("퇴임년월", key=f"position_end_{i}_{j}")
+                with cols[3]:
+                    st.text_input("업무내용", key=f"task_{i}_{j}")
                 
-                st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
-                
-                # 업무 내용
-                if j not in st.session_state.task_counts[i]:
-                    st.session_state.task_counts[i][j] = 1
-
-                for k in range(st.session_state.task_counts[i][j]):
-                    if k > 0:
-                        st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
-                    st.text_input("업무내용", key=f"task_{i}_{j}_{k}")
-
-                # 업무 삭제/추가 버튼
-                col1, col2, col3 = st.columns([2, 2, 3])
-                with col1:
-                    if st.button("업무 삭제", key=f"delete_task_{i}_{j}", use_container_width=True):
-                        if st.session_state.task_counts[i][j] > 1:
+                # 버튼들 (4:1:1:1:1)
+                cols = st.columns([4, 1, 1, 1, 1])
+                with cols[1]:
+                    st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
+                    if st.session_state.position_counts[i] > 1:
+                        if st.button("직위/직책 삭제", key=f"delete_position_{i}_{j}", use_container_width=True):
+                            st.session_state.position_counts[i] -= 1
+                            if j in st.session_state.task_counts[i]:
+                                del st.session_state.task_counts[i][j]
+                            st.rerun()
+                with cols[2]:
+                    st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
+                    if st.button("직위/직책 추가", key=f"add_position_{i}_{j}", use_container_width=True):
+                        st.session_state.position_counts[i] += 1
+                        st.session_state.task_counts[i][st.session_state.position_counts[i]-1] = 1
+                        st.rerun()
+                with cols[3]:
+                    st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
+                    if st.session_state.task_counts[i][j] > 1:
+                        if st.button("업무 삭제", key=f"delete_task_{i}_{j}", use_container_width=True):
                             st.session_state.task_counts[i][j] -= 1
                             st.rerun()
-                with col2:
+                with cols[4]:
+                    st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
                     if st.button("업무 추가", key=f"add_task_{i}_{j}", use_container_width=True):
                         st.session_state.task_counts[i][j] += 1
                         st.rerun()
 
-                st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
-
-            # 직위/직책 삭제/추가 버튼
-            col1, col2, col3 = st.columns([2, 2, 3])
-            with col1:
-                if st.button("직위/직책 삭제", key=f"delete_position_{i}", use_container_width=True):
-                    if st.session_state.position_counts[i] > 1:
-                        st.session_state.position_counts[i] -= 1
-                        # 해당 직위/직책의 업무 데이터도 삭제
-                        if st.session_state.position_counts[i] in st.session_state.task_counts[i]:
-                            del st.session_state.task_counts[i][st.session_state.position_counts[i]]
-                        st.rerun()
-            with col2:
-                if st.button("직위/직책 추가", key=f"add_position_{i}", use_container_width=True):
-                    st.session_state.position_counts[i] += 1
-                    st.session_state.task_counts[i][st.session_state.position_counts[i]-1] = 1
-                    st.rerun()
-
-            # 경력 삭제 버튼
-            col1, col2 = st.columns([2, 5])
-            with col1:
-                if st.button("경력 삭제", key=f"delete_career_{i}", use_container_width=True):
-                    st.session_state.career_data.remove(i)
-                    if len(st.session_state.career_data) == 0:
-                        st.session_state.career_count = 1
-                        st.session_state.career_data = [0]
-                        st.session_state.position_counts = {0: 1}
-                        st.session_state.task_counts = {0: {0: 1}}
-                    st.rerun()
-
-        # 버튼들 (경력추가, 저장)
+        # 경력 추가 버튼 (1:7)
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-        col1, col2 = st.columns([2, 5])
-        with col1:
+        cols = st.columns(8)
+        with cols[0]:
             if st.button("경력 추가", use_container_width=True):
                 new_idx = max(st.session_state.career_data) + 1 if st.session_state.career_data else 0
                 st.session_state.career_data.append(new_idx)
@@ -584,7 +567,13 @@ def show_resume_page():
                 st.session_state.task_counts[new_idx] = {0: 1}
                 st.session_state.career_count += 1
                 st.rerun()
-            st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
+
+        # 저장 버튼 (7:1)
+        st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
+        cols = st.columns(8)
+        for i in range(7):  # 처음 7개 컬럼은 빈 공간
+            cols[i].empty()
+        with cols[7]:  # 마지막 컬럼에 버튼 배치
             if st.button("저장", key="save_career", use_container_width=True):
                 st.success("저장되었습니다!")
 
