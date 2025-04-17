@@ -210,7 +210,7 @@ def show_resume_page():
 
         # 버튼들 (학력추가, 저장)
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-        col1, col2, col3 = st.columns([2, 1, 3])
+        col1, col2, col3 = st.columns([1, 1, 2])
         with col1:
             if st.button("학력 추가", use_container_width=True):
                 new_idx = max(st.session_state.education_data) + 1 if st.session_state.education_data else 0
