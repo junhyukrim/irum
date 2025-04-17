@@ -183,10 +183,10 @@ def show_resume_page():
         # 구분선 추가
         st.markdown("<div style='margin: 5rem 0;'></div>", unsafe_allow_html=True)
 
-        # 저장 버튼 (우측 정렬, 7:1 = 8)
+        # 저장 버튼 (우측 정렬, 1/8 크기)
         cols = st.columns([7, 1])
         with cols[1]:
-            if st.button("저장", use_container_width=True):
+            if st.button("저장", key="save_personal", use_container_width=True):
                 st.success("저장되었습니다!")
 
     # 학력 탭
