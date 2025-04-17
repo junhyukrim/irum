@@ -27,9 +27,13 @@ def login_screen():
 
         /* 텍스트 스타일 */
         .text-container {
-            text-align: center;
+            text-align: left;
             color: white;
             margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0 2rem;
         }
         
         /* Google 로그인 버튼 스타일 */
@@ -46,7 +50,7 @@ def login_screen():
             font-size: 14px !important;
             font-weight: 500 !important;
             height: 40px !important;
-            margin: 0 auto !important;
+            margin: 0 auto 0 2rem !important;
             min-width: 200px !important;
             position: relative !important;
         }
@@ -65,6 +69,13 @@ def login_screen():
             background-repeat: no-repeat;
             background-position: center;
             background-size: contain;
+        }
+
+        /* 버튼 컨테이너 스타일 */
+        div.element-container:has(button) {
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
         }
         </style>
         """,
