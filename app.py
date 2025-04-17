@@ -84,6 +84,7 @@ def login_screen():
             padding: 0 2rem;
             display: flex;
             justify-content: flex-start;
+            padding-left: 2rem;
         }
         </style>
         """,
