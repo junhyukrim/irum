@@ -19,7 +19,7 @@ def show_resume_page():
             }
 
             div[data-testid="stMainBlockContainer"] {
-                max-width: 1200px !important;
+                max-width: 1500px !important;
                 padding-left: 1rem !important;
                 padding-right: 1rem !important;
             }
