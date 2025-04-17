@@ -55,9 +55,9 @@ def login_screen():
             font-size: 14px !important;
             font-weight: 500 !important;
             height: 40px !important;
-            margin: 0 !important;
             min-width: 200px !important;
             position: relative !important;
+            margin: 0 !important;
         }
 
         .stButton > button:hover {
@@ -84,9 +84,22 @@ def login_screen():
             padding: 0 2rem;
         }
 
-        div.stButton {
+        /* Streamlit 기본 정렬 재정의 */
+        .st-emotion-cache-16txtl3 {
+            padding: 0 !important;
             display: flex;
-            justify-content: flex-start;
+            justify-content: flex-start !important;
+        }
+
+        .st-emotion-cache-16txtl3 > div {
+            flex: none !important;
+            width: auto !important;
+        }
+
+        .st-emotion-cache-16txtl3 > div > div {
+            display: flex;
+            justify-content: flex-start !important;
+            width: auto !important;
         }
         </style>
         """,
