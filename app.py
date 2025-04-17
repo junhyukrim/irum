@@ -133,10 +133,18 @@ def main_screen():
                 display: flex !important;
                 align-items: center !important;
                 justify-content: flex-start !important;
+                transition: all 0.2s ease !important;
             }
 
             .stButton > button:hover {
-                background-color: rgba(255, 255, 255, 0.1) !important;
+                font-size: 1.2rem !important;
+                font-weight: bold !important;
+            }
+
+            /* 현재 선택된 버튼 스타일 */
+            .selected-button button {
+                font-size: 1.2rem !important;
+                font-weight: bold !important;
             }
             
             img {
@@ -154,14 +162,26 @@ def main_screen():
         # 메뉴 버튼들
         col1, col2, col3 = st.columns([0.1, 3, 0.1])
         with col2:
+            # 각 버튼에 대해 현재 페이지인 경우 selected-button 클래스 추가
+            st.markdown(f"""<div class="{'selected-button' if st.session_state.current_page == '대시보드' else ''}">""", unsafe_allow_html=True)
             if st.button('대시보드', key='dashboard', use_container_width=True):
                 st.session_state.current_page = '대시보드'
+            st.markdown('</div>', unsafe_allow_html=True)
+
+            st.markdown(f"""<div class="{'selected-button' if st.session_state.current_page == '이력관리' else ''}">""", unsafe_allow_html=True)
             if st.button('이력관리', key='resume', use_container_width=True):
                 st.session_state.current_page = '이력관리'
+            st.markdown('</div>', unsafe_allow_html=True)
+
+            st.markdown(f"""<div class="{'selected-button' if st.session_state.current_page == '공고관리' else ''}">""", unsafe_allow_html=True)
             if st.button('공고관리', key='jobs', use_container_width=True):
                 st.session_state.current_page = '공고관리'
+            st.markdown('</div>', unsafe_allow_html=True)
+
+            st.markdown(f"""<div class="{'selected-button' if st.session_state.current_page == '서류관리' else ''}">""", unsafe_allow_html=True)
             if st.button('서류관리', key='documents', use_container_width=True):
                 st.session_state.current_page = '서류관리'
+            st.markdown('</div>', unsafe_allow_html=True)
 
             # 빈 공간 추가 (크기 조절)
             st.markdown("<div style='flex-grow: 1; min-height: calc(100vh - 550px);'></div>", unsafe_allow_html=True)
