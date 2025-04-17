@@ -377,19 +377,10 @@ def main_screen():
             if 'education_count' not in st.session_state:
                 st.session_state.education_count = 1
 
-            # 학력 추가 버튼
-            col1, col2 = st.columns([1, 5])
-            with col1:
-                if st.button("학력추가", use_container_width=True):
-                    st.session_state.education_count += 1
-                    st.rerun()
-
             # 각 학력 정보 입력 폼
             for i in range(st.session_state.education_count):
                 if i > 0:
                     st.markdown("<hr>", unsafe_allow_html=True)
-                
-                st.markdown(f"<h5>학력 {i+1}</h5>", unsafe_allow_html=True)
                 
                 # 입학년월/졸업년월
                 col1, col2 = st.columns(2)
@@ -418,10 +409,14 @@ def main_screen():
                 # 비고
                 st.text_area("비고", key=f"notes_{i}", height=100)
 
-            # 저장 버튼
+            # 버튼들 (학력추가, 저장)
             st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-            col1, col2 = st.columns([5, 1])
+            col1, col2, col3 = st.columns([4, 1, 1])
             with col2:
+                if st.button("학력추가", use_container_width=True):
+                    st.session_state.education_count += 1
+                    st.rerun()
+            with col3:
                 if st.button("저장", key="save_education", use_container_width=True):
                     st.success("저장되었습니다!")
 
