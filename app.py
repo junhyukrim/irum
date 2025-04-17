@@ -239,7 +239,11 @@ def main_screen():
                 .stTextInput > div > div > input,
                 .stSelectbox > div > div > div,
                 .stDateInput > div > div > input,
-                div[data-baseweb="input"] > input {
+                div[data-baseweb="input"] > input,
+                div[data-baseweb="input"],
+                div[data-baseweb="select"],
+                div[data-baseweb="popover"],
+                div[data-baseweb="calendar"] {
                     background-color: #F8F9FA !important;
                 }
 
@@ -248,19 +252,18 @@ def main_screen():
                 .stSelectbox > div > div > div:hover,
                 .stDateInput > div > div > input:hover,
                 div[data-baseweb="input"] > input:hover,
+                div[data-baseweb="input"]:hover,
+                div[data-baseweb="select"]:hover,
+                div[data-baseweb="popover"]:hover,
+                div[data-baseweb="calendar"]:hover,
                 .stTextInput > div > div > input:focus,
                 .stSelectbox > div > div > div:focus,
                 .stDateInput > div > div > input:focus,
-                div[data-baseweb="input"] > input:focus {
-                    background-color: #FFFFFF !important;
-                }
-                
-                /* 날짜 선택기 배경색 */
-                div[data-baseweb="input"] {
-                    background-color: #F8F9FA !important;
-                }
-                div[data-baseweb="input"]:hover,
-                div[data-baseweb="input"]:focus-within {
+                div[data-baseweb="input"] > input:focus,
+                div[data-baseweb="input"]:focus-within,
+                div[data-baseweb="select"]:focus-within,
+                div[data-baseweb="popover"]:focus-within,
+                div[data-baseweb="calendar"]:focus-within {
                     background-color: #FFFFFF !important;
                 }
                 
