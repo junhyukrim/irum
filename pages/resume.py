@@ -13,6 +13,14 @@ def show_resume_page():
         st.markdown(
             """
             <style>
+            /* 메인 컨테이너 width 조정 */
+            .block-container {
+                max-width: 95% !important;
+                padding-top: 1rem !important;
+                padding-right: 1rem !important;
+                padding-left: 1rem !important;
+            }
+            
             /* 폼 스타일링 */
             .stTextInput > label, 
             .stSelectbox > label, 
