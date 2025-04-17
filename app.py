@@ -81,7 +81,7 @@ def login_screen():
             max-width: 800px;
             margin-left: auto;
             margin-right: auto;
-            padding: 0 2rem;
+            padding-left: 4rem;
             display: flex;
             justify-content: flex-start;
         }
