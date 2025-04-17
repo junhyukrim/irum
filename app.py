@@ -137,13 +137,13 @@ def main_screen():
             }
 
             .stButton > button:hover {
-                font-size: 1.5rem !important;
+                font-size: 2rem !important;
                 font-weight: bold !important;
             }
 
             /* 현재 선택된 버튼 스타일 */
             .selected-button button {
-                font-size: 1.5rem !important;
+                font-size: 2rem !important;
                 font-weight: bold !important;
             }
             
