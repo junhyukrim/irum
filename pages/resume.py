@@ -231,8 +231,15 @@ def show_resume_page():
             st.markdown(
                 """
                 <style>
-                [data-testid="column"] {
+                div[data-testid="column"] > div {
                     height: 120px;
+                    position: relative;
+                }
+                
+                div[data-testid="column"] div.stButton {
+                    position: absolute;
+                    bottom: 0;
+                    width: 100%;
                 }
                 </style>
                 """,
