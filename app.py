@@ -226,8 +226,72 @@ def main_screen():
         
         # 개인정보 탭
         with tab1:
-            st.header("개인정보")
-            st.write("여기에 개인정보 내용이 들어갑니다.")
+            st.markdown(
+                """
+                <style>
+                /* 폼 스타일링 */
+                .stTextInput > label, .stSelectbox > label, .stDateInput > label {
+                    font-size: 1rem !important;
+                    font-weight: 500 !important;
+                }
+                
+                .stButton > button {
+                    background-color: #0051FF !important;
+                    color: white !important;
+                    padding: 0.5rem 2rem !important;
+                    border-radius: 4px !important;
+                }
+                </style>
+                """,
+                unsafe_allow_html=True
+            )
+            
+            # 인적사항 섹션
+            st.subheader("인적사항")
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                name_kr = st.text_input("한글 이름")
+                nationality = st.text_input("국적", value="대한민국")
+                birth_date = st.date_input("생년월일")
+                email = st.text_input("이메일")
+                photo_url = st.text_input("사진 링크")
+            
+            with col2:
+                name_en = st.text_input("영문 이름")
+                gender = st.selectbox("성별", ["선택", "남성", "여성"])
+                address = st.text_input("주소")
+                phone = st.text_input("연락처")
+            
+            # 구분선 추가
+            st.markdown("---")
+            
+            # 병역 및 보훈 섹션
+            st.subheader("병역 및 보훈")
+            col3, col4 = st.columns(2)
+            
+            with col3:
+                military_service = st.selectbox("병역", ["선택", "군필", "미필", "면제", "해당없음"])
+                military_branch = st.selectbox("군별", ["선택", "육군", "해군", "공군", "해병대", "의경", "공익", "기타"])
+                military_rank = st.selectbox("계급", ["선택", "이병", "일병", "상병", "병장", "하사", "중사", "상사", "원사", "준위", "소위", "중위", "대위", "소령", "중령", "대령"])
+                veteran_status = st.selectbox("보훈대상", ["선택", "대상", "비대상"])
+            
+            with col4:
+                service_start = st.date_input("복무 시작일")
+                service_end = st.date_input("복무 종료일")
+                military_details = st.text_area("병역내용", height=100)
+                special_note = st.text_area("특이사항", height=100)
+            
+            # 저장 버튼
+            col5, col6, col7 = st.columns([1, 1, 5])
+            with col5:
+                if st.button("저장", use_container_width=True):
+                    # TODO: 저장 로직 구현
+                    st.success("저장되었습니다!")
+            with col6:
+                if st.button("취소", use_container_width=True):
+                    # TODO: 취소 로직 구현
+                    st.rerun()
         
         # 학력 탭
         with tab2:
