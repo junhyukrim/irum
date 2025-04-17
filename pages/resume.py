@@ -94,6 +94,19 @@ def show_resume_page():
                 align-items: center !important;
                 justify-content: center !important;
                 border-radius: 4px !important;
+                transition: background-color 0.2s ease !important;
+            }
+
+            div.stButton > button:hover {
+                background-color: #1967D2 !important;
+                color: white !important;
+                border-color: #1967D2 !important;
+            }
+
+            div.stButton > button:active {
+                background-color: #1557B0 !important;
+                color: white !important;
+                border-color: #1557B0 !important;
             }
 
             /* 사이드바 버튼 스타일 보존 */
