@@ -122,6 +122,12 @@ def main_screen():
                 width: 250px !important;
             }
             
+            /* 버튼 컨테이너 전체 스타일 */
+            div.st-emotion-cache-8atqhb {
+                margin: 0 -2rem !important;
+                width: calc(100% + 4rem) !important;
+            }
+            
             /* 사이드바 버튼 스타일 */
             .stButton > button {
                 width: 100%;
@@ -134,8 +140,6 @@ def main_screen():
                 align-items: center !important;
                 justify-content: flex-start !important;
                 transition: all 0.2s ease !important;
-                margin: 0 -2rem !important;  /* 네거티브 마진으로 전체 너비 확보 */
-                width: calc(100% + 4rem) !important;  /* 패딩만큼 너비 증가 */
             }
 
             .stButton > button:hover {
@@ -172,7 +176,7 @@ def main_screen():
         # 로고 추가
         st.image("https://i.imgur.com/thQZtYk.png")
         
-        # 메뉴 버튼들 (columns 제거)
+        # 메뉴 버튼들
         if st.button('대시보드', key='dashboard', use_container_width=True):
             st.session_state.current_page = '대시보드'
 
