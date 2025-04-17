@@ -1,5 +1,5 @@
 import streamlit as st
-from app import setup_sidebar
+from components.sidebar import setup_sidebar
 
 def show_resume_page():
     # 사이드바 설정
