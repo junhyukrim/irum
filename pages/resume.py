@@ -462,9 +462,56 @@ def show_resume_page():
 
     # 수상 탭
     with tabs[4]:
-        st.header("수상")
-        st.write("여기에 수상 정보가 들어갑니다.")
-    
+        st.markdown('<h5 class="main-header">수상</h5>', unsafe_allow_html=True)
+        
+        # 수상 카운터 초기화
+        if 'award_count' not in st.session_state:
+            st.session_state.award_count = 1
+        
+        # 수상 데이터 초기화
+        if 'award_data' not in st.session_state:
+            st.session_state.award_data = list(range(st.session_state.award_count))
+
+        # 각 수상 정보 입력 폼
+        for idx, i in enumerate(st.session_state.award_data):
+            if idx > 0:
+                st.markdown("<hr>", unsafe_allow_html=True)
+            
+            # 상명, 수상일, 수여기관
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.text_input("상명", key=f"award_name_{i}")
+            with col2:
+                st.date_input("수상일", key=f"award_date_{i}")
+            with col3:
+                st.text_input("수여기관", key=f"award_org_{i}")
+            
+            # 비고
+            st.text_area("비고", key=f"award_note_{i}", height=100)
+
+            # 수상내역 삭제 버튼
+            col1, col2 = st.columns([2, 5])
+            with col1:
+                if st.button("수상내역 삭제", key=f"delete_award_{i}", use_container_width=True):
+                    st.session_state.award_data.remove(i)
+                    if len(st.session_state.award_data) == 0:
+                        st.session_state.award_count = 1
+                        st.session_state.award_data = [0]
+                    st.rerun()
+
+        # 버튼들 (수상내역 추가, 저장)
+        st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 1, 2])
+        with col1:
+            if st.button("수상내역 추가", use_container_width=True):
+                new_idx = max(st.session_state.award_data) + 1 if st.session_state.award_data else 0
+                st.session_state.award_data.append(new_idx)
+                st.session_state.award_count += 1
+                st.rerun()
+        with col2:
+            if st.button("저장", key="save_award", use_container_width=True):
+                st.success("저장되었습니다!")
+
     # 기타활동 탭
     with tabs[5]:
         st.header("기타활동")
