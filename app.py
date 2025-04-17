@@ -238,7 +238,8 @@ def main_screen():
                 /* 입력란 배경색 조정 */
                 .stTextInput > div > div > input,
                 .stSelectbox > div > div > div,
-                .stDateInput > div > div > input {
+                .stDateInput > div > div > input,
+                div[data-baseweb="input"] > input {
                     background-color: #F8F9FA !important;
                 }
 
@@ -246,9 +247,20 @@ def main_screen():
                 .stTextInput > div > div > input:hover,
                 .stSelectbox > div > div > div:hover,
                 .stDateInput > div > div > input:hover,
+                div[data-baseweb="input"] > input:hover,
                 .stTextInput > div > div > input:focus,
                 .stSelectbox > div > div > div:focus,
-                .stDateInput > div > div > input:focus {
+                .stDateInput > div > div > input:focus,
+                div[data-baseweb="input"] > input:focus {
+                    background-color: #FFFFFF !important;
+                }
+                
+                /* 날짜 선택기 배경색 */
+                div[data-baseweb="input"] {
+                    background-color: #F8F9FA !important;
+                }
+                div[data-baseweb="input"]:hover,
+                div[data-baseweb="input"]:focus-within {
                     background-color: #FFFFFF !important;
                 }
                 
