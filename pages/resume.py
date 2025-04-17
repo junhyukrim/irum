@@ -340,24 +340,23 @@ def show_resume_page():
             st.markdown(
                 """
                 <style>
-                /* 아웃라인 버튼 스타일 */
-                div.element-container div.stButton > button {
+                /* 역량 탭의 버튼 스타일 (저장 버튼 제외) */
+                div[data-testid="stHorizontalBlock"] div.stButton > button:not([kind="primary"]) {
                     background-color: transparent !important;
                     color: #4285F4 !important;
                     border: 1px solid #4285F4 !important;
                 }
 
-                div.element-container div.stButton > button:hover {
+                div[data-testid="stHorizontalBlock"] div.stButton > button:not([kind="primary"]):hover {
                     background-color: #F8F9FA !important;
                     color: #1967D2 !important;
                     border-color: #1967D2 !important;
                 }
 
-                /* 저장 버튼은 기존 스타일 유지 */
-                div.element-container div.stButton > button[data-testid="baseButton-secondary"] {
-                    background-color: #4285F4 !important;
-                    color: white !important;
-                    border: none !important;
+                div[data-testid="stHorizontalBlock"] div.stButton > button:not([kind="primary"]):active {
+                    background-color: #F1F3F4 !important;
+                    color: #1557B0 !important;
+                    border-color: #1557B0 !important;
                 }
                 </style>
                 """,
