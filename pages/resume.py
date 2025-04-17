@@ -338,14 +338,14 @@ def show_resume_page():
                 st.markdown("<hr>", unsafe_allow_html=True)
             
             # 기술 및 역량 (2:1:4:1)
-            cols = st.columns([2, 1, 4, 1, 1, 1, 1])
+            cols = st.columns([2, 1, 4, 1])
             with cols[0]:
                 st.text_input("기술 및 역량", key=f"skill_desc_{i}")
             with cols[1]:
                 st.text_input("성취 수준", key=f"skill_level_{i}")
             with cols[2]:
-                st.text_area("비고", key=f"skill_note_{i}", height=100)
-            with cols[6]:
+                st.text_input("비고", key=f"skill_note_{i}")
+            with cols[3]:
                 st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
                 if len(st.session_state.skill_data) > 1:
                     if st.button("역량 삭제", key=f"delete_skill_{i}", use_container_width=True):
