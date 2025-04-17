@@ -228,6 +228,37 @@ def show_resume_page():
                 st.markdown("<hr>", unsafe_allow_html=True)
             
             # 입학년월/졸업년월/교육기관/학력삭제 버튼 (2:2:3:1 = 8)
+            st.markdown(
+                """
+                <style>
+                /* 학력 삭제 버튼 컨테이너 */
+                [data-testid="stHorizontalBlock"] > [data-testid="column"]:last-child {
+                    position: relative !important;
+                    min-height: 85px !important;
+                }
+                [data-testid="stHorizontalBlock"] > [data-testid="column"]:last-child > div {
+                    position: absolute !important;
+                    bottom: 0 !important;
+                    width: 100% !important;
+                }
+
+                /* 전공 삭제/추가 버튼 컨테이너 */
+                [data-testid="stHorizontalBlock"] > [data-testid="column"]:nth-last-child(2),
+                [data-testid="stHorizontalBlock"] > [data-testid="column"]:last-child {
+                    position: relative !important;
+                    min-height: 85px !important;
+                }
+                [data-testid="stHorizontalBlock"] > [data-testid="column"]:nth-last-child(2) > div,
+                [data-testid="stHorizontalBlock"] > [data-testid="column"]:last-child > div {
+                    position: absolute !important;
+                    bottom: 0 !important;
+                    width: 100% !important;
+                }
+                </style>
+                """,
+                unsafe_allow_html=True
+            )
+            
             cols = st.columns([2, 2, 3, 1])
             with cols[0]:
                 st.date_input("입학년월", key=f"admission_date_{i}")
@@ -237,22 +268,6 @@ def show_resume_page():
                 st.text_input("교육기관", key=f"institution_{i}")
             with cols[3]:
                 if len(st.session_state.education_data) > 1:
-                    st.markdown(
-                        """
-                        <style>
-                        div[data-testid="column"]:nth-child(4) {
-                            position: relative;
-                            min-height: 85px;
-                        }
-                        div[data-testid="column"]:nth-child(4) > div {
-                            position: absolute;
-                            bottom: 0;
-                            width: 100%;
-                        }
-                        </style>
-                        """,
-                        unsafe_allow_html=True
-                    )
                     if st.button("학력 삭제", key=f"delete_education_{i}", use_container_width=True):
                         st.session_state.education_data.remove(i)
                         if i in st.session_state.major_counts:
@@ -262,7 +277,7 @@ def show_resume_page():
                             st.session_state.education_data = [0]
                             st.session_state.major_counts = {0: 1}
                         st.rerun()
-            
+
             # 전공 정보 (여러 개 추가 가능)
             if i not in st.session_state.major_counts:
                 st.session_state.major_counts[i] = 1
@@ -272,30 +287,6 @@ def show_resume_page():
                     st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
                 
                 # 학부/전공/학위/성적/삭제/추가 버튼 (2:2:1:1:1:1 = 8)
-                st.markdown(
-                    """
-                    <style>
-                    [data-testid="stVerticalBlock"] > [data-testid="stHorizontalBlock"] {
-                        position: relative;
-                        min-height: 85px;
-                    }
-                    div[data-testid="column"]:nth-child(5),
-                    div[data-testid="column"]:nth-child(6) {
-                        position: absolute;
-                        bottom: 0;
-                        padding-bottom: 0;
-                    }
-                    div[data-testid="column"]:nth-child(5) {
-                        right: 12.5%;  /* 1/8 of container width */
-                    }
-                    div[data-testid="column"]:nth-child(6) {
-                        right: 0;
-                    }
-                    </style>
-                    """,
-                    unsafe_allow_html=True
-                )
-                
                 cols = st.columns([2, 2, 1, 1, 1, 1])
                 with cols[0]:
                     st.text_input("학부 또는 분야", key=f"department_{i}_{j}")
