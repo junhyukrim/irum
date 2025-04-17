@@ -107,72 +107,53 @@ def login_screen():
     # Google 로그인 버튼
     st.button("Google로 로그인", on_click=st.login)
 
-if not st.experimental_user.is_logged_in:
-    login_screen()
-else:
-    # 로그인 후 화면 스타일
-    st.markdown(
-        """
-        <style>
-        .stApp {
-            background-color: white;
-        }
-
-        /* 사이드바 스타일 */
-        section[data-testid="stSidebar"] {
-            background-color: #4285F4;
-            width: 250px !important;
-        }
-
-        section[data-testid="stSidebar"] > div {
-            padding: 2rem 1rem;
-        }
-
-        /* 사이드바 로고 스타일 */
-        .sidebar-logo {
-            width: 150px;
-            margin-bottom: 3rem;
-        }
-
-        /* 사이드바 메뉴 스타일 */
-        .sidebar-menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .sidebar-menu li {
-            margin-bottom: 1rem;
-        }
-
-        .sidebar-menu a {
-            color: white;
-            text-decoration: none;
-            font-size: 1.1rem;
-            display: block;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
-
-        .sidebar-menu a:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        </style>
-
-        <div class="sidebar-content">
-            <img src="https://i.imgur.com/thQZtYk.png" alt="Logo" class="sidebar-logo">
-            <ul class="sidebar-menu">
-                <li><a href="#">대시보드</a></li>
-                <li><a href="#">이력관리</a></li>
-                <li><a href="#">공고관리</a></li>
-                <li><a href="#">서류관리</a></li>
-            </ul>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+def main_screen():
+    # 사이드바 설정
+    with st.sidebar:
+        st.markdown(
+            """
+            <style>
+            section[data-testid="stSidebar"] {
+                background-color: #4285F4;
+                width: 250px !important;
+            }
+            
+            img {
+                width: 150px;
+                margin-bottom: 3rem;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+        
+        # 로고 추가
+        st.image("https://i.imgur.com/thQZtYk.png")
+        
+        # 메뉴 항목
+        st.markdown(
+            """
+            <style>
+            .sidebar-menu {
+                color: white;
+                font-size: 1.1rem;
+                padding: 0.5rem 0;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+        
+        st.markdown('<div class="sidebar-menu">대시보드</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sidebar-menu">이력관리</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sidebar-menu">공고관리</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sidebar-menu">서류관리</div>', unsafe_allow_html=True)
 
     # 메인 컨텐츠
     st.header(f"환영합니다, {st.experimental_user.name}님!")
-    st.button("로그아웃", on_click=st.logout) 
+    st.button("로그아웃", on_click=st.logout)
+
+if not st.experimental_user.is_logged_in:
+    login_screen()
+else:
+    main_screen() 
