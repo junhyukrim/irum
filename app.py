@@ -533,7 +533,7 @@ def main_screen():
                     st.markdown("<hr>", unsafe_allow_html=True)
                 
                 # 기술 및 역량
-                st.text_area("기술 및 역량", height=100, key=f"skill_desc_{i}")
+                st.text_input("기술 및 역량", key=f"skill_desc_{i}")
                 
                 # 자격증 섹션
                 if i not in st.session_state.cert_counts:
@@ -565,9 +565,9 @@ def main_screen():
                 for j in range(st.session_state.edu_counts[i]):
                     if j > 0:
                         st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
-                    st.text_area("교육, 연수, 유학 등", height=100, key=f"education_{i}_{j}")
+                    st.text_input("교육, 연수, 유학 등", key=f"education_{i}_{j}")
 
-                col1, col2 = st.columns([2, 5])
+                col1, col2 = st.columns([3, 5])
                 with col1:
                     if st.button("교육, 연수, 유학 추가", key=f"add_edu_{i}", use_container_width=True):
                         st.session_state.edu_counts[i] += 1
