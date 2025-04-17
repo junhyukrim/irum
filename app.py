@@ -310,7 +310,7 @@ def main_screen():
             photo_url = st.text_input("사진 링크", key="photo_url")
             
             # 구분선 추가
-            st.markdown("---")
+            st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
             
             # 병역 및 보훈 섹션
             st.markdown('<h5>병역 및 보훈</h5>', unsafe_allow_html=True)
@@ -337,7 +337,7 @@ def main_screen():
             
             
             # 저장 버튼
-            col1, col2 = st.columns([8, 1])
+            col1, col2 = st.columns([5, 1])
             with col2:
                 if st.button("저장", use_container_width=True):
                     # TODO: 저장 로직 구현
