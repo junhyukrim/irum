@@ -478,16 +478,14 @@ def show_resume_page():
                 }
 
                 /* 저장 버튼 스타일 */
-                div[data-testid="stMainBlockContainer"] button[key="save_skill"] {
-                    background-color: #4285F4 !important;
-                    color: white !important;
-                    border: none !important;
+                div[data-testid="stMainBlockContainer"] button p {
+                    color: #4285F4 !important;
                 }
                 </style>
                 """,
                 unsafe_allow_html=True
             )
-            if st.button("저장", key="save_skill", use_container_width=True, type="secondary"):
+            if st.button("저장", key="save_skill", use_container_width=True):
                 st.success("저장되었습니다!")
 
     # 경력 탭
