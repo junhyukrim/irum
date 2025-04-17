@@ -235,11 +235,14 @@ def main_screen():
                     font-weight: 500 !important;
                 }
                 
-                .stButton > button {
+                /* 개인정보 탭 내의 버튼 스타일링 */
+                [data-testid="stHorizontalBlock"] .stButton > button {
                     background-color: #0051FF !important;
                     color: white !important;
                     padding: 0.5rem 2rem !important;
                     border-radius: 4px !important;
+                    width: auto !important;
+                    margin: 0 !important;
                 }
                 </style>
                 """,
