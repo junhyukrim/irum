@@ -212,14 +212,14 @@ def show_resume_page():
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
         col1, col2, col3 = st.columns([1, 1, 2])
         with col1:
-            if st.button("학력 추가", use_container_width=True):
+            if st.button("학력 추가"):
                 new_idx = max(st.session_state.education_data) + 1 if st.session_state.education_data else 0
                 st.session_state.education_data.append(new_idx)
                 st.session_state.major_counts[new_idx] = 1
                 st.session_state.education_count += 1
                 st.rerun()
         with col2:
-            if st.button("저장", key="save_education", use_container_width=True):
+            if st.button("저장", key="save_education"):
                 st.success("저장되었습니다!")
 
     # 역량 탭
