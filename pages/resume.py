@@ -78,21 +78,18 @@ def show_resume_page():
                 background-color: #FFFFFF !important;
             }
             
-            /* 개인정보 탭 내의 버튼 스타일링 */
-            [data-testid="stHorizontalBlock"] .stButton > button,
-            [data-testid="baseButton-secondary"] {
+            /* 저장 버튼 스타일링 */
+            [data-testid="stButton"] > button {
+                width: 100% !important;
+                height: 42px !important;
                 background-color: #4285F4 !important;
                 color: white !important;
-                padding: 0.5rem 2rem !important;
+                font-size: 14px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                padding: 0.5rem !important;
                 border-radius: 4px !important;
-                width: auto !important;
-                margin: 0 !important;
-                font-size: 14px !important;
-            }
-
-            /* 일반 버튼 스타일 (추가, 삭제, 저장 버튼) */
-            .stButton > button {
-                font-size: 14px !important;
             }
 
             /* 사이드바 버튼 스타일 보존 */
