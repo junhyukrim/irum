@@ -227,19 +227,21 @@ def show_resume_page():
             if idx > 0:
                 st.markdown("<hr>", unsafe_allow_html=True)
             
-            # 입학년월/졸업년월
-            col1, col2 = st.columns(2)
-            with col1:
+            # 입학년월/졸업년월/교육기관/학력삭제 버튼 (2:2:3:1 = 8)
+            cols = st.columns([2, 2, 3, 1])
+            with cols[0]:
                 st.date_input("입학년월", key=f"admission_date_{i}")
-            with col2:
+            with cols[1]:
                 st.date_input("졸업년월", key=f"graduation_date_{i}")
-            
-            # 교육기관/학부 또는 분야
-            col1, col2 = st.columns(2)
-            with col1:
+            with cols[2]:
                 st.text_input("교육기관", key=f"institution_{i}")
-            with col2:
-                st.text_input("학부 또는 분야", key=f"department_{i}")
+            with cols[3]:
+                if len(st.session_state.education_data) > 1:
+                    if st.button("학력 삭제", key=f"delete_education_{i}", use_container_width=True):
+                        st.session_state.education_data.remove(i)
+                        if i in st.session_state.major_counts:
+                            del st.session_state.major_counts[i]
+                        st.rerun()
             
             # 전공 정보 (여러 개 추가 가능)
             if i not in st.session_state.major_counts:
@@ -249,48 +251,48 @@ def show_resume_page():
                 if j > 0:
                     st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
                 
-                # 학과, 전공, 세부내용
-                st.text_input("학과, 전공, 세부내용", key=f"major_{i}_{j}")
-                
-                # 학위/성적
-                col1, col2 = st.columns(2)
-                with col1:
+                # 학부/전공/학위/성적/삭제/추가 버튼 (2:2:1:1:1:1 = 8)
+                cols = st.columns([2, 2, 1, 1, 1, 1])
+                with cols[0]:
+                    st.text_input("학부 또는 분야", key=f"department_{i}_{j}")
+                with cols[1]:
+                    st.text_input("학과, 전공, 세부내용", key=f"major_{i}_{j}")
+                with cols[2]:
                     st.selectbox("학위", ["선택", "고등학교 졸업", "전문학사", "학사", "석사", "박사"], key=f"degree_{i}_{j}")
-                with col2:
+                with cols[3]:
                     st.text_input("성적", placeholder="예: 4.0/4.3", key=f"gpa_{i}_{j}")
-
-            # 전공 추가 버튼
-            col1, col2 = st.columns([2, 5])
-            with col1:
-                if st.button("전공 추가", key=f"add_major_{i}", use_container_width=True):
-                    st.session_state.major_counts[i] += 1
-                    st.rerun()
+                with cols[4]:
+                    if st.session_state.major_counts[i] > 1:
+                        if st.button("전공 삭제", key=f"delete_major_{i}_{j}", use_container_width=True):
+                            st.session_state.major_counts[i] -= 1
+                            st.rerun()
+                with cols[5]:
+                    if st.button("전공 추가", key=f"add_major_{i}_{j}", use_container_width=True):
+                        st.session_state.major_counts[i] += 1
+                        st.rerun()
             
             # 비고
             st.text_area("비고", key=f"notes_{i}", height=100)
 
-            # 학력 삭제 버튼
-            col1, col2 = st.columns([2, 5])
-            with col1:
-                if st.button("학력 삭제", key=f"delete_education_{i}", use_container_width=True):
-                    st.session_state.education_data.remove(i)
-                    if len(st.session_state.education_data) == 0:
-                        st.session_state.education_count = 1
-                        st.session_state.education_data = [0]
-                        st.session_state.major_counts = {0: 1}
-                    st.rerun()
-
-        # 버튼들 (학력추가, 저장)
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-        col1, col2 = st.columns([2, 5])
-        with col1:
+
+        # 학력 추가 버튼 (1:7 = 8, left align)
+        cols = st.columns(8)
+        with cols[0]:
             if st.button("학력 추가", use_container_width=True):
                 new_idx = max(st.session_state.education_data) + 1 if st.session_state.education_data else 0
                 st.session_state.education_data.append(new_idx)
                 st.session_state.major_counts[new_idx] = 1
                 st.session_state.education_count += 1
                 st.rerun()
-            st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
+
+        st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
+
+        # 저장 버튼 (7:1 = 8, right align)
+        cols = st.columns(8)
+        for i in range(7):  # 처음 7개 컬럼은 빈 공간
+            cols[i].empty()
+        with cols[7]:  # 마지막 컬럼에 버튼 배치
             if st.button("저장", key="save_education", use_container_width=True):
                 st.success("저장되었습니다!")
 
