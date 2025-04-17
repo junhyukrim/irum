@@ -219,6 +219,36 @@ def main_screen():
         st.write("환영합니다, " + st.experimental_user.name + "님!")
         
     elif st.session_state.current_page == '이력관리':
+        st.markdown(
+            """
+            <style>
+            /* 상단 고정 컨테이너 스타일 */
+            [data-testid="stHeader"] {
+                position: sticky !important;
+                top: 0px;
+                background-color: white;
+                z-index: 999;
+                padding: 1rem 0;
+            }
+            
+            /* 탭 컨테이너 고정 */
+            .stTabs {
+                position: sticky !important;
+                top: 80px;
+                z-index: 998;
+                background-color: white;
+                padding: 10px 0;
+            }
+            
+            /* 탭 아래 내용 여백 */
+            .stTabs + div {
+                margin-top: 20px;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+        
         st.markdown('<h1 class="main-header">이력관리</h1>', unsafe_allow_html=True)
         
         # 탭 생성
