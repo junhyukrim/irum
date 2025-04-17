@@ -235,6 +235,23 @@ def main_screen():
                     font-weight: 500 !important;
                 }
                 
+                /* 입력란 배경색 조정 */
+                .stTextInput > div > div > input,
+                .stSelectbox > div > div > div,
+                .stDateInput > div > div > input {
+                    background-color: #F8F9FA !important;
+                }
+
+                /* 입력란 호버/포커스 시 배경색 */
+                .stTextInput > div > div > input:hover,
+                .stSelectbox > div > div > div:hover,
+                .stDateInput > div > div > input:hover,
+                .stTextInput > div > div > input:focus,
+                .stSelectbox > div > div > div:focus,
+                .stDateInput > div > div > input:focus {
+                    background-color: #FFFFFF !important;
+                }
+                
                 /* 개인정보 탭 내의 버튼 스타일링 */
                 [data-testid="stHorizontalBlock"] .stButton > button {
                     background-color: #0051FF !important;
