@@ -1,11 +1,12 @@
 import streamlit as st
 
 def show_resume_page():
+    # 사이드바 스타일
     st.markdown(
         """
         <style>
-        /* 버튼 스타일링 */
-        .stButton > button {
+        /* 사이드바 버튼 스타일링 */
+        section[data-testid="stSidebar"] .stButton > button {
             width: calc(100% + 4rem) !important;
             margin-left: -2rem !important;
             background-color: transparent !important;
@@ -20,15 +21,15 @@ def show_resume_page():
             border-radius: 0 !important;
         }
 
-        /* 호버 스타일 */
-        .stButton > button:hover {
+        /* 사이드바 호버 스타일 */
+        section[data-testid="stSidebar"] .stButton > button:hover {
             font-size: 2rem !important;
             font-weight: bold !important;
             background-color: rgba(255, 255, 255, 0.1) !important;
         }
 
-        /* 선택된 버튼 스타일 */
-        .stButton > button[aria-pressed="true"] {
+        /* 사이드바 선택된 버튼 스타일 */
+        section[data-testid="stSidebar"] .stButton > button[aria-pressed="true"] {
             background-color: #0051FF !important;
             font-size: 2rem !important;
             font-weight: bold !important;
@@ -37,6 +38,7 @@ def show_resume_page():
         """,
         unsafe_allow_html=True
     )
+
     st.markdown('<h3 class="main-header">이력관리</h3>', unsafe_allow_html=True)
     
     # 탭 생성
@@ -82,8 +84,8 @@ def show_resume_page():
                 background-color: #FFFFFF !important;
             }
             
-            /* 버튼 스타일링 */
-            .stButton > button {
+            /* 메인 영역 버튼 스타일링 */
+            div[data-testid="stVerticalBlock"] .stButton > button {
                 background-color: #4285F4 !important;
                 color: white !important;
                 padding: 0.5rem 2rem !important;
@@ -92,7 +94,7 @@ def show_resume_page():
                 margin: 0 !important;
             }
 
-            .stButton > button:hover {
+            div[data-testid="stVerticalBlock"] .stButton > button:hover {
                 background-color: #3367D6 !important;
             }
             </style>

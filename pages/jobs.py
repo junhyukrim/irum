@@ -4,8 +4,8 @@ def show_jobs_page():
     st.markdown(
         """
         <style>
-        /* 버튼 스타일링 */
-        .stButton > button {
+        /* 사이드바 버튼 스타일링 */
+        section[data-testid="stSidebar"] .stButton > button {
             width: calc(100% + 4rem) !important;
             margin-left: -2rem !important;
             background-color: transparent !important;
@@ -20,15 +20,15 @@ def show_jobs_page():
             border-radius: 0 !important;
         }
 
-        /* 호버 스타일 */
-        .stButton > button:hover {
+        /* 사이드바 호버 스타일 */
+        section[data-testid="stSidebar"] .stButton > button:hover {
             font-size: 2rem !important;
             font-weight: bold !important;
             background-color: rgba(255, 255, 255, 0.1) !important;
         }
 
-        /* 선택된 버튼 스타일 */
-        .stButton > button[aria-pressed="true"] {
+        /* 사이드바 선택된 버튼 스타일 */
+        section[data-testid="stSidebar"] .stButton > button[aria-pressed="true"] {
             background-color: #0051FF !important;
             font-size: 2rem !important;
             font-weight: bold !important;
