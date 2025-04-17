@@ -78,8 +78,10 @@ def login_screen():
             <img src="https://i.imgur.com/thQZtYk.png" alt="Logo">
         </div>
         <div class="text-container">
-            <h1>이 앱은 비공개입니다.</h1>
-            <h3>로그인이 필요합니다.</h3>
+            <h1>꿈으로의 문을 여는 곳, 이룸</h1>
+            <h3>이룸은 이력 관리와 지원 공고 분석을 통해 취업과 이직을 위한 맞춤형 서류 제작은 물론 경력 관리까지 지원하는 서비스입니다.
+                        <br><br>
+                        여러분의 경험을 이해하고, 커리어 시장에서 원하는 미래로 나아가는 길을 함께 엽니다.</h3>
         </div>
         """,
         unsafe_allow_html=True
