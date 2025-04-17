@@ -419,8 +419,8 @@ def main_screen():
                         st.text_input("성적", placeholder="예: 4.0/4.3", key=f"gpa_{i}_{j}")
 
                 # 전공 추가 버튼
-                col1, col2, col3 = st.columns([3, 1, 2])
-                with col3:
+                col1, col2 = st.columns([2, 5])
+                with col1:
                     if st.button("전공 추가", key=f"add_major_{i}", use_container_width=True):
                         st.session_state.major_counts[i] += 1
                         st.rerun()
