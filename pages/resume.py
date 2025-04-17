@@ -95,11 +95,12 @@ def show_resume_page():
                 justify-content: center !important;
                 border-radius: 4px !important;
                 transition: all 0.2s ease !important;
-                border: none !important;
+                border: 1px solid #4285F4 !important;
             }
 
             div.stButton > button:hover {
                 background-color: #1967D2 !important;
+                border-color: #1967D2 !important;
             }
 
             div.stButton > button:active {
@@ -304,29 +305,11 @@ def show_resume_page():
 
         st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
 
-        # 저장 버튼 (7:1)
+        # 저장 버튼 (7:1 = 8, right align)
         cols = st.columns(8)
         for i in range(7):  # 처음 7개 컬럼은 빈 공간
             cols[i].empty()
         with cols[7]:  # 마지막 컬럼에 버튼 배치
-            st.markdown(
-                """
-                <style>
-                /* 메인 컨테이너 안의 일반 버튼 스타일 */
-                div[data-testid="stMainBlockContainer"] button {
-                    background-color: transparent !important;
-                    color: #4285F4 !important;
-                    border: 1px solid #4285F4 !important;
-                }
-
-                /* 저장 버튼 스타일 */
-                div[data-testid="stMainBlockContainer"] button p {
-                    color: #4285F4 !important;
-                }
-                </style>
-                """,
-                unsafe_allow_html=True
-            )
             if st.button("저장", key="save_education", use_container_width=True):
                 st.success("저장되었습니다!")
 
@@ -357,18 +340,23 @@ def show_resume_page():
             st.markdown(
                 """
                 <style>
-                /* 메인 컨테이너 안의 일반 버튼 스타일 */
-                div[data-testid="stMainBlockContainer"] button {
+                /* 역량 탭의 버튼 스타일 (저장 버튼 제외) */
+                div[data-testid="stHorizontalBlock"] div.stButton > button:not([kind="primary"]) {
                     background-color: transparent !important;
                     color: #4285F4 !important;
                     border: 1px solid #4285F4 !important;
                 }
 
-                /* 저장 버튼은 원래 스타일 유지 */
-                div[data-testid="stMainBlockContainer"] button[data-testid="baseButton-secondary"] {
-                    background-color: #4285F4 !important;
-                    color: white !important;
-                    border: none !important;
+                div[data-testid="stHorizontalBlock"] div.stButton > button:not([kind="primary"]):hover {
+                    background-color: #F8F9FA !important;
+                    color: #1967D2 !important;
+                    border-color: #1967D2 !important;
+                }
+
+                div[data-testid="stHorizontalBlock"] div.stButton > button:not([kind="primary"]):active {
+                    background-color: #F1F3F4 !important;
+                    color: #1557B0 !important;
+                    border-color: #1557B0 !important;
                 }
                 </style>
                 """,
@@ -467,24 +455,6 @@ def show_resume_page():
         for i in range(7):  # 처음 7개 컬럼은 빈 공간
             cols[i].empty()
         with cols[7]:  # 마지막 컬럼에 버튼 배치
-            st.markdown(
-                """
-                <style>
-                /* 메인 컨테이너 안의 일반 버튼 스타일 */
-                div[data-testid="stMainBlockContainer"] button {
-                    background-color: transparent !important;
-                    color: #4285F4 !important;
-                    border: 1px solid #4285F4 !important;
-                }
-
-                /* 저장 버튼 스타일 */
-                div[data-testid="stMainBlockContainer"] button p {
-                    color: #4285F4 !important;
-                }
-                </style>
-                """,
-                unsafe_allow_html=True
-            )
             if st.button("저장", key="save_skill", use_container_width=True):
                 st.success("저장되었습니다!")
 
