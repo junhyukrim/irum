@@ -381,9 +381,13 @@ def main_screen():
             if 'major_counts' not in st.session_state:
                 st.session_state.major_counts = {0: 1}  # {학력인덱스: 전공개수}
 
+            # 학력 데이터 초기화
+            if 'education_data' not in st.session_state:
+                st.session_state.education_data = list(range(st.session_state.education_count))
+
             # 각 학력 정보 입력 폼
-            for i in range(st.session_state.education_count):
-                if i > 0:
+            for idx, i in enumerate(st.session_state.education_data):
+                if idx > 0:
                     st.markdown("<hr>", unsafe_allow_html=True)
                 
                 # 입학년월/졸업년월
@@ -428,13 +432,26 @@ def main_screen():
                 # 비고
                 st.text_area("비고", key=f"notes_{i}", height=100)
 
+                # 학력 삭제 버튼
+                col1, col2 = st.columns([2, 5])
+                with col1:
+                    if st.button("학력 삭제", key=f"delete_education_{i}", use_container_width=True):
+                        st.session_state.education_data.remove(i)
+                        if len(st.session_state.education_data) == 0:  # 모든 학력이 삭제된 경우
+                            st.session_state.education_count = 1
+                            st.session_state.education_data = [0]
+                            st.session_state.major_counts = {0: 1}
+                        st.rerun()
+
             # 버튼들 (학력추가, 저장)
             st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
             col1, col2, col3 = st.columns([3, 2, 1])
             with col2:
                 if st.button("학력 추가", use_container_width=True):
+                    new_idx = max(st.session_state.education_data) + 1 if st.session_state.education_data else 0
+                    st.session_state.education_data.append(new_idx)
+                    st.session_state.major_counts[new_idx] = 1
                     st.session_state.education_count += 1
-                    st.session_state.major_counts[st.session_state.education_count - 1] = 1
                     st.rerun()
             with col3:
                 if st.button("저장", key="save_education", use_container_width=True):
