@@ -120,6 +120,8 @@ def main_screen():
             section[data-testid="stSidebar"] {
                 background-color: #4285F4;
                 width: 250px !important;
+                height: 100vh;
+                position: relative;
             }
             
             img {
@@ -134,8 +136,10 @@ def main_screen():
                 border: none !important;
                 color: white !important;
                 font-size: 1.1rem !important;
-                text-align: left !important;
                 padding: 0.5rem 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
             }
 
             .stButton > button:hover {
@@ -143,19 +147,22 @@ def main_screen():
             }
 
             /* 로그아웃 버튼 컨테이너 */
+            div[data-testid="stVerticalBlock"] {
+                height: calc(100vh - 100px);
+                display: flex;
+                flex-direction: column;
+            }
+
             .logout-container {
-                position: absolute;
-                bottom: 2rem;
-                left: 0;
-                right: 0;
-                padding: 0 1rem;
+                margin-top: auto;
+                padding: 1rem;
             }
 
             /* 로그아웃 버튼 스타일 */
             .logout-container .stButton > button {
                 border: 1px solid white !important;
                 border-radius: 4px !important;
-                text-align: center !important;
+                justify-content: center !important;
             }
             </style>
             """,
@@ -166,14 +173,16 @@ def main_screen():
         st.image("https://i.imgur.com/thQZtYk.png")
         
         # 메뉴 버튼들
-        if st.button('대시보드', key='dashboard', use_container_width=True):
-            st.session_state.current_page = '대시보드'
-        if st.button('이력관리', key='resume', use_container_width=True):
-            st.session_state.current_page = '이력관리'
-        if st.button('공고관리', key='jobs', use_container_width=True):
-            st.session_state.current_page = '공고관리'
-        if st.button('서류관리', key='documents', use_container_width=True):
-            st.session_state.current_page = '서류관리'
+        col1, col2, col3 = st.columns([0.1, 3, 0.1])
+        with col2:
+            if st.button('대시보드', key='dashboard', use_container_width=True):
+                st.session_state.current_page = '대시보드'
+            if st.button('이력관리', key='resume', use_container_width=True):
+                st.session_state.current_page = '이력관리'
+            if st.button('공고관리', key='jobs', use_container_width=True):
+                st.session_state.current_page = '공고관리'
+            if st.button('서류관리', key='documents', use_container_width=True):
+                st.session_state.current_page = '서류관리'
 
         # 로그아웃 버튼
         st.markdown('<div class="logout-container">', unsafe_allow_html=True)
