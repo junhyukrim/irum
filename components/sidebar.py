@@ -59,25 +59,40 @@ def setup_sidebar():
     # 로고 추가
     st.image("https://i.imgur.com/thQZtYk.png")
     
-    # 메뉴 버튼들
-    if st.button('대시보드', key='dashboard', use_container_width=True):
+    # 현재 페이지 상태 초기화
+    if 'current_page' not in st.session_state:
         st.session_state.current_page = '대시보드'
-        st.rerun()
 
-    if st.button('이력관리', key='resume', use_container_width=True):
-        st.session_state.current_page = '이력관리'
-        st.rerun()
+    # 메뉴 버튼들
+    pages = {
+        '대시보드': 'dashboard',
+        '이력관리': 'resume',
+        '공고관리': 'jobs',
+        '서류관리': 'documents'
+    }
 
-    if st.button('공고관리', key='jobs', use_container_width=True):
-        st.session_state.current_page = '공고관리'
-        st.rerun()
+    for page_name, page_key in pages.items():
+        button_key = f"btn_{page_key}"
+        if button_key not in st.session_state:
+            st.session_state[button_key] = False
 
-    if st.button('서류관리', key='documents', use_container_width=True):
-        st.session_state.current_page = '서류관리'
-        st.rerun()
+        if st.button(
+            page_name,
+            key=button_key,
+            use_container_width=True,
+            help=f"{page_name}로 이동",
+            args=(page_name,),
+            on_click=lambda p=page_name: set_page(p)
+        ):
+            pass
 
     # 빈 공간 추가 (크기 조절)
     st.markdown("<div style='flex-grow: 1; min-height: calc(100vh - 800px);'></div>", unsafe_allow_html=True)
     
     # 로그아웃 버튼
-    st.button("로그아웃", key='logout', on_click=st.logout) 
+    if st.button("로그아웃", key="btn_logout", on_click=st.logout):
+        pass
+
+def set_page(page_name):
+    """페이지 전환 함수"""
+    st.session_state.current_page = page_name 
