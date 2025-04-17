@@ -95,12 +95,11 @@ def show_resume_page():
                 justify-content: center !important;
                 border-radius: 4px !important;
                 transition: all 0.2s ease !important;
-                border: 1px solid #4285F4 !important;
+                border: none !important;
             }
 
             div.stButton > button:hover {
                 background-color: #1967D2 !important;
-                border-color: #1967D2 !important;
             }
 
             div.stButton > button:active {
