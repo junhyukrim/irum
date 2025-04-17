@@ -79,9 +79,12 @@ def login_screen():
         </div>
         <div class="text-container">
             <h1 style="font-size: 2rem; margin-bottom: 1.5rem; font-weight: 500; line-height: 1.35; color: white;">꿈으로의 문을 여는 곳, 이룸</h1>
-            <h3 style="font-size: 1.1rem; margin-bottom: 3rem; line-height: 1.6; color: white;">이룸은 이력 관리와 지원 공고 분석을 통해 취업과 이직을 위한 맞춤형 서류 제작은 물론 경력 관리까지 지원하는 서비스입니다.
-                        <br><br>
-                        여러분의 경험을 이해하고, 커리어 시장에서 원하는 미래로 나아가는 길을 함께 엽니다.</h3>
+            <h3 style="font-size: 1.1rem; margin-bottom: 3rem; line-height: 1.6; color: white;">
+            이룸은 이력 관리와 지원 공고 분석을 통해<br> 
+            취업과 이직을 위한 맞춤형 서류 제작은 물론 <br>
+            경력 관리까지 지원하는 서비스입니다.<br>
+            <br>
+            여러분을 이해하고, 미래의 길을 함께 엽니다.</h3>
         </div>
         """,
         unsafe_allow_html=True
