@@ -167,7 +167,7 @@ def main_screen():
             .stButton > button[aria-pressed="true"] {
                 font-size: 2rem !important;
                 font-weight: bold !important;
-                background-color: rgba(255, 255, 255, 0.1) !important;
+                background-color: #0051FF !important;
                 border-radius: 0 !important;
             }
             
