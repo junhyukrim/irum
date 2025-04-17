@@ -440,7 +440,7 @@ def main_screen():
                         if len(st.session_state.education_data) == 0:  # 모든 학력이 삭제된 경우
                             st.session_state.education_count = 1
                             st.session_state.education_data = [0]
-                            st.session_state.major_counts = {0: 1}
+                            st.session_state.major_counts = {0: 1} 
                         st.rerun()
 
             # 버튼들 (학력추가, 저장)
@@ -518,8 +518,166 @@ def main_screen():
         
         # 역량 탭
         with tab3:
-            st.header("역량")
-            st.write("여기에 역량 정보가 들어갑니다.")
+            st.markdown('<h5 class="main-header">역량</h5>', unsafe_allow_html=True)
+            
+            # 역량 카운터 초기화
+            if 'skill_count' not in st.session_state:
+                st.session_state.skill_count = 1
+            
+            # 자격증, 교육 카운터 초기화
+            if 'cert_counts' not in st.session_state:
+                st.session_state.cert_counts = {0: 1}  # {역량인덱스: 자격증개수}
+            if 'edu_counts' not in st.session_state:
+                st.session_state.edu_counts = {0: 1}  # {역량인덱스: 교육개수}
+
+            # 역량 데이터 초기화
+            if 'skill_data' not in st.session_state:
+                st.session_state.skill_data = list(range(st.session_state.skill_count))
+
+            # 각 역량 정보 입력 폼
+            for idx, i in enumerate(st.session_state.skill_data):
+                if idx > 0:
+                    st.markdown("<hr>", unsafe_allow_html=True)
+                
+                # 기술 및 역량
+                st.text_area("기술 및 역량", key=f"skill_desc_{i}", height=100)
+                
+                st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
+                
+                # 자격증 섹션
+                if i not in st.session_state.cert_counts:
+                    st.session_state.cert_counts[i] = 1
+
+                for j in range(st.session_state.cert_counts[i]):
+                    if j > 0:
+                        st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
+                    
+                    # 자격증/취득년월
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.text_input("자격증", key=f"cert_name_{i}_{j}")
+                    with col2:
+                        st.date_input("자격증 취득년월", key=f"cert_date_{i}_{j}")
+                    
+                    # 발급기관
+                    st.text_input("자격증 발급기관", key=f"cert_org_{i}_{j}")
+
+                # 자격증 추가 버튼
+                col1, col2 = st.columns([2, 5])
+                with col1:
+                    if st.button("자격증 추가", key=f"add_cert_{i}", use_container_width=True):
+                        st.session_state.cert_counts[i] += 1
+                        st.rerun()
+
+                st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
+
+                # 교육 섹션
+                if i not in st.session_state.edu_counts:
+                    st.session_state.edu_counts[i] = 1
+
+                for j in range(st.session_state.edu_counts[i]):
+                    if j > 0:
+                        st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
+                    
+                    st.text_area("교육, 연수, 유학 등", key=f"education_{i}_{j}", height=100)
+
+                # 교육 추가 버튼
+                col1, col2 = st.columns([2, 5])
+                with col1:
+                    if st.button("교육, 연수, 유학 추가", key=f"add_edu_{i}", use_container_width=True):
+                        st.session_state.edu_counts[i] += 1
+                        st.rerun()
+
+                st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
+                
+                # 비고
+                st.text_area("비고", key=f"skill_notes_{i}", height=100)
+
+                # 역량 삭제 버튼
+                col1, col2 = st.columns([2, 5])
+                with col1:
+                    if st.button("역량 삭제", key=f"delete_skill_{i}", use_container_width=True):
+                        st.session_state.skill_data.remove(i)
+                        if len(st.session_state.skill_data) == 0:  # 모든 역량이 삭제된 경우
+                            st.session_state.skill_count = 1
+                            st.session_state.skill_data = [0]
+                            st.session_state.cert_counts = {0: 1}
+                            st.session_state.edu_counts = {0: 1}
+                        st.rerun()
+
+            # 버튼들 (역량추가, 저장)
+            st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
+            col1, col2, col3 = st.columns([2, 1, 3])
+            with col1:
+                if st.button("역량 추가", use_container_width=True):
+                    new_idx = max(st.session_state.skill_data) + 1 if st.session_state.skill_data else 0
+                    st.session_state.skill_data.append(new_idx)
+                    st.session_state.cert_counts[new_idx] = 1
+                    st.session_state.edu_counts[new_idx] = 1
+                    st.session_state.skill_count += 1
+                    st.rerun()
+            with col2:
+                if st.button("저장", key="save_skill", use_container_width=True):
+                    st.success("저장되었습니다!")
+
+            st.markdown(
+                """
+                <style>
+                /* 입력란 스타일링 */
+                .stTextInput > label, .stSelectbox > label, .stDateInput > label {
+                    font-size: 1rem !important;
+                    font-weight: 500 !important;
+                }
+                
+                /* 구분선 스타일 */
+                hr {
+                    margin: 2rem 0;
+                    border: none;
+                    border-top: 1px solid rgba(49, 51, 63, 0.2);
+                }
+
+                /* 버튼 스타일링 */
+                .stButton > button {
+                    background-color: #4285F4 !important;
+                    color: white !important;
+                    padding: 0.5rem 2rem !important;
+                    border-radius: 4px !important;
+                    margin: 0 !important;
+                }
+
+                .stButton > button:hover {
+                    background-color: #3367D6 !important;
+                }
+
+                /* 입력란 배경색 조정 */
+                .stTextInput > div > div > input,
+                .stSelectbox > div > div > div,
+                .stDateInput > div > div > input,
+                div[data-baseweb="input"] > input,
+                div[data-baseweb="input"],
+                div[data-baseweb="base-input"] {
+                    background-color: #F8F9FA !important;
+                }
+
+                /* 입력란 호버/포커스 시 배경색 */
+                .stTextInput > div > div > input:hover,
+                .stSelectbox > div > div > div:hover,
+                .stDateInput > div > div > input:hover,
+                div[data-baseweb="input"] > input:hover,
+                div[data-baseweb="input"]:hover,
+                div[data-baseweb="base-input"]:hover,
+                .stTextInput > div > div > input:focus,
+                .stSelectbox > div > div > div:focus,
+                .stDateInput > div > div > input:focus,
+                div[data-baseweb="input"] > input:focus,
+                div[data-baseweb="input"]:focus-within,
+                div[data-baseweb="base-input"]:focus-within {
+                    background-color: #FFFFFF !important;
+                }
+                </style>
+                """,
+                unsafe_allow_html=True
+            )
         
         # 경력 탭
         with tab4:
