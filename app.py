@@ -16,8 +16,13 @@ def login_screen():
         /* 로고 스타일 */
         .logo-container {
             display: flex;
-            justify-content: center;
-            margin: 4rem auto 2rem auto;
+            justify-content: flex-start;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0 2rem;
+            margin-top: 4rem;
+            margin-bottom: 2rem;
         }
         
         .logo-container img {
@@ -50,7 +55,7 @@ def login_screen():
             font-size: 14px !important;
             font-weight: 500 !important;
             height: 40px !important;
-            margin: 0 auto 0 2rem !important;
+            margin: 0 !important;
             min-width: 200px !important;
             position: relative !important;
         }
@@ -76,6 +81,12 @@ def login_screen():
             max-width: 800px;
             margin-left: auto;
             margin-right: auto;
+            padding: 0 2rem;
+        }
+
+        div.stButton {
+            display: flex;
+            justify-content: flex-start;
         }
         </style>
         """,
