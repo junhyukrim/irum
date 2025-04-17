@@ -200,7 +200,6 @@ def show_resume_page():
         cols = st.columns(8)  # 8등분
         for i in range(7):  # 처음 7개 컬럼은 빈 공간
             cols[i].empty()
-        # 마지막 컬럼에 버튼 배치
         with cols[7]:
             if st.button("저장", key="save_personal", use_container_width=True):
                 st.success("저장되었습니다!")
@@ -602,38 +601,42 @@ def show_resume_page():
             if idx > 0:
                 st.markdown("<hr>", unsafe_allow_html=True)
             
-            # 상명, 수상일, 수여기관
-            col1, col2, col3 = st.columns(3)
-            with col1:
+            # 상명/수상일/수여기관/비고/삭제 버튼 (1:1:1:4:1)
+            cols = st.columns([2, 1, 1, 3, 1])
+            with cols[0]:
                 st.text_input("상명", key=f"award_name_{i}")
-            with col2:
-                st.date_input("수상일", key=f"award_date_{i}")
-            with col3:
+            with cols[1]:
+                st.date_input("수상년월", key=f"award_date_{i}")
+            with cols[2]:
                 st.text_input("수여기관", key=f"award_org_{i}")
-            
-            # 비고
-            st.text_area("비고", key=f"award_note_{i}", height=100)
+            with cols[3]:
+                st.text_input("비고", key=f"award_note_{i}")
+            with cols[4]:
+                st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
+                if len(st.session_state.award_data) > 1:
+                    if st.button("수상내역 삭제", key=f"delete_award_{i}", use_container_width=True):
+                        st.session_state.award_data.remove(i)
+                        if len(st.session_state.award_data) == 0:
+                            st.session_state.award_count = 1
+                            st.session_state.award_data = [0]
+                        st.rerun()
 
-            # 수상내역 삭제 버튼
-            col1, col2 = st.columns([2, 5])
-            with col1:
-                if st.button("수상내역 삭제", key=f"delete_award_{i}", use_container_width=True):
-                    st.session_state.award_data.remove(i)
-                    if len(st.session_state.award_data) == 0:
-                        st.session_state.award_count = 1
-                        st.session_state.award_data = [0]
-                    st.rerun()
-
-        # 버튼들 (수상내역 추가, 저장)
+        # 수상내역 추가 버튼 (1:7)
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-        col1, col2 = st.columns([2, 5])
-        with col1:
+        cols = st.columns(8)
+        with cols[0]:
             if st.button("수상내역 추가", use_container_width=True):
                 new_idx = max(st.session_state.award_data) + 1 if st.session_state.award_data else 0
                 st.session_state.award_data.append(new_idx)
                 st.session_state.award_count += 1
                 st.rerun()
-            st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
+
+        # 저장 버튼 (7:1)
+        st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
+        cols = st.columns(8)
+        for i in range(7):  # 처음 7개 컬럼은 빈 공간
+            cols[i].empty()
+        with cols[7]:  # 마지막 컬럼에 버튼 배치
             if st.button("저장", key="save_award", use_container_width=True):
                 st.success("저장되었습니다!")
 
