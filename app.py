@@ -259,19 +259,19 @@ def main_screen():
             with name_col2:
                 name_en = st.text_input("영문 이름", key="name_en")
             
-            # 국적/성별
+            # 국적/성별+생년월일
             nat_col1, nat_col2 = st.columns(2)
             with nat_col1:
                 nationality = st.text_input("국적", value="대한민국", key="nationality")
             with nat_col2:
-                gender = st.selectbox("성별", ["선택", "남성", "여성"], key="gender")
+                gender_birth_col1, gender_birth_col2 = st.columns(2)
+                with gender_birth_col1:
+                    gender = st.selectbox("성별", ["선택", "남성", "여성"], key="gender")
+                with gender_birth_col2:
+                    birth_date = st.date_input("생년월일", key="birth_date")
             
-            # 생년월일/주소
-            birth_col1, birth_col2 = st.columns(2)
-            with birth_col1:
-                birth_date = st.date_input("생년월일", key="birth_date")
-            with birth_col2:
-                address = st.text_input("주소", key="address")
+            # 주소 (전체 너비)
+            address = st.text_input("주소", key="address")
             
             # 이메일/연락처
             contact_col1, contact_col2 = st.columns(2)
