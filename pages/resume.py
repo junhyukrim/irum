@@ -185,8 +185,11 @@ def show_resume_page():
         st.markdown("<div style='margin: 5rem 0;'></div>", unsafe_allow_html=True)
 
         # 저장 버튼 (우측 정렬, 1/8 크기)
-        cols = st.columns([7, 1])
-        with cols[1]:
+        cols = st.columns(8)  # 8등분
+        for i in range(7):  # 처음 7개 컬럼은 빈 공간
+            cols[i].empty()
+        # 마지막 컬럼에 버튼 배치
+        with cols[7]:
             if st.button("저장", key="save_personal", use_container_width=True):
                 st.success("저장되었습니다!")
 
