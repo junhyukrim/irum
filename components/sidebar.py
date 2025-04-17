@@ -1,5 +1,9 @@
 import streamlit as st
 
+def change_page(page_name):
+    """페이지 전환 함수"""
+    st.session_state.current_page = page_name
+
 def setup_sidebar():
     """사이드바의 스타일과 구조를 설정하는 함수"""
     st.markdown(
@@ -64,35 +68,21 @@ def setup_sidebar():
         st.session_state.current_page = '대시보드'
 
     # 메뉴 버튼들
-    pages = {
-        '대시보드': 'dashboard',
-        '이력관리': 'resume',
-        '공고관리': 'jobs',
-        '서류관리': 'documents'
-    }
+    if st.button('대시보드', key='btn_dashboard', use_container_width=True, type='secondary'):
+        change_page('대시보드')
 
-    for page_name, page_key in pages.items():
-        button_key = f"btn_{page_key}"
-        if button_key not in st.session_state:
-            st.session_state[button_key] = False
+    if st.button('이력관리', key='btn_resume', use_container_width=True, type='secondary'):
+        change_page('이력관리')
 
-        if st.button(
-            page_name,
-            key=button_key,
-            use_container_width=True,
-            help=f"{page_name}로 이동",
-            args=(page_name,),
-            on_click=lambda p=page_name: set_page(p)
-        ):
-            pass
+    if st.button('공고관리', key='btn_jobs', use_container_width=True, type='secondary'):
+        change_page('공고관리')
+
+    if st.button('서류관리', key='btn_documents', use_container_width=True, type='secondary'):
+        change_page('서류관리')
 
     # 빈 공간 추가 (크기 조절)
     st.markdown("<div style='flex-grow: 1; min-height: calc(100vh - 800px);'></div>", unsafe_allow_html=True)
     
     # 로그아웃 버튼
-    if st.button("로그아웃", key="btn_logout", on_click=st.logout):
-        pass
-
-def set_page(page_name):
-    """페이지 전환 함수"""
-    st.session_state.current_page = page_name 
+    if st.button("로그아웃", key="btn_logout", use_container_width=True, type='secondary'):
+        st.logout() 
