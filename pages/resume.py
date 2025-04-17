@@ -241,10 +241,13 @@ def show_resume_page():
                         """
                         <style>
                         div[data-testid="column"]:nth-child(4) {
-                            display: flex;
-                            align-items: flex-start;
+                            position: relative;
                             min-height: 85px;
-                            padding-top: 1.5rem;
+                        }
+                        div[data-testid="column"]:nth-child(4) > div {
+                            position: absolute;
+                            bottom: 0;
+                            width: 100%;
                         }
                         </style>
                         """,
