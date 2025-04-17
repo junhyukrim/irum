@@ -281,9 +281,7 @@ def main_screen():
                 phone = st.text_input("연락처", key="phone")
             
             # 사진 링크
-            photo_col1, photo_col2 = st.columns(2)
-            with photo_col1:
-                photo_url = st.text_input("사진 링크", key="photo_url")
+            photo_url = st.text_input("사진 링크", key="photo_url")
             
             # 구분선 추가
             st.markdown("---")
