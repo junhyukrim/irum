@@ -77,17 +77,13 @@ def login_screen():
         }
 
         /* 버튼 컨테이너 스타일 */
-        div.element-container:has(button) {
+        div.stElementContainer.element-container.st-emotion-cache-k6hex6.eu64p4t1 {
             max-width: 800px;
             margin-left: auto;
             margin-right: auto;
             padding: 0 2rem;
-        }
-
-        div.stButton.st-emotion-cache-8atqhb.e1m1olm0 {
             display: flex;
             justify-content: flex-start;
-            width: 100%;
         }
         </style>
         """,
