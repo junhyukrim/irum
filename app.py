@@ -237,7 +237,7 @@ def main_screen():
                 
                 /* 섹션 제목 스타일링 */
                 .section-title {
-                    font-size: 10rem;
+                    font-size: 1.1rem;
                     font-weight: 600;
                     margin-bottom: 1rem;
                     color: #333;
