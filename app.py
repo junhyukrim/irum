@@ -111,10 +111,6 @@ def main_screen():
     # 현재 페이지 상태 관리
     if 'current_page' not in st.session_state:
         st.session_state.current_page = '대시보드'
-    
-    # 마지막으로 클릭된 버튼 상태 관리
-    if 'last_clicked_button' not in st.session_state:
-        st.session_state.last_clicked_button = 'dashboard'
 
     # 사이드바 설정
     with st.sidebar:
@@ -137,9 +133,14 @@ def main_screen():
                 width: 150px;
                 margin-bottom: 3rem;
             }
+
+            /* 버튼 컨테이너 전체 스타일 */
+            div.st-emotion-cache-8atqhb {
+                background-color: transparent;
+            }
             
-            /* 버튼 기본 스타일 */
-            div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"] button[kind="secondary"] {
+            /* 사이드바 버튼 스타일 */
+            .stButton > button {
                 width: calc(100% + 4rem) !important;
                 margin-left: -2rem !important;
                 background-color: transparent !important;
@@ -154,18 +155,31 @@ def main_screen():
                 border-radius: 0 !important;
             }
 
-            /* 호버 스타일 */
-            div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"] button[kind="secondary"]:hover {
+            .stButton > button:hover {
                 font-size: 2rem !important;
                 font-weight: bold !important;
                 background-color: rgba(255, 255, 255, 0.1) !important;
+                border-radius: 0 !important;
             }
 
-            /* 선택된 버튼 스타일 */
-            div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"] button[kind="secondary"][aria-selected="true"] {
-                background-color: #0051FF !important;
+            /* 현재 선택된 버튼 스타일 */
+            .stButton > button[data-testid="stButton"]:active,
+            .stButton > button[aria-pressed="true"] {
                 font-size: 2rem !important;
                 font-weight: bold !important;
+                background-color: rgba(255, 255, 255, 0.1) !important;
+                border-radius: 0 !important;
+            }
+            
+            /* columns 패딩 제거 */
+            div.row-widget.stButton {
+                padding: 0 !important;
+            }
+
+            /* 버튼 컨테이너 패딩 제거 */
+            div.stButton {
+                margin: 0 !important;
+                padding: 0 !important;
             }
             </style>
             """,
@@ -176,29 +190,17 @@ def main_screen():
         st.image("https://i.imgur.com/thQZtYk.png")
         
         # 메뉴 버튼들
-        if st.button('대시보드', key='dashboard', use_container_width=True, type='secondary'):
+        if st.button('대시보드', key='dashboard', use_container_width=True):
             st.session_state.current_page = '대시보드'
-            st.session_state.last_clicked_button = 'dashboard'
-            st.experimental_set_query_params(page='dashboard')
-            st.rerun()
 
-        if st.button('이력관리', key='resume', use_container_width=True, type='secondary'):
+        if st.button('이력관리', key='resume', use_container_width=True):
             st.session_state.current_page = '이력관리'
-            st.session_state.last_clicked_button = 'resume'
-            st.experimental_set_query_params(page='resume')
-            st.rerun()
 
-        if st.button('공고관리', key='jobs', use_container_width=True, type='secondary'):
+        if st.button('공고관리', key='jobs', use_container_width=True):
             st.session_state.current_page = '공고관리'
-            st.session_state.last_clicked_button = 'jobs'
-            st.experimental_set_query_params(page='jobs')
-            st.rerun()
 
-        if st.button('서류관리', key='documents', use_container_width=True, type='secondary'):
+        if st.button('서류관리', key='documents', use_container_width=True):
             st.session_state.current_page = '서류관리'
-            st.session_state.last_clicked_button = 'documents'
-            st.experimental_set_query_params(page='documents')
-            st.rerun()
 
         # 빈 공간 추가 (크기 조절)
         st.markdown("<div style='flex-grow: 1; min-height: calc(100vh - 800px);'></div>", unsafe_allow_html=True)
