@@ -14,9 +14,23 @@ def show_resume_page():
             """
             <style>
             /* 폼 스타일링 */
-            .stTextInput > label, .stSelectbox > label, .stDateInput > label {
-                font-size: 1rem !important;
+            .stTextInput > label, 
+            .stSelectbox > label, 
+            .stDateInput > label,
+            .stTextArea > label {
+                font-size: 14px !important;
                 font-weight: 500 !important;
+            }
+            
+            /* 입력란 폰트 크기 */
+            .stTextInput > div > div > input,
+            .stSelectbox > div > div > div,
+            .stDateInput > div > div > input,
+            .stTextArea > div > div > textarea,
+            div[data-baseweb="input"] > input,
+            div[data-baseweb="textarea"] > textarea,
+            div[data-baseweb="select"] > div {
+                font-size: 14px !important;
             }
             
             /* 입력란 배경색 조정 */
@@ -57,6 +71,12 @@ def show_resume_page():
                 border-radius: 4px !important;
                 width: auto !important;
                 margin: 0 !important;
+                font-size: 14px !important;
+            }
+
+            /* 일반 버튼 스타일 (추가, 삭제, 저장 버튼) */
+            .stButton > button {
+                font-size: 14px !important;
             }
 
             /* 사이드바 버튼 스타일 보존 */
