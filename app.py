@@ -111,9 +111,6 @@ def main_screen():
     # 현재 페이지 상태 관리
     if 'current_page' not in st.session_state:
         st.session_state.current_page = '대시보드'
-    
-    if 'selected_button' not in st.session_state:
-        st.session_state.selected_button = 'dashboard'
 
     # 사이드바 설정
     with st.sidebar:
@@ -135,6 +132,11 @@ def main_screen():
             img {
                 width: 150px;
                 margin-bottom: 3rem;
+            }
+
+            /* 버튼 컨테이너 전체 스타일 */
+            div.st-emotion-cache-8atqhb {
+                background-color: transparent;
             }
             
             /* 사이드바 버튼 스타일 */
@@ -159,11 +161,24 @@ def main_screen():
                 background-color: rgba(255, 255, 255, 0.1) !important;
             }
 
-            /* 선택된 버튼 스타일 */
-            .stButton.selected > button {
+            /* 현재 선택된 버튼 스타일 */
+            .stButton > button[data-testid="stButton"]:active,
+            .stButton > button[aria-pressed="true"] {
                 font-size: 2rem !important;
                 font-weight: bold !important;
                 background-color: #0051FF !important;
+                border-radius: 0 !important;
+            }
+            
+            /* columns 패딩 제거 */
+            div.row-widget.stButton {
+                padding: 0 !important;
+            }
+
+            /* 버튼 컨테이너 패딩 제거 */
+            div.stButton {
+                margin: 0 !important;
+                padding: 0 !important;
             }
             </style>
             """,
@@ -174,39 +189,64 @@ def main_screen():
         st.image("https://i.imgur.com/thQZtYk.png")
         
         # 메뉴 버튼들
-        col1, col2, col3, col4 = st.columns(4)
+        st.markdown(
+            f"""
+            <style>
+            /* 기본 버튼 스타일 */
+            .stButton > button {{
+                width: calc(100% + 4rem) !important;
+                margin-left: -2rem !important;
+                background-color: transparent !important;
+                border: none !important;
+                color: white !important;
+                font-size: 1.1rem !important;
+                padding: 0.5rem 2rem !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
+                transition: all 0.2s ease !important;
+                border-radius: 0 !important;
+            }}
+
+            /* 호버 스타일 */
+            .stButton > button:hover {{
+                font-size: 2rem !important;
+                font-weight: bold !important;
+                background-color: rgba(255, 255, 255, 0.1) !important;
+            }}
+
+            /* 선택된 페이지 버튼 스타일 */
+            {'div[data-testid="stHorizontalBlock"] button[kind="secondary"][data-testid="baseButton-secondary"]:has(div:contains("대시보드")) { background-color: #0051FF !important; font-size: 2rem !important; font-weight: bold !important; }' if st.session_state.current_page == '대시보드' else ''}
+            {'div[data-testid="stHorizontalBlock"] button[kind="secondary"][data-testid="baseButton-secondary"]:has(div:contains("이력관리")) { background-color: #0051FF !important; font-size: 2rem !important; font-weight: bold !important; }' if st.session_state.current_page == '이력관리' else ''}
+            {'div[data-testid="stHorizontalBlock"] button[kind="secondary"][data-testid="baseButton-secondary"]:has(div:contains("공고관리")) { background-color: #0051FF !important; font-size: 2rem !important; font-weight: bold !important; }' if st.session_state.current_page == '공고관리' else ''}
+            {'div[data-testid="stHorizontalBlock"] button[kind="secondary"][data-testid="baseButton-secondary"]:has(div:contains("서류관리")) { background-color: #0051FF !important; font-size: 2rem !important; font-weight: bold !important; }' if st.session_state.current_page == '서류관리' else ''}
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
         
-        # 대시보드 버튼
-        dashboard_div = """<div class="stButton selected">""" if st.session_state.selected_button == 'dashboard' else """<div class="stButton">"""
-        st.markdown(dashboard_div, unsafe_allow_html=True)
+        # 메뉴 버튼들
         if st.button('대시보드', key='dashboard', use_container_width=True):
             st.session_state.current_page = '대시보드'
-            st.session_state.selected_button = 'dashboard'
-        st.markdown("</div>", unsafe_allow_html=True)
-        
-        # 이력관리 버튼
-        resume_div = """<div class="stButton selected">""" if st.session_state.selected_button == 'resume' else """<div class="stButton">"""
-        st.markdown(resume_div, unsafe_allow_html=True)
+            st.rerun()
+
         if st.button('이력관리', key='resume', use_container_width=True):
             st.session_state.current_page = '이력관리'
-            st.session_state.selected_button = 'resume'
-        st.markdown("</div>", unsafe_allow_html=True)
-        
-        # 공고관리 버튼
-        jobs_div = """<div class="stButton selected">""" if st.session_state.selected_button == 'jobs' else """<div class="stButton">"""
-        st.markdown(jobs_div, unsafe_allow_html=True)
+            st.rerun()
+
         if st.button('공고관리', key='jobs', use_container_width=True):
             st.session_state.current_page = '공고관리'
-            st.session_state.selected_button = 'jobs'
-        st.markdown("</div>", unsafe_allow_html=True)
-        
-        # 서류관리 버튼
-        documents_div = """<div class="stButton selected">""" if st.session_state.selected_button == 'documents' else """<div class="stButton">"""
-        st.markdown(documents_div, unsafe_allow_html=True)
+            st.rerun()
+
         if st.button('서류관리', key='documents', use_container_width=True):
             st.session_state.current_page = '서류관리'
-            st.session_state.selected_button = 'documents'
-        st.markdown("</div>", unsafe_allow_html=True)
+            st.rerun()
+
+        # 빈 공간 추가 (크기 조절)
+        st.markdown("<div style='flex-grow: 1; min-height: calc(100vh - 800px);'></div>", unsafe_allow_html=True)
+        
+        # 로그아웃 버튼
+        st.button("로그아웃", key='logout', on_click=st.logout)
 
     # 메인 컨텐츠 영역 스타일
     st.markdown(
