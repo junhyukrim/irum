@@ -277,13 +277,13 @@ def show_resume_page():
                 with cols[3]:
                     st.text_input("성적", placeholder="예: 4.0/4.3", key=f"gpa_{i}_{j}")
                 with cols[4]:
-                    st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
+                    st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
                     if st.session_state.major_counts[i] > 1:
                         if st.button("전공 삭제", key=f"delete_major_{i}_{j}", use_container_width=True):
                             st.session_state.major_counts[i] -= 1
                             st.rerun()
                 with cols[5]:
-                    st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
+                    st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
                     if st.button("전공 추가", key=f"add_major_{i}_{j}", use_container_width=True):
                         st.session_state.major_counts[i] += 1
                         st.rerun()
