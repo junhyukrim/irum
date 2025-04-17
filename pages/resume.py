@@ -232,32 +232,20 @@ def show_resume_page():
                 """
                 <style>
                 /* 버튼 컨테이너 공통 스타일 */
-                div.row-widget.stButton {
-                    position: absolute !important;
-                    bottom: 0 !important;
-                    left: 0 !important;
-                    right: 0 !important;
+                div.stButton {
+                    margin-top: auto !important;
                 }
 
                 /* 버튼을 포함하는 컬럼 스타일 */
-                div.element-container:has(> div.row-widget.stButton) {
-                    position: relative !important;
+                [data-testid="column"] {
+                    display: flex !important;
+                    flex-direction: column !important;
                     min-height: 85px !important;
                 }
 
-                /* 학력 삭제 버튼 컨테이너 */
-                [data-testid="stHorizontalBlock"] > [data-testid="column"]:last-child {
-                    display: flex !important;
-                    flex-direction: column !important;
-                    justify-content: flex-end !important;
-                }
-
-                /* 전공 삭제/추가 버튼 컨테이너 */
-                [data-testid="stHorizontalBlock"] > [data-testid="column"]:nth-last-child(2),
-                [data-testid="stHorizontalBlock"] > [data-testid="column"]:last-child {
-                    display: flex !important;
-                    flex-direction: column !important;
-                    justify-content: flex-end !important;
+                /* 버튼 스타일 */
+                .stButton > button {
+                    width: 100% !important;
                 }
                 </style>
                 """,
