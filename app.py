@@ -129,11 +129,13 @@ def main_screen():
                 border: none !important;
                 color: white !important;
                 font-size: 1.1rem !important;
-                padding: 0.5rem 0 !important;
+                padding: 0.5rem 2rem !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: flex-start !important;
                 transition: all 0.2s ease !important;
+                margin: 0 -2rem !important;  /* 네거티브 마진으로 전체 너비 확보 */
+                width: calc(100% + 4rem) !important;  /* 패딩만큼 너비 증가 */
             }
 
             .stButton > button:hover {
@@ -145,6 +147,17 @@ def main_screen():
             .selected-button button {
                 font-size: 2rem !important;
                 font-weight: bold !important;
+            }
+            
+            /* columns 패딩 제거 */
+            div.row-widget.stButton {
+                padding: 0 !important;
+            }
+
+            /* 버튼 컨테이너 패딩 제거 */
+            div.stButton {
+                margin: 0 !important;
+                padding: 0 !important;
             }
             
             img {
@@ -159,35 +172,24 @@ def main_screen():
         # 로고 추가
         st.image("https://i.imgur.com/thQZtYk.png")
         
-        # 메뉴 버튼들
-        col1, col2, col3 = st.columns([0.1, 3, 0.1])
-        with col2:
-            # 각 버튼에 대해 현재 페이지인 경우 selected-button 클래스 추가
-            st.markdown(f"""<div class="{'selected-button' if st.session_state.current_page == '대시보드' else ''}">""", unsafe_allow_html=True)
-            if st.button('대시보드', key='dashboard', use_container_width=True):
-                st.session_state.current_page = '대시보드'
-            st.markdown('</div>', unsafe_allow_html=True)
+        # 메뉴 버튼들 (columns 제거)
+        if st.button('대시보드', key='dashboard', use_container_width=True):
+            st.session_state.current_page = '대시보드'
 
-            st.markdown(f"""<div class="{'selected-button' if st.session_state.current_page == '이력관리' else ''}">""", unsafe_allow_html=True)
-            if st.button('이력관리', key='resume', use_container_width=True):
-                st.session_state.current_page = '이력관리'
-            st.markdown('</div>', unsafe_allow_html=True)
+        if st.button('이력관리', key='resume', use_container_width=True):
+            st.session_state.current_page = '이력관리'
 
-            st.markdown(f"""<div class="{'selected-button' if st.session_state.current_page == '공고관리' else ''}">""", unsafe_allow_html=True)
-            if st.button('공고관리', key='jobs', use_container_width=True):
-                st.session_state.current_page = '공고관리'
-            st.markdown('</div>', unsafe_allow_html=True)
+        if st.button('공고관리', key='jobs', use_container_width=True):
+            st.session_state.current_page = '공고관리'
 
-            st.markdown(f"""<div class="{'selected-button' if st.session_state.current_page == '서류관리' else ''}">""", unsafe_allow_html=True)
-            if st.button('서류관리', key='documents', use_container_width=True):
-                st.session_state.current_page = '서류관리'
-            st.markdown('</div>', unsafe_allow_html=True)
+        if st.button('서류관리', key='documents', use_container_width=True):
+            st.session_state.current_page = '서류관리'
 
-            # 빈 공간 추가 (크기 조절)
-            st.markdown("<div style='flex-grow: 1; min-height: calc(100vh - 700px);'></div>", unsafe_allow_html=True)
-            
-            # 로그아웃 버튼
-            st.button("로그아웃", key='logout', on_click=st.logout)
+        # 빈 공간 추가 (크기 조절)
+        st.markdown("<div style='flex-grow: 1; min-height: calc(100vh - 700px);'></div>", unsafe_allow_html=True)
+        
+        # 로그아웃 버튼
+        st.button("로그아웃", key='logout', on_click=st.logout)
 
     # 메인 컨텐츠 영역 스타일
     st.markdown(
