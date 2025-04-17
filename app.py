@@ -124,7 +124,9 @@ def main_screen():
             
             /* 이미지 컨테이너 스타일 */
             div.element-container:has(img) {
-                padding: 0 2rem !important;
+                padding: 0 !important;
+                display: flex !important;
+                justify-content: center !important;
             }
             
             img {
