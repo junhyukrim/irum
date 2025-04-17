@@ -231,21 +231,8 @@ def show_resume_page():
             st.markdown(
                 """
                 <style>
-                /* 버튼 컨테이너 공통 스타일 */
-                div.stButton {
-                    margin-top: auto !important;
-                }
-
-                /* 버튼을 포함하는 컬럼 스타일 */
                 [data-testid="column"] {
-                    display: flex !important;
-                    flex-direction: column !important;
-                    min-height: 85px !important;
-                }
-
-                /* 버튼 스타일 */
-                .stButton > button {
-                    width: 100% !important;
+                    height: 120px;
                 }
                 </style>
                 """,
