@@ -84,9 +84,14 @@ def login_screen():
             padding: 0 2rem;
         }
 
-        div.stButton {
+        .block-container > div > div > div > div:nth-child(3) {
             display: flex;
             justify-content: flex-start;
+            padding-left: 2rem;
+        }
+
+        .block-container > div > div > div > div:nth-child(3) > div {
+            width: auto !important;
         }
         </style>
         """,
