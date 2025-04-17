@@ -219,37 +219,6 @@ def main_screen():
         st.write("환영합니다, " + st.experimental_user.name + "님!")
         
     elif st.session_state.current_page == '이력관리':
-        st.markdown(
-            """
-            <style>
-            /* 상단 고정 스타일링 */
-            section.main > div:has(h1) {
-                position: sticky !important;
-                top: 0 !important;
-                background-color: white !important;
-                z-index: 999 !important;
-                padding: 1rem 0 !important;
-            }
-            
-            /* 탭 컨테이너 고정 */
-            section.main > div:has([data-baseweb="tabs"]) {
-                position: sticky !important;
-                top: 80px !important;
-                background-color: white !important;
-                z-index: 998 !important;
-                padding: 0.5rem 0 !important;
-                border-bottom: 1px solid #eee !important;
-            }
-
-            /* 탭 내용 여백 조정 */
-            section.main > div:has([data-baseweb="tab-panel"]) {
-                padding-top: 2rem !important;
-            }
-            </style>
-            """,
-            unsafe_allow_html=True
-        )
-        
         st.markdown('<h1 class="main-header">이력관리</h1>', unsafe_allow_html=True)
         
         # 탭 생성
