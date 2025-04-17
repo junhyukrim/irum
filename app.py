@@ -222,27 +222,28 @@ def main_screen():
         st.markdown(
             """
             <style>
-            /* 상단 고정 컨테이너 스타일 */
-            [data-testid="stHeader"] {
+            /* 상단 고정 스타일링 */
+            section.main > div:has(h1) {
                 position: sticky !important;
-                top: 0px;
-                background-color: white;
-                z-index: 999;
-                padding: 1rem 0;
+                top: 0 !important;
+                background-color: white !important;
+                z-index: 999 !important;
+                padding: 1rem 0 !important;
             }
             
             /* 탭 컨테이너 고정 */
-            .stTabs {
+            section.main > div:has([data-baseweb="tabs"]) {
                 position: sticky !important;
-                top: 80px;
-                z-index: 998;
-                background-color: white;
-                padding: 10px 0;
+                top: 80px !important;
+                background-color: white !important;
+                z-index: 998 !important;
+                padding: 0.5rem 0 !important;
+                border-bottom: 1px solid #eee !important;
             }
-            
-            /* 탭 아래 내용 여백 */
-            .stTabs + div {
-                margin-top: 20px;
+
+            /* 탭 내용 여백 조정 */
+            section.main > div:has([data-baseweb="tab-panel"]) {
+                padding-top: 2rem !important;
             }
             </style>
             """,
