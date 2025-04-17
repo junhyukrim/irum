@@ -376,6 +376,10 @@ def main_screen():
             # 학력 카운터 초기화
             if 'education_count' not in st.session_state:
                 st.session_state.education_count = 1
+            
+            # 전공 카운터 초기화
+            if 'major_counts' not in st.session_state:
+                st.session_state.major_counts = {0: 1}  # {학력인덱스: 전공개수}
 
             # 각 학력 정보 입력 폼
             for i in range(st.session_state.education_count):
@@ -396,15 +400,30 @@ def main_screen():
                 with col2:
                     st.text_input("학부 또는 분야", key=f"department_{i}")
                 
-                # 학과, 전공, 세부내용
-                st.text_input("학과, 전공, 세부내용", key=f"major_{i}")
-                
-                # 학위/성적
-                col1, col2 = st.columns(2)
+                # 전공 정보 (여러 개 추가 가능)
+                if i not in st.session_state.major_counts:
+                    st.session_state.major_counts[i] = 1
+
+                for j in range(st.session_state.major_counts[i]):
+                    if j > 0:
+                        st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
+                    
+                    # 학과, 전공, 세부내용
+                    st.text_input("학과, 전공, 세부내용", key=f"major_{i}_{j}")
+                    
+                    # 학위/성적
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.selectbox("학위", ["선택", "고등학교 졸업", "전문학사", "학사", "석사", "박사"], key=f"degree_{i}_{j}")
+                    with col2:
+                        st.text_input("성적", placeholder="예: 4.0/4.3", key=f"gpa_{i}_{j}")
+
+                # 전공 추가 버튼
+                col1, col2, col3 = st.columns([1, 4, 1])
                 with col1:
-                    st.selectbox("학위", ["선택", "고등학교 졸업", "전문학사", "학사", "석사", "박사"], key=f"degree_{i}")
-                with col2:
-                    st.text_input("성적", placeholder="예: 4.0/4.3", key=f"gpa_{i}")
+                    if st.button("전공 추가", key=f"add_major_{i}", use_container_width=True):
+                        st.session_state.major_counts[i] += 1
+                        st.rerun()
                 
                 # 비고
                 st.text_area("비고", key=f"notes_{i}", height=100)
@@ -415,6 +434,7 @@ def main_screen():
             with col2:
                 if st.button("학력추가", use_container_width=True):
                     st.session_state.education_count += 1
+                    st.session_state.major_counts[st.session_state.education_count - 1] = 1
                     st.rerun()
             with col3:
                 if st.button("저장", key="save_education", use_container_width=True):
