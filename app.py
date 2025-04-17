@@ -120,8 +120,11 @@ def main_screen():
             section[data-testid="stSidebar"] {
                 background-color: #4285F4;
                 width: 250px !important;
+            }
+            
+            section[data-testid="stSidebar"] > div {
                 height: 100vh;
-                position: relative;
+                padding-bottom: 70px;  /* 로그아웃 버튼 높이만큼 여백 */
             }
             
             img {
@@ -147,15 +150,14 @@ def main_screen():
             }
 
             /* 로그아웃 버튼 컨테이너 */
-            div[data-testid="stVerticalBlock"] {
-                height: calc(100vh - 100px);
-                display: flex;
-                flex-direction: column;
-            }
-
             .logout-container {
-                margin-top: auto;
-                padding: 1rem;
+                position: fixed !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                width: 250px !important;
+                padding: 1rem !important;
+                background-color: #4285F4 !important;
+                z-index: 1000 !important;
             }
 
             /* 로그아웃 버튼 스타일 */
