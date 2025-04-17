@@ -427,7 +427,9 @@ def show_resume_page():
                 with col3:
                     st.date_input("퇴임년월", key=f"position_end_{i}_{j}")
                 
-                # 업무 내용 (들여쓰기 제거)
+                st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
+                
+                # 업무 내용
                 if j not in st.session_state.task_counts[i]:
                     st.session_state.task_counts[i][j] = 1
 
@@ -436,16 +438,31 @@ def show_resume_page():
                         st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
                     st.text_input("업무내용", key=f"task_{i}_{j}_{k}")
 
-                # 업무 추가 버튼
-                col1, col2 = st.columns([2, 5])
+                # 업무 삭제/추가 버튼
+                col1, col2, col3 = st.columns([2, 2, 3])
                 with col1:
-                    if st.button("업무추가", key=f"add_task_{i}_{j}", use_container_width=True):
+                    if st.button("업무 삭제", key=f"delete_task_{i}_{j}", use_container_width=True):
+                        if st.session_state.task_counts[i][j] > 1:
+                            st.session_state.task_counts[i][j] -= 1
+                            st.rerun()
+                with col2:
+                    if st.button("업무 추가", key=f"add_task_{i}_{j}", use_container_width=True):
                         st.session_state.task_counts[i][j] += 1
                         st.rerun()
 
-            # 직위/직책 추가 버튼
-            col1, col2 = st.columns([2, 5])
+                st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
+
+            # 직위/직책 삭제/추가 버튼
+            col1, col2, col3 = st.columns([2, 2, 3])
             with col1:
+                if st.button("직위/직책 삭제", key=f"delete_position_{i}", use_container_width=True):
+                    if st.session_state.position_counts[i] > 1:
+                        st.session_state.position_counts[i] -= 1
+                        # 해당 직위/직책의 업무 데이터도 삭제
+                        if st.session_state.position_counts[i] in st.session_state.task_counts[i]:
+                            del st.session_state.task_counts[i][st.session_state.position_counts[i]]
+                        st.rerun()
+            with col2:
                 if st.button("직위/직책 추가", key=f"add_position_{i}", use_container_width=True):
                     st.session_state.position_counts[i] += 1
                     st.session_state.task_counts[i][st.session_state.position_counts[i]-1] = 1
