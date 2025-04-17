@@ -52,18 +52,8 @@ def show_resume_page():
                 color: white !important;
                 padding: 0.5rem 2rem !important;
                 border-radius: 4px !important;
-                width: 150px !important;
+                width: auto !important;
                 margin: 0 !important;
-                min-width: 150px !important;
-                max-width: 150px !important;
-                display: flex !important;
-                justify-content: center !important;
-                align-items: center !important;
-            }
-
-            /* 사이드바 버튼 스타일 */
-            section[data-testid="stSidebar"] .stButton > button {
-                justify-content: flex-start !important;
             }
 
             .stButton > button:hover {
@@ -222,14 +212,14 @@ def show_resume_page():
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
         col1, col2, col3 = st.columns([1, 1, 2])
         with col1:
-            if st.button("학력 추가"):
+            if st.button("학력 추가", use_container_width=True):
                 new_idx = max(st.session_state.education_data) + 1 if st.session_state.education_data else 0
                 st.session_state.education_data.append(new_idx)
                 st.session_state.major_counts[new_idx] = 1
                 st.session_state.education_count += 1
                 st.rerun()
         with col2:
-            if st.button("저장", key="save_education"):
+            if st.button("저장", key="save_education", use_container_width=True):
                 st.success("저장되었습니다!")
 
     # 역량 탭
