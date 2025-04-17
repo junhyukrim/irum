@@ -427,26 +427,24 @@ def show_resume_page():
                 with col3:
                     st.date_input("퇴임년월", key=f"position_end_{i}_{j}")
                 
-                # 업무 내용 (들여쓰기)
-                col1, col2 = st.columns([1, 8])
-                with col2:
-                    if j not in st.session_state.task_counts[i]:
-                        st.session_state.task_counts[i][j] = 1
+                # 업무 내용 (들여쓰기 제거)
+                if j not in st.session_state.task_counts[i]:
+                    st.session_state.task_counts[i][j] = 1
 
-                    for k in range(st.session_state.task_counts[i][j]):
-                        if k > 0:
-                            st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
-                        st.text_input("업무내용", key=f"task_{i}_{j}_{k}")
+                for k in range(st.session_state.task_counts[i][j]):
+                    if k > 0:
+                        st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
+                    st.text_input("업무내용", key=f"task_{i}_{j}_{k}")
 
-                    # 업무 추가 버튼
-                    col1, col2 = st.columns([3, 5])
-                    with col1:
-                        if st.button("업무추가", key=f"add_task_{i}_{j}", use_container_width=True):
-                            st.session_state.task_counts[i][j] += 1
-                            st.rerun()
+                # 업무 추가 버튼
+                col1, col2 = st.columns([2, 5])
+                with col1:
+                    if st.button("업무추가", key=f"add_task_{i}_{j}", use_container_width=True):
+                        st.session_state.task_counts[i][j] += 1
+                        st.rerun()
 
             # 직위/직책 추가 버튼
-            col1, col2 = st.columns([3, 5])
+            col1, col2 = st.columns([2, 5])
             with col1:
                 if st.button("직위/직책 추가", key=f"add_position_{i}", use_container_width=True):
                     st.session_state.position_counts[i] += 1
