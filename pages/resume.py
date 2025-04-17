@@ -304,11 +304,31 @@ def show_resume_page():
 
         st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
 
-        # 저장 버튼 (7:1 = 8, right align)
+        # 저장 버튼 (7:1)
         cols = st.columns(8)
         for i in range(7):  # 처음 7개 컬럼은 빈 공간
             cols[i].empty()
         with cols[7]:  # 마지막 컬럼에 버튼 배치
+            st.markdown(
+                """
+                <style>
+                /* 메인 컨테이너 안의 일반 버튼 스타일 */
+                div[data-testid="stMainBlockContainer"] div.stButton > button {
+                    background-color: transparent !important;
+                    color: #4285F4 !important;
+                    border: 1px solid #4285F4 !important;
+                }
+
+                /* 저장 버튼 스타일 - 마지막 컬럼에 있는 버튼 */
+                div[data-testid="stMainBlockContainer"] div.row-widget:last-child div.stButton > button {
+                    background-color: #4285F4 !important;
+                    color: white !important;
+                    border: none !important;
+                }
+                </style>
+                """,
+                unsafe_allow_html=True
+            )
             if st.button("저장", key="save_education", use_container_width=True):
                 st.success("저장되었습니다!")
 
@@ -449,29 +469,28 @@ def show_resume_page():
         for i in range(7):  # 처음 7개 컬럼은 빈 공간
             cols[i].empty()
         with cols[7]:  # 마지막 컬럼에 버튼 배치
-            if st.button("저장", key="primary_save_skill", use_container_width=True):
+            st.markdown(
+                """
+                <style>
+                /* 메인 컨테이너 안의 일반 버튼 스타일 */
+                div[data-testid="stMainBlockContainer"] div.stButton > button {
+                    background-color: transparent !important;
+                    color: #4285F4 !important;
+                    border: 1px solid #4285F4 !important;
+                }
+
+                /* 저장 버튼 스타일 - 마지막 컬럼에 있는 버튼 */
+                div[data-testid="stMainBlockContainer"] div.row-widget:last-child div.stButton > button {
+                    background-color: #4285F4 !important;
+                    color: white !important;
+                    border: none !important;
+                }
+                </style>
+                """,
+                unsafe_allow_html=True
+            )
+            if st.button("저장", key="save_skill", use_container_width=True):
                 st.success("저장되었습니다!")
-
-        st.markdown(
-            """
-            <style>
-            /* 메인 컨테이너 안의 일반 버튼 스타일 */
-            div[data-testid="stMainBlockContainer"] div.stButton > button {
-                background-color: transparent !important;
-                color: #4285F4 !important;
-                border: 1px solid #4285F4 !important;
-            }
-
-            /* 저장 버튼 스타일 */
-            div[data-testid="stMainBlockContainer"] button[data-testid="baseButton-primary_save_skill"] {
-                background-color: #4285F4 !important;
-                color: white !important;
-                border: none !important;
-            }
-            </style>
-            """,
-            unsafe_allow_html=True
-        )
 
     # 경력 탭
     with tabs[3]:
