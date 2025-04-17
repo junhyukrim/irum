@@ -18,16 +18,17 @@ def show_resume_page():
                 width: 14rem;
             }
 
-            [data-testid="stAppViewContainer"] > section:first-child {
-                width: calc(100% - 14rem);
-                padding: 1rem 2rem;
+            div[data-testid="stMainBlockContainer"] {
+                max-width: 1200px !important;
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
             }
 
-            div[data-testid="stVerticalBlock"] {
-                width: 100%;
-                padding: 0;
+            section[data-testid="stSidebar"] {
+                width: 14rem !important;
+                min-width: 14rem !important;
             }
-            
+
             /* 폼 스타일링 */
             .stTextInput > label, 
             .stSelectbox > label, 
