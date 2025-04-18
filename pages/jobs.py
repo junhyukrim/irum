@@ -4,7 +4,7 @@ def show_jobs_page():
     st.markdown(
         """
         <style>
-        /* 메인 컨테이너 width 조정 */
+        /* 메인 컨테이너 */
         div[data-testid="stMainBlockContainer"] {
             max-width: 1500px !important;
             padding-left: 1rem !important;
@@ -12,7 +12,7 @@ def show_jobs_page():
             margin: 0 auto !important;
         }
 
-        /* 섹션 스타일 */
+        /* 섹션 헤더 */
         .section-header {
             margin-top: 2rem;
             margin-bottom: 1rem;
@@ -20,63 +20,47 @@ def show_jobs_page():
             color: #333;
         }
 
-        /* 입력란 스타일링 */
+        /* 입력란 */
         .stTextInput > div > div > input,
         .stSelectbox > div > div > div,
         .stDateInput > div > div > input,
-        .stTextArea > div > div > textarea,
-        div[data-baseweb="input"] > input,
-        div[data-baseweb="textarea"] > textarea,
-        div[data-baseweb="select"] > div,
-        div[data-baseweb="input"],
-        div[data-baseweb="base-input"] {
+        .stTextArea > div > div > textarea {
             background-color: #F8F9FA !important;
         }
 
-        /* 입력란 호버/포커스 시 배경색 */
         .stTextInput > div > div > input:hover,
         .stSelectbox > div > div > div:hover,
         .stDateInput > div > div > input:hover,
-        div[data-baseweb="input"] > input:hover,
-        div[data-baseweb="input"]:hover,
-        div[data-baseweb="base-input"]:hover,
+        .stTextArea > div > div > textarea:hover,
         .stTextInput > div > div > input:focus,
         .stSelectbox > div > div > div:focus,
         .stDateInput > div > div > input:focus,
-        div[data-baseweb="input"] > input:focus,
-        div[data-baseweb="input"]:focus-within,
-        div[data-baseweb="base-input"]:focus-within {
+        .stTextArea > div > div > textarea:focus {
             background-color: #FFFFFF !important;
         }
 
-        /* 버튼 스타일링 */
+        /* 버튼 */
         div.stButton > button {
-            width: 100% !important;
-            height: 42px !important;
-            margin: 0 !important;
-            padding: 0.5rem !important;
-            background-color: #4285F4 !important;
-            color: white !important;
-            font-size: 14px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            border-radius: 4px !important;
-            transition: all 0.2s ease !important;
-            border: 1px solid #4285F4 !important;
+            width: 100%;
+            height: 42px;
+            background-color: #4285F4;
+            color: white;
+            border-radius: 4px;
+            border: 1px solid #4285F4;
+            font-size: 14px;
         }
 
         div.stButton > button:hover {
-            background-color: #1967D2 !important;
-            border-color: #1967D2 !important;
+            background-color: #1967D2;
+            border-color: #1967D2;
         }
 
         div.stButton > button:active {
-            background-color: #1557B0 !important;
-            border-color: #1557B0 !important;
+            background-color: #1557B0;
+            border-color: #1557B0;
         }
 
-        /* 모바일 화면 대응 */
+        /* 모바일 대응 */
         @media (max-width: 768px) {
             div[data-testid="stMainBlockContainer"] {
                 max-width: 100% !important;
