@@ -62,6 +62,13 @@ def show_jobs_page():
     
     st.markdown('<h3 class="main-header">공고관리</h3>', unsafe_allow_html=True)
     
+    # 드롭다운 추가
+    st.selectbox(
+        "저장된 공고",
+        ["공고 1", "공고 2"],
+        placeholder="저장된 공고를 선택하세요"
+    )
+    
     # 필수 채용공고 양식
     st.markdown('<h5 class="section-header">필수 채용공고 양식</h5>', unsafe_allow_html=True)
     
@@ -121,14 +128,8 @@ def show_jobs_page():
     additional_info = st.text_area("기타 안내사항", height=100,
                                  help="• 추가로 안내할 사항이 있다면 기재해주세요.")
     
-    # 저장 버튼
-    col6, col7, col8 = st.columns([6, 1, 1, 1])
-    with col7:
-        if st.button("초기화"):
-            st.rerun()
+    # 우측 하단에 저장 버튼 배치
+    col6, col7, col8 = st.columns([6, 1, 1])
     with col8:
-        if st.button("임시저장"):
-            st.success("임시저장 되었습니다!")
-    with col8:
-        if st.button("저장"):
+        if st.button("저장", type="primary"):
             st.success("저장되었습니다!") 
