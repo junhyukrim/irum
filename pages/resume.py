@@ -135,6 +135,20 @@ def show_resume_page():
                 font-size: 2rem !important;
                 font-weight: bold !important;
             }
+
+            /* 섹션 여백 통일 */
+            div.stVerticalBlock {
+                margin-top: 0 !important;
+            }
+
+            h5 {
+                margin-bottom: 1rem !important;
+            }
+
+            /* 탭 내부 여백 통일 */
+            .stTabs [data-baseweb="tab-panel"] {
+                padding-top: 1rem !important;
+            }
             </style>
             """,
             unsafe_allow_html=True
