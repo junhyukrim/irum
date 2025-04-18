@@ -430,9 +430,6 @@ def show_resume_page():
                 st.session_state.cert_counts[i] = 1
 
             for j in range(st.session_state.cert_counts[i]):
-                if j > 0:
-                    st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
-                
                 # 자격증 (3:1:2:1:1)
                 cols = st.columns([3, 1, 2, 1, 1])
                 with cols[0]:
@@ -452,6 +449,9 @@ def show_resume_page():
                     if st.button("자격증 추가", key=f"add_cert_{i}_{j}", use_container_width=True):
                         st.session_state.cert_counts[i] += 1
                         st.rerun()
+
+                if j < st.session_state.cert_counts[i] - 1:
+                    st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
 
             st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
 
