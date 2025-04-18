@@ -49,6 +49,33 @@ def show_jobs_page():
             background-color: #FFFFFF !important;
         }
 
+        /* 버튼 스타일링 */
+        div.stButton > button {
+            width: 100% !important;
+            height: 42px !important;
+            margin: 0 !important;
+            padding: 0.5rem !important;
+            background-color: #4285F4 !important;
+            color: white !important;
+            font-size: 14px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border-radius: 4px !important;
+            transition: all 0.2s ease !important;
+            border: 1px solid #4285F4 !important;
+        }
+
+        div.stButton > button:hover {
+            background-color: #1967D2 !important;
+            border-color: #1967D2 !important;
+        }
+
+        div.stButton > button:active {
+            background-color: #1557B0 !important;
+            border-color: #1557B0 !important;
+        }
+
         /* 모바일 화면 대응 */
         @media (max-width: 768px) {
             div[data-testid="stMainBlockContainer"] {
