@@ -230,6 +230,24 @@ def show_resume_page():
 
     # 학력 탭
     with tabs[1]:
+        st.markdown(
+            """
+            <style>
+            /* 학력 섹션 스타일링 - 여백만 유지 */
+            div[data-testid="stVerticalBlock"] > div:has(> div.element-container:has(h5)):not(:first-child) {
+                padding-top: 20px;
+                margin-top: 20px;
+            }
+
+            div[data-testid="stVerticalBlock"] > div:has(> div.element-container:has(h5)) {
+                padding-bottom: 20px;
+                margin-bottom: 20px;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+        
         st.markdown('<h5>학력</h5>', unsafe_allow_html=True)
         
         # 학력 카운터 초기화
