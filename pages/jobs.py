@@ -131,5 +131,5 @@ def show_jobs_page():
     # 우측 하단에 저장 버튼 배치
     col6, col7, col8 = st.columns([6, 1, 1])
     with col8:
-        if st.button("저장", type="primary"):
+        if st.button("저장", type="primary", use_container_width=True):
             st.success("저장되었습니다!") 
