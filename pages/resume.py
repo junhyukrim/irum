@@ -44,10 +44,27 @@ def show_resume_page():
             padding: 0 !important;
         }
 
-        /* stVerticalBlock 여백 제거 */
-        [data-testid="stVerticalBlock"] > div {
-            padding-top: 0 !important;
+        /* 학력, 역량 탭 여백 조정 */
+        div[data-testid="stHorizontalBlock"] {
+            padding: 0 !important;
+            margin: 0 !important;
             gap: 1rem !important;
+        }
+
+        div[data-testid="stHorizontalBlock"] > div {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+        }
+
+        /* 입력 필드 그룹 여백 조정 */
+        div.row-widget.stRadio > div {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+        }
+
+        div.row-widget.stSelectbox > div {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
         }
 
         /* 폼 스타일링 */
