@@ -46,40 +46,118 @@ def show_resume_page():
                 overflow: hidden !important;
             }
 
-            /* 입력 필드 스타일 통일 */
-            .stTextInput, .stSelectbox, .stDateInput {
-                margin-bottom: 0.5rem !important;
-                padding: 0.5rem 0 !important;
-            }
-
-            /* 입력 필드 컨테이너 스타일 통일 */
-            div[data-testid="column"] {
-                padding: 0.5rem !important;
-                margin: 0 !important;
-            }
-
-            /* 버튼 컨테이너 스타일 */
-            div.stButton {
-                padding: 0.5rem !important;
-                margin: 0 !important;
-            }
-
-            /* 구분선 스타일 */
-            hr {
-                margin: 1rem 0 !important;
-            }
-
-            /* 텍스트 영역 스타일 */
-            .stTextArea {
-                margin: 0.5rem 0 !important;
-                padding: 0.5rem 0 !important;
-            }
-
             /* 사이드바 접힘/펼침에 따른 메인 컨테이너 조정 */
             @media (max-width: 768px) {
                 div[data-testid="stMainBlockContainer"] {
                     max-width: 100% !important;
                 }
+            }
+
+            /* 폼 스타일링 */
+            .stTextInput > label, 
+            .stSelectbox > label, 
+            .stDateInput > label,
+            .stTextArea > label {
+                font-size: 14px !important;
+                font-weight: 500 !important;
+            }
+            
+            /* 입력란 폰트 크기 */
+            .stTextInput > div > div > input,
+            .stSelectbox > div > div > div,
+            .stDateInput > div > div > input,
+            .stTextArea > div > div > textarea,
+            div[data-baseweb="input"] > input,
+            div[data-baseweb="textarea"] > textarea,
+            div[data-baseweb="select"] > div {
+                font-size: 14px !important;
+            }
+            
+            /* 입력란 배경색 조정 */
+            .stTextInput > div > div > input,
+            .stSelectbox > div > div > div,
+            .stDateInput > div > div > input,
+            div[data-baseweb="input"] > input,
+            div[data-baseweb="input"],
+            div[data-baseweb="base-input"] {
+                background-color: #F8F9FA !important;
+            }
+
+            /* 입력란 호버/포커스 시 배경색 */
+            .stTextInput > div > div > input:hover,
+            .stSelectbox > div > div > div:hover,
+            .stDateInput > div > div > input:hover,
+            div[data-baseweb="input"] > input:hover,
+            div[data-baseweb="input"]:hover,
+            div[data-baseweb="base-input"]:hover,
+            .stTextInput > div > div > input:focus,
+            .stSelectbox > div > div > div:focus,
+            .stDateInput > div > div > input:focus,
+            div[data-baseweb="input"] > input:focus,
+            div[data-baseweb="input"]:focus-within,
+            div[data-baseweb="base-input"]:focus-within {
+                background-color: #FFFFFF !important;
+            }
+            
+            /* 저장 버튼 스타일링 */
+            div.stButton {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            div.stButton > button {
+                width: 100% !important;
+                height: 42px !important;
+                margin: 0 !important;
+                padding: 0.5rem !important;
+                background-color: #4285F4 !important;
+                color: white !important;
+                font-size: 14px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                border-radius: 4px !important;
+                transition: all 0.2s ease !important;
+                border: 1px solid #4285F4 !important;
+            }
+
+            div.stButton > button:hover {
+                background-color: #1967D2 !important;
+                border-color: #1967D2 !important;
+            }
+
+            div.stButton > button:active {
+                background-color: #1557B0 !important;
+                border-color: #1557B0 !important;
+            }
+
+            /* 사이드바 버튼 스타일 보존 */
+            [data-testid="stSidebar"] .stButton > button {
+                background-color: transparent !important;
+                border: none !important;
+                color: white !important;
+                font-size: 1.1rem !important;
+                padding: 0.5rem 2rem !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
+                transition: all 0.2s ease !important;
+                border-radius: 0 !important;
+                width: calc(100% + 4rem) !important;
+                margin-left: -2rem !important;
+            }
+
+            [data-testid="stSidebar"] .stButton > button:hover {
+                font-size: 2rem !important;
+                font-weight: bold !important;
+                background-color: rgba(255, 255, 255, 0.1) !important;
+            }
+
+            [data-testid="stSidebar"] .stButton > button[aria-pressed="true"] {
+                background-color: #0051FF !important;
+                font-size: 2rem !important;
+                font-weight: bold !important;
             }
             </style>
             """,
