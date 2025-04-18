@@ -130,9 +130,8 @@ def show_jobs_page():
     
     st.markdown("<br>", unsafe_allow_html=True)  # 버튼 위에 여백 추가
     
-    # 우측 하단에 저장 버튼 배치
-    col6, col7, col8 = st.columns([6, 1, 1])
-    with col8:
-        save_button = st.button("저장", type="primary", use_container_width=True)
-        if save_button:
+    # 저장 버튼 배치
+    col1, col2, col3 = st.columns([7, 1, 1])
+    with col3:
+        if st.button("저장", type="primary", use_container_width=True):
             st.success("저장되었습니다!") 
