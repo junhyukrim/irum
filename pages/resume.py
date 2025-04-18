@@ -230,7 +230,23 @@ def show_resume_page():
 
     # 학력 탭
     with tabs[1]:
-        st.markdown('<h5 class="main-header">학력</h5>', unsafe_allow_html=True)
+        st.markdown(
+            """
+            <style>
+            /* 학력 섹션 스타일링 */
+            .education-header {
+                border-top: 2px solid #9C27B0;
+                border-bottom: 2px solid #9C27B0;
+                padding: 10px 0;
+                margin: 20px 0;
+                text-align: left;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+        
+        st.markdown('<h5 class="education-header">학력</h5>', unsafe_allow_html=True)
         
         # 학력 카운터 초기화
         if 'education_count' not in st.session_state:
@@ -247,20 +263,9 @@ def show_resume_page():
         # 각 학력 정보 입력 폼
         for idx, i in enumerate(st.session_state.education_data):
             if idx > 0:
-                st.markdown("<hr>", unsafe_allow_html=True)
+                st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
             
             # 입학년월/졸업년월/교육기관/학력삭제 버튼 (2:2:3:1 = 8)
-            st.markdown(
-                """
-                <style>
-                div.stButton > button:first-child {
-                    margin-top: 40px;
-                }
-                </style>
-                """,
-                unsafe_allow_html=True
-            )
-            
             cols = st.columns([2, 2, 3, 1])
             with cols[0]:
                 st.date_input("입학년월", key=f"admission_date_{i}")
