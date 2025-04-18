@@ -67,14 +67,9 @@ def show_resume_page():
                 background-color: #FFFFFF !important;
             }
             
-            /* 저장 버튼 스타일링 */
-            div.stButton {
-                width: 100% !important;
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-
-            div.stButton > button {
+            /* 메인 컨텐츠 버튼 스타일링 */
+            div[data-testid="stHorizontalBlock"] div.stButton > button,
+            div[data-testid="stVerticalBlock"] div.stButton > button {
                 width: 100% !important;
                 height: 42px !important;
                 margin: 0 !important;
@@ -90,14 +85,44 @@ def show_resume_page():
                 border: 1px solid #4285F4 !important;
             }
 
-            div.stButton > button:hover {
+            div[data-testid="stHorizontalBlock"] div.stButton > button:hover,
+            div[data-testid="stVerticalBlock"] div.stButton > button:hover {
                 background-color: #1967D2 !important;
                 border-color: #1967D2 !important;
             }
 
-            div.stButton > button:active {
+            div[data-testid="stHorizontalBlock"] div.stButton > button:active,
+            div[data-testid="stVerticalBlock"] div.stButton > button:active {
                 background-color: #1557B0 !important;
                 border-color: #1557B0 !important;
+            }
+
+            /* 사이드바 버튼 스타일 */
+            section[data-testid="stSidebar"] .stButton > button {
+                width: calc(100% + 4rem) !important;
+                margin-left: -2rem !important;
+                background-color: transparent !important;
+                border: none !important;
+                color: white !important;
+                font-size: 1.1rem !important;
+                padding: 0.5rem 2rem !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
+                transition: all 0.2s ease !important;
+                border-radius: 0 !important;
+            }
+
+            section[data-testid="stSidebar"] .stButton > button:hover {
+                font-size: 2rem !important;
+                font-weight: bold !important;
+                background-color: rgba(255, 255, 255, 0.1) !important;
+            }
+
+            section[data-testid="stSidebar"] .stButton > button[aria-pressed="true"] {
+                background-color: #0051FF !important;
+                font-size: 2rem !important;
+                font-weight: bold !important;
             }
 
             /* 모바일 화면 대응 */
