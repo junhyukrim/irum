@@ -431,7 +431,7 @@ def show_resume_page():
 
             for j in range(st.session_state.cert_counts[i]):
                 if j > 0:
-                    st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
+                    st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
                 
                 # 자격증 (3:1:2:1:1)
                 cols = st.columns([3, 1, 2, 1, 1])
