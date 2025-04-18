@@ -135,6 +135,3 @@ def show_jobs_page():
     with col2:
         if st.button("저장", type="primary", use_container_width=True):
             st.success("저장되었습니다!") 
-
-# 페이지 표시
-show_jobs_page() 
