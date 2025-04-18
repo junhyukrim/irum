@@ -28,24 +28,26 @@ def show_resume_page():
             min-width: 14rem !important;
         }
 
-        /* 탭 컨테이너 여백 제거 */
+        /* 여백 통일 */
         div[data-testid="stMarkdown"] {
-            margin-bottom: 1rem !important;
-        }
-
-        div[data-testid="stMarkdown"] > div {
-            margin-bottom: 0 !important;
-        }
-
-        div[data-testid="stMarkdown"] h5 {
             margin: 0 !important;
             padding: 0 !important;
         }
 
-        /* h5 태그 여백 통일 */
-        h5 {
-            margin-top: 0.5rem !important;
-            margin-bottom: 1.5rem !important;
+        div[data-testid="stMarkdown"] > div {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        div[data-testid="stMarkdown"] h5 {
+            margin: 0 0 1rem 0 !important;
+            padding: 0 !important;
+        }
+
+        /* stVerticalBlock 여백 제거 */
+        [data-testid="stVerticalBlock"] > div {
+            padding-top: 0 !important;
+            gap: 1rem !important;
         }
 
         /* 폼 스타일링 */
