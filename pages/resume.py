@@ -29,6 +29,14 @@ def show_resume_page():
                 min-width: 14rem !important;
             }
 
+            /* 구분선 스타일 */
+            hr {
+                margin: 1rem 0;
+                border: none;
+                border-top: 1px solid rgba(128, 128, 255, 0.3);
+                background-color: transparent;
+            }
+
             /* 폼 스타일링 */
             .stTextInput > label, 
             .stSelectbox > label, 
@@ -179,7 +187,9 @@ def show_resume_page():
         )
         
         # 인적사항 섹션
+        st.markdown("<hr>", unsafe_allow_html=True)
         st.markdown('<h5>인적사항</h5>', unsafe_allow_html=True)
+        st.markdown("<hr>", unsafe_allow_html=True)
         
         # 한글이름/영문이름/국적/성별/생년월일 (2:2:2:1:1 = 8)
         cols = st.columns([2, 2, 2, 1, 1])
@@ -244,7 +254,9 @@ def show_resume_page():
 
     # 학력 탭
     with tabs[1]:
+        st.markdown("<hr>", unsafe_allow_html=True)
         st.markdown('<h5>학력</h5>', unsafe_allow_html=True)
+        st.markdown("<hr>", unsafe_allow_html=True)
         
         # 학력 카운터 초기화
         if 'education_count' not in st.session_state:
@@ -352,7 +364,9 @@ def show_resume_page():
 
     # 역량 탭
     with tabs[2]:
+        st.markdown("<hr>", unsafe_allow_html=True)
         st.markdown('<h5>역량</h5>', unsafe_allow_html=True)
+        st.markdown("<hr>", unsafe_allow_html=True)
         
         # 역량 카운터 초기화
         if 'skill_count' not in st.session_state:
@@ -471,7 +485,9 @@ def show_resume_page():
 
     # 경력 탭
     with tabs[3]:
+        st.markdown("<hr>", unsafe_allow_html=True)
         st.markdown('<h5>경력</h5>', unsafe_allow_html=True)
+        st.markdown("<hr>", unsafe_allow_html=True)
         
         # 경력 카운터 초기화
         if 'career_count' not in st.session_state:
@@ -598,7 +614,9 @@ def show_resume_page():
 
     # 수상 탭
     with tabs[4]:
+        st.markdown("<hr>", unsafe_allow_html=True)
         st.markdown('<h5>수상</h5>', unsafe_allow_html=True)
+        st.markdown("<hr>", unsafe_allow_html=True)
         
         # 수상 카운터 초기화
         if 'award_count' not in st.session_state:
@@ -654,7 +672,9 @@ def show_resume_page():
 
     # 기타활동 탭
     with tabs[5]:
+        st.markdown("<hr>", unsafe_allow_html=True)
         st.markdown('<h5>기타활동</h5>', unsafe_allow_html=True)
+        st.markdown("<hr>", unsafe_allow_html=True)
         
         # 활동 카운터 초기화
         if 'activity_count' not in st.session_state:
@@ -721,7 +741,9 @@ def show_resume_page():
 
     # 자기소개 탭
     with tabs[6]:
+        st.markdown("<hr>", unsafe_allow_html=True)
         st.markdown('<h5>자기소개</h5>', unsafe_allow_html=True)
+        st.markdown("<hr>", unsafe_allow_html=True)
         
         # 자기소개 카운터 초기화
         if 'intro_count' not in st.session_state:
