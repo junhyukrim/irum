@@ -230,23 +230,7 @@ def show_resume_page():
 
     # 학력 탭
     with tabs[1]:
-        st.markdown(
-            """
-            <style>
-            /* 학력 섹션 스타일링 */
-            .education-header {
-                border-top: 2px solid #9C27B0;
-                border-bottom: 2px solid #9C27B0;
-                padding: 10px 0;
-                margin: 20px 0;
-                text-align: left;
-            }
-            </style>
-            """,
-            unsafe_allow_html=True
-        )
-        
-        st.markdown('<h5 class="education-header">학력</h5>', unsafe_allow_html=True)
+        st.markdown('<h5>학력</h5>', unsafe_allow_html=True)
         
         # 학력 카운터 초기화
         if 'education_count' not in st.session_state:
