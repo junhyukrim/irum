@@ -50,7 +50,7 @@ def show_jobs_page():
         }
 
         /* 버튼 스타일링 */
-        div.stButton > button:not([data-testid="baseButton-secondary"]) {
+        div.stButton > button {
             width: 100% !important;
             height: 42px !important;
             margin: 0 !important;
@@ -66,12 +66,12 @@ def show_jobs_page():
             border: 1px solid #4285F4 !important;
         }
 
-        div.stButton > button:not([data-testid="baseButton-secondary"]):hover {
+        div.stButton > button:hover {
             background-color: #1967D2 !important;
             border-color: #1967D2 !important;
         }
 
-        div.stButton > button:not([data-testid="baseButton-secondary"]):active {
+        div.stButton > button:active {
             background-color: #1557B0 !important;
             border-color: #1557B0 !important;
         }
