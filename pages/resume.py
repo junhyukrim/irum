@@ -14,43 +14,11 @@ def show_resume_page():
             """
             <style>
             /* 메인 컨테이너 width 조정 */
-            [data-testid="stSidebarContent"] {
-                width: 14rem;
-                overflow: hidden !important;
-            }
-
             div[data-testid="stMainBlockContainer"] {
                 max-width: 1500px !important;
                 padding-left: 1rem !important;
                 padding-right: 1rem !important;
                 margin: 0 auto !important;
-            }
-
-            section[data-testid="stSidebar"][aria-expanded="true"] {
-                width: 14rem !important;
-                margin-left: 0 !important;
-                overflow: hidden !important;
-            }
-
-            section[data-testid="stSidebar"][aria-expanded="false"] {
-                width: 0 !important;
-                margin-left: 0 !important;
-                overflow: hidden !important;
-            }
-
-            /* 로고 영역 조정 */
-            section[data-testid="stSidebar"] .element-container:first-child {
-                width: 14rem !important;
-                min-width: 14rem !important;
-                max-width: 14rem !important;
-                overflow: hidden !important;
-            }
-
-            /* 사이드바 접힘/펼침에 따른 메인 컨테이너 조정 */
-            @media (max-width: 768px) {
-                div[data-testid="stMainBlockContainer"] {
-                    max-width: 100% !important;
-                }
             }
 
             /* 폼 스타일링 */
@@ -132,32 +100,11 @@ def show_resume_page():
                 border-color: #1557B0 !important;
             }
 
-            /* 사이드바 버튼 스타일 보존 */
-            [data-testid="stSidebar"] .stButton > button {
-                background-color: transparent !important;
-                border: none !important;
-                color: white !important;
-                font-size: 1.1rem !important;
-                padding: 0.5rem 2rem !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: flex-start !important;
-                transition: all 0.2s ease !important;
-                border-radius: 0 !important;
-                width: calc(100% + 4rem) !important;
-                margin-left: -2rem !important;
-            }
-
-            [data-testid="stSidebar"] .stButton > button:hover {
-                font-size: 2rem !important;
-                font-weight: bold !important;
-                background-color: rgba(255, 255, 255, 0.1) !important;
-            }
-
-            [data-testid="stSidebar"] .stButton > button[aria-pressed="true"] {
-                background-color: #0051FF !important;
-                font-size: 2rem !important;
-                font-weight: bold !important;
+            /* 모바일 화면 대응 */
+            @media (max-width: 768px) {
+                div[data-testid="stMainBlockContainer"] {
+                    max-width: 100% !important;
+                }
             }
             </style>
             """,
