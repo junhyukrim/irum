@@ -8,200 +8,140 @@ def show_resume_page():
         "개인정보", "학력", "역량", "경력", "수상", "기타활동", "자기소개"
     ])
     
-    # CSS 스타일 정의
-    st.markdown(
-        """
-        <style>
-        /* 메인 컨테이너 width 조정 */
-        [data-testid="stSidebarContent"] {
-            width: 14rem;
-        }
-
-        div[data-testid="stMainBlockContainer"] {
-            max-width: 1500px !important;
-            padding-left: 1rem !important;
-            padding-right: 1rem !important;
-        }
-
-        section[data-testid="stSidebar"] {
-            width: 14rem !important;
-            min-width: 14rem !important;
-        }
-
-        /* 여백 통일 */
-        div[data-testid="stMarkdown"] {
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-
-        div[data-testid="stMarkdown"] > div {
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-
-        div[data-testid="stMarkdown"] h5 {
-            margin: 0 0 1rem 0 !important;
-            padding: 0 !important;
-        }
-
-        /* 학력, 역량 탭 여백 조정 */
-        div[data-testid="stHorizontalBlock"] {
-            padding: 0 !important;
-            margin: 0 !important;
-            gap: 1rem !important;
-        }
-
-        div[data-testid="stHorizontalBlock"] > div {
-            padding-top: 0 !important;
-            margin-top: 0 !important;
-        }
-
-        /* 입력 필드 그룹 여백 조정 */
-        div.row-widget.stRadio > div {
-            padding-top: 0 !important;
-            margin-top: 0 !important;
-        }
-
-        div.row-widget.stSelectbox > div {
-            padding-top: 0 !important;
-            margin-top: 0 !important;
-        }
-
-        /* 폼 스타일링 */
-        .stTextInput > label, 
-        .stSelectbox > label, 
-        .stDateInput > label,
-        .stTextArea > label {
-            font-size: 14px !important;
-            font-weight: 500 !important;
-        }
-        
-        /* 입력란 폰트 크기 */
-        .stTextInput > div > div > input,
-        .stSelectbox > div > div > div,
-        .stDateInput > div > div > input,
-        .stTextArea > div > div > textarea,
-        div[data-baseweb="input"] > input,
-        div[data-baseweb="textarea"] > textarea,
-        div[data-baseweb="select"] > div {
-            font-size: 14px !important;
-        }
-        
-        /* 입력란 배경색 조정 */
-        .stTextInput > div > div > input,
-        .stSelectbox > div > div > div,
-        .stDateInput > div > div > input,
-        div[data-baseweb="input"] > input,
-        div[data-baseweb="input"],
-        div[data-baseweb="base-input"] {
-            background-color: #F8F9FA !important;
-        }
-
-        /* 입력란 호버/포커스 시 배경색 */
-        .stTextInput > div > div > input:hover,
-        .stSelectbox > div > div > div:hover,
-        .stDateInput > div > div > input:hover,
-        div[data-baseweb="input"] > input:hover,
-        div[data-baseweb="input"]:hover,
-        div[data-baseweb="base-input"]:hover,
-        .stTextInput > div > div > input:focus,
-        .stSelectbox > div > div > div:focus,
-        .stDateInput > div > div > input:focus,
-        div[data-baseweb="input"] > input:focus,
-        div[data-baseweb="input"]:focus-within,
-        div[data-baseweb="base-input"]:focus-within {
-            background-color: #FFFFFF !important;
-        }
-        
-        /* 저장 버튼 스타일링 */
-        div.stButton {
-            width: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-
-        div.stButton > button {
-            width: 100% !important;
-            height: 42px !important;
-            margin: 0 !important;
-            padding: 0.5rem !important;
-            background-color: #4285F4 !important;
-            color: white !important;
-            font-size: 14px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            border-radius: 4px !important;
-            transition: all 0.2s ease !important;
-            border: 1px solid #4285F4 !important;
-        }
-
-        div.stButton > button:hover {
-            background-color: #1967D2 !important;
-            border-color: #1967D2 !important;
-        }
-
-        div.stButton > button:active {
-            background-color: #1557B0 !important;
-            border-color: #1557B0 !important;
-        }
-
-        /* 사이드바 버튼 스타일 보존 */
-        [data-testid="stSidebar"] .stButton > button {
-            background-color: transparent !important;
-            border: none !important;
-            color: white !important;
-            font-size: 1.1rem !important;
-            padding: 0.5rem 2rem !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: flex-start !important;
-            transition: all 0.2s ease !important;
-            border-radius: 0 !important;
-            width: calc(100% + 4rem) !important;
-            margin-left: -2rem !important;
-        }
-
-        [data-testid="stSidebar"] .stButton > button:hover {
-            font-size: 2rem !important;
-            font-weight: bold !important;
-            background-color: rgba(255, 255, 255, 0.1) !important;
-        }
-
-        [data-testid="stSidebar"] .stButton > button[aria-pressed="true"] {
-            background-color: #0051FF !important;
-            font-size: 2rem !important;
-            font-weight: bold !important;
-        }
-
-        /* subheader 스타일링 */
-        .stSubheader {
-            font-size: 1.1rem !important;
-            font-weight: 600 !important;
-            margin: 0 0 1rem 0 !important;
-            padding: 0 !important;
-        }
-        
-        /* 여백 제거 */
-        [data-testid="stVerticalBlock"] > div:first-child {
-            padding-top: 0 !important;
-            margin-top: 0 !important;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-    
     # 개인정보 탭
     with tabs[0]:
         st.markdown(
             """
-            <div style="padding-top: 0; margin-top: 0;">
-            <h5>인적사항</h5>
-            </div>
+            <style>
+            /* 메인 컨테이너 width 조정 */
+            [data-testid="stSidebarContent"] {
+                width: 14rem;
+            }
+
+            div[data-testid="stMainBlockContainer"] {
+                max-width: 1500px !important;
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+
+            section[data-testid="stSidebar"] {
+                width: 14rem !important;
+                min-width: 14rem !important;
+            }
+
+            /* 폼 스타일링 */
+            .stTextInput > label, 
+            .stSelectbox > label, 
+            .stDateInput > label,
+            .stTextArea > label {
+                font-size: 14px !important;
+                font-weight: 500 !important;
+            }
+            
+            /* 입력란 폰트 크기 */
+            .stTextInput > div > div > input,
+            .stSelectbox > div > div > div,
+            .stDateInput > div > div > input,
+            .stTextArea > div > div > textarea,
+            div[data-baseweb="input"] > input,
+            div[data-baseweb="textarea"] > textarea,
+            div[data-baseweb="select"] > div {
+                font-size: 14px !important;
+            }
+            
+            /* 입력란 배경색 조정 */
+            .stTextInput > div > div > input,
+            .stSelectbox > div > div > div,
+            .stDateInput > div > div > input,
+            div[data-baseweb="input"] > input,
+            div[data-baseweb="input"],
+            div[data-baseweb="base-input"] {
+                background-color: #F8F9FA !important;
+            }
+
+            /* 입력란 호버/포커스 시 배경색 */
+            .stTextInput > div > div > input:hover,
+            .stSelectbox > div > div > div:hover,
+            .stDateInput > div > div > input:hover,
+            div[data-baseweb="input"] > input:hover,
+            div[data-baseweb="input"]:hover,
+            div[data-baseweb="base-input"]:hover,
+            .stTextInput > div > div > input:focus,
+            .stSelectbox > div > div > div:focus,
+            .stDateInput > div > div > input:focus,
+            div[data-baseweb="input"] > input:focus,
+            div[data-baseweb="input"]:focus-within,
+            div[data-baseweb="base-input"]:focus-within {
+                background-color: #FFFFFF !important;
+            }
+            
+            /* 저장 버튼 스타일링 */
+            div.stButton {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            div.stButton > button {
+                width: 100% !important;
+                height: 42px !important;
+                margin: 0 !important;
+                padding: 0.5rem !important;
+                background-color: #4285F4 !important;
+                color: white !important;
+                font-size: 14px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                border-radius: 4px !important;
+                transition: all 0.2s ease !important;
+                border: 1px solid #4285F4 !important;
+            }
+
+            div.stButton > button:hover {
+                background-color: #1967D2 !important;
+                border-color: #1967D2 !important;
+            }
+
+            div.stButton > button:active {
+                background-color: #1557B0 !important;
+                border-color: #1557B0 !important;
+            }
+
+            /* 사이드바 버튼 스타일 보존 */
+            [data-testid="stSidebar"] .stButton > button {
+                background-color: transparent !important;
+                border: none !important;
+                color: white !important;
+                font-size: 1.1rem !important;
+                padding: 0.5rem 2rem !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
+                transition: all 0.2s ease !important;
+                border-radius: 0 !important;
+                width: calc(100% + 4rem) !important;
+                margin-left: -2rem !important;
+            }
+
+            [data-testid="stSidebar"] .stButton > button:hover {
+                font-size: 2rem !important;
+                font-weight: bold !important;
+                background-color: rgba(255, 255, 255, 0.1) !important;
+            }
+
+            [data-testid="stSidebar"] .stButton > button[aria-pressed="true"] {
+                background-color: #0051FF !important;
+                font-size: 2rem !important;
+                font-weight: bold !important;
+            }
+            </style>
             """,
             unsafe_allow_html=True
         )
+        
+        # 인적사항 섹션
+        st.markdown('<h5>인적사항</h5>', unsafe_allow_html=True)
         
         # 한글이름/영문이름/국적/성별/생년월일 (2:2:2:1:1 = 8)
         cols = st.columns([2, 2, 2, 1, 1])
@@ -234,7 +174,7 @@ def show_resume_page():
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
         
         # 병역 및 보훈 섹션
-        st.markdown('<h5 class="main-header">병역 및 보훈</h5>', unsafe_allow_html=True)
+        st.markdown('<h5>병역 및 보훈</h5>', unsafe_allow_html=True)
         
         # 병역/군별/계급/보훈대상/복무시작일/복무종료일/전역유형 (1:1:1:1:1:1:1:1 = 8)
         cols = st.columns([1, 1, 1, 1, 1, 1, 2])
@@ -266,8 +206,7 @@ def show_resume_page():
 
     # 학력 탭
     with tabs[1]:
-        st.write('<style>div.stMarkdown > div:first-child { margin-bottom: 1rem !important; }</style>', unsafe_allow_html=True)
-        st.markdown('<h5>학력</h5>', unsafe_allow_html=True)
+        st.markdown('<h5 class="main-header">학력</h5>', unsafe_allow_html=True)
         
         # 학력 카운터 초기화
         if 'education_count' not in st.session_state:
@@ -375,8 +314,7 @@ def show_resume_page():
 
     # 역량 탭
     with tabs[2]:
-        st.write('<style>div.stMarkdown > div:first-child { margin-bottom: 1rem !important; }</style>', unsafe_allow_html=True)
-        st.markdown('<h5>역량</h5>', unsafe_allow_html=True)
+        st.markdown('<h5 class="main-header">역량</h5>', unsafe_allow_html=True)
         
         # 역량 카운터 초기화
         if 'skill_count' not in st.session_state:
@@ -521,14 +459,7 @@ def show_resume_page():
 
     # 경력 탭
     with tabs[3]:
-        st.markdown(
-            """
-            <div>
-            <h5 style="margin-bottom: 1rem !important;">경력</h5>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        st.markdown('<h5 class="main-header">경력</h5>', unsafe_allow_html=True)
         
         # 경력 카운터 초기화
         if 'career_count' not in st.session_state:
@@ -655,14 +586,7 @@ def show_resume_page():
 
     # 수상 탭
     with tabs[4]:
-        st.markdown(
-            """
-            <div>
-            <h5 style="margin-bottom: 1rem !important;">수상</h5>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        st.markdown('<h5 class="main-header">수상</h5>', unsafe_allow_html=True)
         
         # 수상 카운터 초기화
         if 'award_count' not in st.session_state:
@@ -718,14 +642,7 @@ def show_resume_page():
 
     # 기타활동 탭
     with tabs[5]:
-        st.markdown(
-            """
-            <div>
-            <h5 style="margin-bottom: 1rem !important;">기타활동</h5>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        st.markdown('<h5 class="main-header">기타활동</h5>', unsafe_allow_html=True)
         
         # 활동 카운터 초기화
         if 'activity_count' not in st.session_state:
@@ -792,14 +709,7 @@ def show_resume_page():
 
     # 자기소개 탭
     with tabs[6]:
-        st.markdown(
-            """
-            <div>
-            <h5 style="margin-bottom: 1rem !important;">자기소개</h5>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        st.markdown('<h5 class="main-header">자기소개</h5>', unsafe_allow_html=True)
         
         # 자기소개 카운터 초기화
         if 'intro_count' not in st.session_state:
