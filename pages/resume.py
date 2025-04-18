@@ -23,6 +23,15 @@ def show_resume_page():
             padding-right: 1rem !important;
         }
 
+        /* 탭 컨테이너 여백 제거 */
+        .stTabs {
+            padding-top: 0 !important;
+        }
+        
+        div[data-testid="stTabContent"] {
+            padding-top: 0 !important;
+        }
+
         section[data-testid="stSidebar"] {
             width: 14rem !important;
             min-width: 14rem !important;
