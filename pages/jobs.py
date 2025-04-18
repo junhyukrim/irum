@@ -36,13 +36,13 @@ def show_jobs_page():
     # 필수 채용공고 양식
     st.markdown('<h4 class="section-header">필수 채용공고 양식</h4>', unsafe_allow_html=True)
     
-    col1, col2 = st.columns([2, 1])
+    col1, col2, col3 = st.columns([3, 3, 1])
     with col1:
         company_name = st.text_input("기업명")
     with col2:
+        position_name = st.text_input("직무명")
+    with col3:
         position_count = st.number_input("채용인원", min_value=1, value=1)
-    
-    position_name = st.text_input("직무명")
     
     # 자격요건 (여러 줄 입력 가능)
     requirements = st.text_area("자격요건", height=150,
@@ -57,10 +57,10 @@ def show_jobs_page():
                             help="• 제출서류와 지원방법을 상세히 기재해주세요.")
     
     # 문의처와 홈페이지
-    col3, col4 = st.columns(2)
-    with col3:
-        contact = st.text_input("문의처(이메일/연락처)")
+    col4, col5 = st.columns(2)
     with col4:
+        contact = st.text_input("문의처(이메일/연락처)")
+    with col5:
         website = st.text_input("홈페이지 주소")
     
     st.markdown("<hr>", unsafe_allow_html=True)
@@ -93,11 +93,11 @@ def show_jobs_page():
                                  help="• 추가로 안내할 사항이 있다면 기재해주세요.")
     
     # 저장 버튼
-    col5, col6, col7, col8 = st.columns([6, 1, 1, 1])
-    with col6:
+    col6, col7, col8 = st.columns([6, 1, 1, 1])
+    with col7:
         if st.button("초기화"):
             st.rerun()
-    with col7:
+    with col8:
         if st.button("임시저장"):
             st.success("임시저장 되었습니다!")
     with col8:
