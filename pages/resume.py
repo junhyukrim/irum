@@ -16,6 +16,7 @@ def show_resume_page():
             /* 메인 컨테이너 width 조정 */
             [data-testid="stSidebarContent"] {
                 width: 14rem;
+                overflow: hidden !important;
             }
 
             div[data-testid="stMainBlockContainer"] {
@@ -28,11 +29,21 @@ def show_resume_page():
             section[data-testid="stSidebar"][aria-expanded="true"] {
                 width: 14rem !important;
                 margin-left: 0 !important;
+                overflow: hidden !important;
             }
 
             section[data-testid="stSidebar"][aria-expanded="false"] {
                 width: 0 !important;
                 margin-left: 0 !important;
+                overflow: hidden !important;
+            }
+
+            /* 로고 영역 조정 */
+            section[data-testid="stSidebar"] .element-container:first-child {
+                width: 14rem !important;
+                min-width: 14rem !important;
+                max-width: 14rem !important;
+                overflow: hidden !important;
             }
 
             /* 사이드바 접힘/펼침에 따른 메인 컨테이너 조정 */
