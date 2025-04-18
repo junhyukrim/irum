@@ -41,23 +41,29 @@ def show_jobs_page():
 
         /* 버튼 */
         div.stButton > button {
-            width: 100%;
-            height: 42px;
-            background-color: #4285F4;
-            color: white;
-            border-radius: 4px;
-            border: 1px solid #4285F4;
-            font-size: 14px;
+            width: 100% !important;
+            height: 42px !important;
+            margin: 0 !important;
+            padding: 0.5rem !important;
+            background-color: #4285F4 !important;
+            color: white !important;
+            font-size: 14px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border-radius: 4px !important;
+            transition: all 0.2s ease !important;
+            border: 1px solid #4285F4 !important;
         }
 
         div.stButton > button:hover {
-            background-color: #1967D2;
-            border-color: #1967D2;
+            background-color: #1967D2 !important;
+            border-color: #1967D2 !important;
         }
 
         div.stButton > button:active {
-            background-color: #1557B0;
-            border-color: #1557B0;
+            background-color: #1557B0 !important;
+            border-color: #1557B0 !important;
         }
 
         /* 모바일 대응 */
