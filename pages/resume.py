@@ -358,6 +358,25 @@ def show_resume_page():
                 padding-bottom: 20px;
                 margin-bottom: 20px;
             }
+
+            /* 역량 탭의 버튼 스타일 (저장 버튼 제외) */
+            div[data-testid="stHorizontalBlock"] div.stButton > button:not([kind="primary"]) {
+                background-color: transparent !important;
+                color: #4285F4 !important;
+                border: 1px solid #4285F4 !important;
+            }
+
+            div[data-testid="stHorizontalBlock"] div.stButton > button:not([kind="primary"]):hover {
+                background-color: #F8F9FA !important;
+                color: #1967D2 !important;
+                border-color: #1967D2 !important;
+            }
+
+            div[data-testid="stHorizontalBlock"] div.stButton > button:not([kind="primary"]):active {
+                background-color: #F1F3F4 !important;
+                color: #1557B0 !important;
+                border-color: #1557B0 !important;
+            }
             </style>
             """,
             unsafe_allow_html=True
@@ -382,7 +401,7 @@ def show_resume_page():
         # 각 역량 정보 입력 폼
         for idx, i in enumerate(st.session_state.skill_data):
             if idx > 0:
-                st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
+                st.markdown("<hr>", unsafe_allow_html=True)
             
             # 기술 및 역량 (2:1:4:1)
             cols = st.columns([2, 1, 4, 1])
@@ -411,19 +430,17 @@ def show_resume_page():
                 st.session_state.cert_counts[i] = 1
 
             for j in range(st.session_state.cert_counts[i]):
-                if j == 0:
-                    st.text_input("자격증", key=f"cert_label_{i}", disabled=True)
                 if j > 0:
-                    st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
+                    st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
                 
                 # 자격증 (3:1:2:1:1)
                 cols = st.columns([3, 1, 2, 1, 1])
                 with cols[0]:
-                    st.text_input("자격증명", key=f"cert_name_{i}_{j}", label_visibility="collapsed")
+                    st.text_input("자격증", key=f"cert_name_{i}_{j}")
                 with cols[1]:
-                    st.date_input("취득년월", key=f"cert_date_{i}_{j}", label_visibility="collapsed")
+                    st.date_input("취득년월", key=f"cert_date_{i}_{j}")
                 with cols[2]:
-                    st.text_input("발급기관", key=f"cert_org_{i}_{j}", label_visibility="collapsed")
+                    st.text_input("발급기관", key=f"cert_org_{i}_{j}")
                 with cols[3]:
                     st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
                     if st.session_state.cert_counts[i] > 1:
@@ -443,14 +460,12 @@ def show_resume_page():
                 st.session_state.edu_counts[i] = 1
 
             for j in range(st.session_state.edu_counts[i]):
-                if j == 0:
-                    st.text_input("교육: 훈련, 연수, 유학 등", key=f"edu_label_{i}", disabled=True)
                 if j > 0:
-                    st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
+                    st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
                 
                 cols = st.columns([6, 1, 1])
                 with cols[0]:
-                    st.text_input("교육내용", key=f"education_{i}_{j}", label_visibility="collapsed")
+                    st.text_input("교육: 훈련, 연수, 유학 등", key=f"education_{i}_{j}")
                 with cols[1]:
                     st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
                     if st.session_state.edu_counts[i] > 1:
