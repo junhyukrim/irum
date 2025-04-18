@@ -24,12 +24,14 @@ def show_resume_page():
         }
 
         /* 탭 컨테이너 여백 제거 */
-        .stTabs {
+        [data-testid="stVerticalBlock"] > div:first-child {
             padding-top: 0 !important;
+            margin-top: 0 !important;
         }
-        
-        div[data-testid="stTabContent"] {
+
+        [data-testid="stVerticalBlock"] div[data-testid="stMarkdown"] {
             padding-top: 0 !important;
+            margin-top: 0 !important;
         }
 
         section[data-testid="stSidebar"] {
