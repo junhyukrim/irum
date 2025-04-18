@@ -173,6 +173,20 @@ def show_resume_page():
             font-size: 2rem !important;
             font-weight: bold !important;
         }
+
+        /* subheader 스타일링 */
+        .stSubheader {
+            font-size: 1.1rem !important;
+            font-weight: 600 !important;
+            margin: 0 0 1rem 0 !important;
+            padding: 0 !important;
+        }
+        
+        /* 여백 제거 */
+        [data-testid="stVerticalBlock"] > div:first-child {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+        }
         </style>
         """,
         unsafe_allow_html=True
@@ -252,14 +266,9 @@ def show_resume_page():
 
     # 학력 탭
     with tabs[1]:
-        st.markdown(
-            """
-            <div>
-            <h5 style="margin-bottom: 1rem !important;">학력</h5>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        cols = st.columns([8])
+        with cols[0]:
+            st.subheader("학력")
         
         # 학력 카운터 초기화
         if 'education_count' not in st.session_state:
@@ -367,14 +376,9 @@ def show_resume_page():
 
     # 역량 탭
     with tabs[2]:
-        st.markdown(
-            """
-            <div>
-            <h5 style="margin-bottom: 1rem !important;">역량</h5>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        cols = st.columns([8])
+        with cols[0]:
+            st.subheader("역량")
         
         # 역량 카운터 초기화
         if 'skill_count' not in st.session_state:
