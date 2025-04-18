@@ -345,7 +345,44 @@ def show_resume_page():
 
     # 역량 탭
     with tabs[2]:
-        st.markdown('<h5 class="main-header">역량</h5>', unsafe_allow_html=True)
+        st.markdown(
+            """
+            <style>
+            /* 역량 섹션 스타일링 - 여백만 유지 */
+            div[data-testid="stVerticalBlock"] > div:has(> div.element-container:has(h5)):not(:first-child) {
+                padding-top: 20px;
+                margin-top: 20px;
+            }
+
+            div[data-testid="stVerticalBlock"] > div:has(> div.element-container:has(h5)) {
+                padding-bottom: 20px;
+                margin-bottom: 20px;
+            }
+
+            /* 역량 탭의 버튼 스타일 (저장 버튼 제외) */
+            div[data-testid="stHorizontalBlock"] div.stButton > button:not([kind="primary"]) {
+                background-color: transparent !important;
+                color: #4285F4 !important;
+                border: 1px solid #4285F4 !important;
+            }
+
+            div[data-testid="stHorizontalBlock"] div.stButton > button:not([kind="primary"]):hover {
+                background-color: #F8F9FA !important;
+                color: #1967D2 !important;
+                border-color: #1967D2 !important;
+            }
+
+            div[data-testid="stHorizontalBlock"] div.stButton > button:not([kind="primary"]):active {
+                background-color: #F1F3F4 !important;
+                color: #1557B0 !important;
+                border-color: #1557B0 !important;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+        
+        st.markdown('<h5>역량</h5>', unsafe_allow_html=True)
         
         # 역량 카운터 초기화
         if 'skill_count' not in st.session_state:
@@ -367,32 +404,6 @@ def show_resume_page():
                 st.markdown("<hr>", unsafe_allow_html=True)
             
             # 기술 및 역량 (2:1:4:1)
-            st.markdown(
-                """
-                <style>
-                /* 역량 탭의 버튼 스타일 (저장 버튼 제외) */
-                div[data-testid="stHorizontalBlock"] div.stButton > button:not([kind="primary"]) {
-                    background-color: transparent !important;
-                    color: #4285F4 !important;
-                    border: 1px solid #4285F4 !important;
-                }
-
-                div[data-testid="stHorizontalBlock"] div.stButton > button:not([kind="primary"]):hover {
-                    background-color: #F8F9FA !important;
-                    color: #1967D2 !important;
-                    border-color: #1967D2 !important;
-                }
-
-                div[data-testid="stHorizontalBlock"] div.stButton > button:not([kind="primary"]):active {
-                    background-color: #F1F3F4 !important;
-                    color: #1557B0 !important;
-                    border-color: #1557B0 !important;
-                }
-                </style>
-                """,
-                unsafe_allow_html=True
-            )
-            
             cols = st.columns([2, 1, 4, 1])
             with cols[0]:
                 st.text_input("기술 및 역량", key=f"skill_desc_{i}")
