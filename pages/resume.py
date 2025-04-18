@@ -22,11 +22,24 @@ def show_resume_page():
                 max-width: 1500px !important;
                 padding-left: 1rem !important;
                 padding-right: 1rem !important;
+                margin: 0 auto !important;
             }
 
-            section[data-testid="stSidebar"] {
+            section[data-testid="stSidebar"][aria-expanded="true"] {
                 width: 14rem !important;
-                min-width: 14rem !important;
+                margin-left: 0 !important;
+            }
+
+            section[data-testid="stSidebar"][aria-expanded="false"] {
+                width: 0 !important;
+                margin-left: 0 !important;
+            }
+
+            /* 사이드바 접힘/펼침에 따른 메인 컨테이너 조정 */
+            @media (max-width: 768px) {
+                div[data-testid="stMainBlockContainer"] {
+                    max-width: 100% !important;
+                }
             }
 
             /* 폼 스타일링 */
