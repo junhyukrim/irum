@@ -66,7 +66,7 @@ def show_jobs_page():
     st.markdown("<hr>", unsafe_allow_html=True)
     
     # 추가적 채용공고 양식
-    st.markdown('<h4 class="section-header">추가적 채용공고 양식</h4>', unsafe_allow_html=True)
+    st.markdown('<h4 class="section-header">추가 채용공고 양식</h4>', unsafe_allow_html=True)
     
     # 기업소개 (여러 줄 입력 가능)
     company_intro = st.text_area("기업소개", height=150,
