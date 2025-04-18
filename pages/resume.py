@@ -232,8 +232,8 @@ def show_resume_page():
     with tabs[1]:
         st.markdown(
             """
-            <div style="padding-top: 0; margin-top: 0;">
-            <h5>학력</h5>
+            <div>
+            <h5 style="margin-bottom: 1rem !important;">학력</h5>
             </div>
             """,
             unsafe_allow_html=True
@@ -347,8 +347,8 @@ def show_resume_page():
     with tabs[2]:
         st.markdown(
             """
-            <div style="padding-top: 0; margin-top: 0;">
-            <h5>역량</h5>
+            <div>
+            <h5 style="margin-bottom: 1rem !important;">역량</h5>
             </div>
             """,
             unsafe_allow_html=True
@@ -499,8 +499,8 @@ def show_resume_page():
     with tabs[3]:
         st.markdown(
             """
-            <div style="padding-top: 0; margin-top: 0;">
-            <h5>경력</h5>
+            <div>
+            <h5 style="margin-bottom: 1rem !important;">경력</h5>
             </div>
             """,
             unsafe_allow_html=True
@@ -633,8 +633,8 @@ def show_resume_page():
     with tabs[4]:
         st.markdown(
             """
-            <div style="padding-top: 0; margin-top: 0;">
-            <h5>수상</h5>
+            <div>
+            <h5 style="margin-bottom: 1rem !important;">수상</h5>
             </div>
             """,
             unsafe_allow_html=True
@@ -696,8 +696,8 @@ def show_resume_page():
     with tabs[5]:
         st.markdown(
             """
-            <div style="padding-top: 0; margin-top: 0;">
-            <h5>기타활동</h5>
+            <div>
+            <h5 style="margin-bottom: 1rem !important;">기타활동</h5>
             </div>
             """,
             unsafe_allow_html=True
@@ -770,8 +770,8 @@ def show_resume_page():
     with tabs[6]:
         st.markdown(
             """
-            <div style="padding-top: 0; margin-top: 0;">
-            <h5>자기소개</h5>
+            <div>
+            <h5 style="margin-bottom: 1rem !important;">자기소개</h5>
             </div>
             """,
             unsafe_allow_html=True
