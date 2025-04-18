@@ -20,6 +20,35 @@ def show_jobs_page():
             color: #333;
         }
 
+        /* 입력란 스타일링 */
+        .stTextInput > div > div > input,
+        .stSelectbox > div > div > div,
+        .stDateInput > div > div > input,
+        .stTextArea > div > div > textarea,
+        div[data-baseweb="input"] > input,
+        div[data-baseweb="textarea"] > textarea,
+        div[data-baseweb="select"] > div,
+        div[data-baseweb="input"],
+        div[data-baseweb="base-input"] {
+            background-color: #F8F9FA !important;
+        }
+
+        /* 입력란 호버/포커스 시 배경색 */
+        .stTextInput > div > div > input:hover,
+        .stSelectbox > div > div > div:hover,
+        .stDateInput > div > div > input:hover,
+        div[data-baseweb="input"] > input:hover,
+        div[data-baseweb="input"]:hover,
+        div[data-baseweb="base-input"]:hover,
+        .stTextInput > div > div > input:focus,
+        .stSelectbox > div > div > div:focus,
+        .stDateInput > div > div > input:focus,
+        div[data-baseweb="input"] > input:focus,
+        div[data-baseweb="input"]:focus-within,
+        div[data-baseweb="base-input"]:focus-within {
+            background-color: #FFFFFF !important;
+        }
+
         /* 모바일 화면 대응 */
         @media (max-width: 768px) {
             div[data-testid="stMainBlockContainer"] {
