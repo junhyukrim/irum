@@ -266,9 +266,14 @@ def show_resume_page():
 
     # 학력 탭
     with tabs[1]:
-        cols = st.columns([8])
-        with cols[0]:
-            st.subheader("학력")
+        st.markdown(
+            """
+            <div>
+            <h5 style="margin-bottom: 1rem !important;">학력</h5>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
         
         # 학력 카운터 초기화
         if 'education_count' not in st.session_state:
@@ -376,9 +381,14 @@ def show_resume_page():
 
     # 역량 탭
     with tabs[2]:
-        cols = st.columns([8])
-        with cols[0]:
-            st.subheader("역량")
+        st.markdown(
+            """
+            <div>
+            <h5 style="margin-bottom: 1rem !important;">역량량</h5>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
         
         # 역량 카운터 초기화
         if 'skill_count' not in st.session_state:
