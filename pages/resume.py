@@ -501,7 +501,25 @@ def show_resume_page():
 
     # 경력 탭
     with tabs[3]:
-        st.markdown('<h5 class="main-header">경력</h5>', unsafe_allow_html=True)
+        st.markdown(
+            """
+            <style>
+            /* 경력 섹션 스타일링 - 여백만 유지 */
+            div[data-testid="stVerticalBlock"] > div:has(> div.element-container:has(h5)):not(:first-child) {
+                padding-top: 20px;
+                margin-top: 20px;
+            }
+
+            div[data-testid="stVerticalBlock"] > div:has(> div.element-container:has(h5)) {
+                padding-bottom: 20px;
+                margin-bottom: 20px;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+        
+        st.markdown('<h5>경력</h5>', unsafe_allow_html=True)
         
         # 경력 카운터 초기화
         if 'career_count' not in st.session_state:
@@ -522,7 +540,7 @@ def show_resume_page():
         # 각 경력 정보 입력 폼
         for idx, i in enumerate(st.session_state.career_data):
             if idx > 0:
-                st.markdown("<hr>", unsafe_allow_html=True)
+                st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
             
             # 회사명/입사년월/퇴사년월/퇴사사유/경력삭제 (2:1:1:3:1)
             cols = st.columns([2, 1, 1, 3, 1])
