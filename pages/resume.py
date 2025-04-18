@@ -23,20 +23,23 @@ def show_resume_page():
             padding-right: 1rem !important;
         }
 
-        /* 탭 컨테이너 여백 제거 */
-        [data-testid="stVerticalBlock"] > div:first-child {
-            padding-top: 0 !important;
-            margin-top: 0 !important;
-        }
-
-        [data-testid="stVerticalBlock"] div[data-testid="stMarkdown"] {
-            padding-top: 0 !important;
-            margin-top: 0 !important;
-        }
-
         section[data-testid="stSidebar"] {
             width: 14rem !important;
             min-width: 14rem !important;
+        }
+
+        /* 탭 컨테이너 여백 제거 */
+        div[data-testid="stMarkdown"] {
+            margin-bottom: 1rem !important;
+        }
+
+        div[data-testid="stMarkdown"] > div {
+            margin-bottom: 0 !important;
+        }
+
+        div[data-testid="stMarkdown"] h5 {
+            margin: 0 !important;
+            padding: 0 !important;
         }
 
         /* h5 태그 여백 통일 */
