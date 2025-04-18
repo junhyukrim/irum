@@ -67,9 +67,8 @@ def show_resume_page():
                 background-color: #FFFFFF !important;
             }
             
-            /* 메인 컨텐츠 버튼 스타일링 */
-            div[data-testid="stHorizontalBlock"] div.stButton > button,
-            div[data-testid="stVerticalBlock"] div.stButton > button {
+            /* 버튼 스타일링 */
+            div.stButton > button {
                 width: 100% !important;
                 height: 42px !important;
                 margin: 0 !important;
@@ -85,18 +84,34 @@ def show_resume_page():
                 border: 1px solid #4285F4 !important;
             }
 
-            div[data-testid="stHorizontalBlock"] div.stButton > button:hover,
-            div[data-testid="stVerticalBlock"] div.stButton > button:hover {
+            div.stButton > button:hover {
                 background-color: #1967D2 !important;
                 border-color: #1967D2 !important;
             }
 
-            div[data-testid="stHorizontalBlock"] div.stButton > button:active,
-            div[data-testid="stVerticalBlock"] div.stButton > button:active {
+            div.stButton > button:active {
                 background-color: #1557B0 !important;
                 border-color: #1557B0 !important;
             }
 
+            /* 사이드바 스타일 */
+            section[data-testid="stSidebar"] {
+                background-color: #4285F4;
+                width: 250px !important;
+            }
+            
+            /* 이미지 컨테이너 스타일 */
+            div.element-container:has(img) {
+                padding: 0 !important;
+                display: flex !important;
+                justify-content: center !important;
+            }
+            
+            img {
+                width: 150px;
+                margin-bottom: 3rem;
+            }
+            
             /* 사이드바 버튼 스타일 */
             section[data-testid="stSidebar"] .stButton > button {
                 width: calc(100% + 4rem) !important;
