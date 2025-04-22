@@ -12,10 +12,10 @@ def connect_to_db():
             database=st.secrets["mysql"]["database"],
             cursorclass=pymysql.cursors.DictCursor
         )
-        st.success("데이터베이스 연결 성공!")
+        
         return connection
     except Exception as e:
-        st.error(f"데이터베이스 연결 실패: {str(e)}")
+        
         return None
 
 def save_personal_info(login_email, data):
