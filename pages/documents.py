@@ -1,6 +1,8 @@
 import streamlit as st
 
 def show_documents_page():
+    st.write("Hello World")
+
     # 페이지 초기화
     st.empty()
     
@@ -25,4 +27,5 @@ def show_documents_page():
     st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
     
     # 임시 메시지
-    st.info("여기에 서류관리 내용이 들어갑니다.")
+    st.info("서류관리 기능이 곧 추가될 예정입니다.") 
+    st.info("Hello World ")
