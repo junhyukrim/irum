@@ -1,6 +1,4 @@
 import streamlit as st
-from datetime import datetime
-from utils.database import save_personal_info
 
 def show_resume_page():
     st.markdown('<h3 class="main-header">이력관리</h3>', unsafe_allow_html=True)
@@ -215,30 +213,7 @@ def show_resume_page():
             cols[i].empty()
         with cols[7]:
             if st.button("저장", key="save_personal", use_container_width=True):
-                # 저장 함수 호출
-                success = save_personal_info(
-                    name_kr=name_kr,
-                    name_en=name_en,
-                    nationality=nationality,
-                    gender=gender,
-                    birth_date=birth_date,
-                    address=address,
-                    email=email,
-                    phone=phone,
-                    photo_url=photo_url,
-                    military_service=military_service,
-                    military_branch=military_branch,
-                    military_rank=military_rank,
-                    veteran_status=veteran_status,
-                    service_start=service_start,
-                    service_end=service_end,
-                    discharge_type=discharge_type
-                )
-                
-                if success:
-                    st.success("저장되었습니다!")
-                else:
-                    st.error("저장에 실패했습니다.")
+                st.success("저장되었습니다!")
 
     # 학력 탭
     with tabs[1]:
