@@ -17,6 +17,11 @@ def login_screen():
             background-color: #4285F4;
         }
         
+        /* 기본 pages 네비게이션 숨기기 */
+        [data-testid="stSidebarNav"] {
+            display: none;
+        }
+        
         /* 로고 스타일 */
         .logo-container {
             display: flex;
