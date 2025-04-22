@@ -1,22 +1,8 @@
 import streamlit as st
-import pymysql
-
-def connect_to_db():
-    try:
-        connection = pymysql.connect(
-            host=st.secrets["mysql"]["host"],
-            port=int(st.secrets["mysql"]["port"]),
-            user=st.secrets["mysql"]["user"],
-            password=st.secrets["mysql"]["password"],
-            database=st.secrets["mysql"]["database"],
-            cursorclass=pymysql.cursors.DictCursor
-        )
-        return connection
-    except Exception as e:
-        st.error(f"DB 연결 실패: {str(e)}")
-        return None
 
 def show_documents_page():
+    st.write("Hello World")
+
     # 페이지 초기화
     st.empty()
     
