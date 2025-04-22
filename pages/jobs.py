@@ -1,6 +1,20 @@
 import streamlit as st
 
 def show_jobs_page():
+    st.markdown(
+        """
+        <style>
+        div[data-testid="stMainBlockContainer"] {
+            max-width: 1500px !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+            margin: 0 auto !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+    
     st.markdown('<h3 class="main-header">공고관리</h3>', unsafe_allow_html=True)
     
     # 드롭다운 추가
@@ -69,10 +83,10 @@ def show_jobs_page():
     additional_info = st.text_area("기타 안내사항", height=100,
                                  help="• 추가로 안내할 사항이 있다면 기재해주세요.")
     
-    st.markdown("<br>", unsafe_allow_html=True)  # 버튼 위에 여백 추가
+    st.markdown("<br>", unsafe_allow_html=True)
     
     # 저장 버튼
-    col1, col2 = st.columns([7, 1])
-    with col2:
+    col6, col7 = st.columns([7, 1])
+    with col7:
         if st.button("저장", type="primary", use_container_width=True):
             st.success("저장되었습니다!") 

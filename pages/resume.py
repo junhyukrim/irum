@@ -1,4 +1,69 @@
 import streamlit as st
+import mysql.connector
+from datetime import datetime
+
+def init_db_connection():
+    try:
+        conn = mysql.connector.connect(
+            host=st.secrets["mysql"]["host"],
+            port=st.secrets["mysql"]["port"],
+            database=st.secrets["mysql"]["database"],
+            user=st.secrets["mysql"]["user"],
+            password=st.secrets["mysql"]["password"]
+        )
+        return conn
+    except Exception as e:
+        st.error(f"데이터베이스 연결 실패: {str(e)}")
+        return None
+
+def save_personal_info(name_kr, name_en, nationality, gender, birth_date, 
+                      address, email, phone, photo_url, military_service,
+                      military_branch, military_rank, veteran_status, 
+                      service_start, service_end, discharge_type):
+    conn = init_db_connection()
+    if not conn:
+        return False
+    
+    try:
+        cursor = conn.cursor()
+        
+        # 현재 시간 가져오기
+        now = datetime.now()
+        
+        # SQL 쿼리 작성
+        sql = """
+        INSERT INTO tb_resume_personal_info 
+        (name_kr, name_en, nationality, gender, birth_date, 
+         address, email, phone, photo_url, military_service,
+         military_branch, military_rank, veteran_status, 
+         service_start_date, service_end_date, discharge_type,
+         created_at, updated_at)
+        VALUES 
+        (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        
+        # 데이터 준비
+        data = (
+            name_kr, name_en, nationality, gender, birth_date,
+            address, email, phone, photo_url, military_service,
+            military_branch, military_rank, veteran_status,
+            service_start, service_end, discharge_type,
+            now, now
+        )
+        
+        # 쿼리 실행
+        cursor.execute(sql, data)
+        conn.commit()
+        
+        return True
+        
+    except Exception as e:
+        st.error(f"저장 중 오류 발생: {str(e)}")
+        return False
+        
+    finally:
+        if conn:
+            conn.close()
 
 def show_resume_page():
     st.markdown('<h3 class="main-header">이력관리</h3>', unsafe_allow_html=True)
@@ -213,7 +278,30 @@ def show_resume_page():
             cols[i].empty()
         with cols[7]:
             if st.button("저장", key="save_personal", use_container_width=True):
-                st.success("저장되었습니다!")
+                # 저장 함수 호출
+                success = save_personal_info(
+                    name_kr=name_kr,
+                    name_en=name_en,
+                    nationality=nationality,
+                    gender=gender,
+                    birth_date=birth_date,
+                    address=address,
+                    email=email,
+                    phone=phone,
+                    photo_url=photo_url,
+                    military_service=military_service,
+                    military_branch=military_branch,
+                    military_rank=military_rank,
+                    veteran_status=veteran_status,
+                    service_start=service_start,
+                    service_end=service_end,
+                    discharge_type=discharge_type
+                )
+                
+                if success:
+                    st.success("저장되었습니다!")
+                else:
+                    st.error("저장에 실패했습니다.")
 
     # 학력 탭
     with tabs[1]:
