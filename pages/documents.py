@@ -1,4 +1,5 @@
 import streamlit as st
+import pymysql
 
 def show_documents_page():
     # 페이지 초기화
