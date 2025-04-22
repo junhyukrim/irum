@@ -123,9 +123,9 @@ def main_screen():
     # 로그인한 사용자 정보 저장
     if st.experimental_user.email:
         st.session_state.user_email = st.experimental_user.email
-        st.write("디버그 - 로그인된 이메일:", st.experimental_user.email)
+        st.write("로그인된 이메일:", st.experimental_user.email)
     else:
-        st.write("디버그 - 로그인 정보 없음")
+        st.write("로그인 정보 없음")
         st.write("experimental_user 정보:", st.experimental_user)
 
     # 기본 pages 네비게이션 숨기기
