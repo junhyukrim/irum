@@ -8,7 +8,7 @@ def show_documents_page():
     
     # 페이지 제목
     st.title("서류관리")
-    
+     
     # DB 연결 테스트 - 단순하게
     try:
         conn = pymysql.connect(
@@ -28,4 +28,4 @@ def show_documents_page():
     
     # 임시 메시지
     st.info("서류관리 기능이 곧 추가될 예정입니다.") 
-    st.info("Hello World")
+    st.info("Hello World ")
