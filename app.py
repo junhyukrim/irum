@@ -123,9 +123,9 @@ def main_screen():
     # 로그인한 사용자 정보 저장
     if st.experimental_user.email:
         st.session_state.user_email = st.experimental_user.email
-        st.write("디버그 - 로그인된 이메일:", st.experimental_user.email)
+        st.write("로그인된 이메일:", st.experimental_user.email)
     else:
-        st.write("디버그 - 로그인 정보 없음")
+        st.write("로그인 정보 없음")
         st.write("experimental_user 정보:", st.experimental_user)
 
     # 기본 pages 네비게이션 숨기기
@@ -169,7 +169,6 @@ def main_screen():
         show_jobs_page()
         
     elif st.session_state.current_page == '서류관리':
-        st.write("디버그 - 서류관리 페이지 진입")  # 디버깅용
         show_documents_page()
 
 if not st.experimental_user.is_logged_in:
