@@ -6,6 +6,9 @@ from pages.documents import show_documents_page
 from components.sidebar import setup_sidebar
 
 def login_screen():
+    # 사이드바 제거
+    st.set_page_config(initial_sidebar_state="collapsed")
+    
     # Hide streamlit default menu
     st.markdown(
         """
@@ -17,14 +20,17 @@ def login_screen():
             background-color: #4285F4;
         }
         
-        /* 사이드바 완전히 숨기기 */
-        section[data-testid="stSidebar"] {
+        /* 사이드바 완전히 제거 */
+        [data-testid="stSidebar"] {
+            width: 0px !important;
             display: none !important;
         }
         
-        /* 기본 pages 네비게이션 숨기기 */
-        [data-testid="stSidebarNav"] {
-            display: none !important;
+        div.block-container {
+            padding-left: 0rem !important;
+            padding-right: 0rem !important;
+            margin-left: 0rem !important;
+            margin-right: 0rem !important;
         }
         
         /* 로고 스타일 */
