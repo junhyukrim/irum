@@ -341,7 +341,7 @@ def show_resume_page():
         with cols[4]:
             nationality = st.text_input("국적", value=personal_info.get('nationality', '대한민국'), key="nationality")
         with cols[5]:
-            gender = st.selectbox("성별", ["선택", "남성", "여성"], index=["선택", "남성", "여성"].index(personal_info.get('gender', '선택')), key="gender")
+            gender = st.selectbox("성별", [None, "남성", "여성"], index=[None, "남성", "여성"].index(personal_info.get('gender', None)), key="gender")
         with cols[6]:
             birth_date = st.date_input("생년월일", value=personal_info.get('birth_date', None), key="birth_date")
         
