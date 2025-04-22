@@ -31,7 +31,7 @@ def save_personal_info(login_email, data):
         cursor = conn.cursor()
         try:
             # 기존 데이터가 있는지 확인
-            cursor.execute("SELECT resume_id FROM tb_resume_personal_info WHERE login_email = %s", (login_email,))
+            cursor.execute("SELECT * FROM tb_resume_personal_info WHERE login_email = %s", (login_email,))
             result = cursor.fetchone()
             
             if result:
