@@ -1,4 +1,85 @@
 import streamlit as st
+import mysql.connector
+from datetime import datetime
+
+def connect_to_db():
+    return mysql.connector.connect(
+        host=st.secrets["mysql"]["host"],
+        port=st.secrets["mysql"]["port"],
+        user=st.secrets["mysql"]["user"],
+        password=st.secrets["mysql"]["password"],
+        database=st.secrets["mysql"]["database"]
+    )
+
+def save_personal_info(login_email, data):
+    conn = connect_to_db()
+    cursor = conn.cursor()
+    
+    try:
+        # 기존 데이터가 있는지 확인
+        cursor.execute("SELECT resume_id FROM tb_resume_personal_info WHERE login_email = %s", (login_email,))
+        result = cursor.fetchone()
+        
+        if result:
+            # 기존 데이터 업데이트
+            update_query = """
+                UPDATE tb_resume_personal_info SET
+                ko_lastname = %s, ko_firstname = %s, en_firstname = %s, en_lastname = %s,
+                nationality = %s, gender = %s, birth_date = %s, address = %s,
+                email = %s, contact_number = %s, photo_url = %s,
+                military_status = %s, military_type = %s, military_rank = %s,
+                veterans_status = %s, service_start = %s, service_end = %s,
+                discharge_type = %s
+                WHERE login_email = %s
+            """
+            cursor.execute(update_query, (
+                data['kr_last'], data['kr_first'], data['en_first'], data['en_last'],
+                data['nationality'], data['gender'], data['birth_date'], data['address'],
+                data['email'], data['phone'], data['photo_url'],
+                data['military_status'],
+                data['military_branch'] if data['military_status'] == "군필" else None,
+                data['military_rank'] if data['military_status'] == "군필" else None,
+                data['veteran_status'] if data['military_status'] == "군필" else None,
+                data['service_start'] if data['military_status'] == "군필" else None,
+                data['service_end'] if data['military_status'] == "군필" else None,
+                data['discharge_type'] if data['military_status'] == "군필" else None,
+                login_email
+            ))
+        else:
+            # 새로운 데이터 삽입
+            insert_query = """
+                INSERT INTO tb_resume_personal_info (
+                    login_email, ko_lastname, ko_firstname, en_firstname, en_lastname,
+                    nationality, gender, birth_date, address,
+                    email, contact_number, photo_url,
+                    military_status, military_type, military_rank,
+                    veterans_status, service_start, service_end,
+                    discharge_type
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """
+            cursor.execute(insert_query, (
+                login_email,
+                data['kr_last'], data['kr_first'], data['en_first'], data['en_last'],
+                data['nationality'], data['gender'], data['birth_date'], data['address'],
+                data['email'], data['phone'], data['photo_url'],
+                data['military_status'],
+                data['military_branch'] if data['military_status'] == "군필" else None,
+                data['military_rank'] if data['military_status'] == "군필" else None,
+                data['veteran_status'] if data['military_status'] == "군필" else None,
+                data['service_start'] if data['military_status'] == "군필" else None,
+                data['service_end'] if data['military_status'] == "군필" else None,
+                data['discharge_type'] if data['military_status'] == "군필" else None
+            ))
+        
+        conn.commit()
+        return True
+    except Exception as e:
+        print(f"Error: {e}")
+        conn.rollback()
+        return False
+    finally:
+        cursor.close()
+        conn.close()
 
 def show_resume_page():
     st.markdown('<h3 class="main-header">이력관리</h3>', unsafe_allow_html=True)
@@ -225,7 +306,38 @@ def show_resume_page():
             cols[i].empty()
         with cols[7]:
             if st.button("저장", key="save_personal", use_container_width=True):
-                st.success("저장되었습니다!")
+                if 'user_email' not in st.session_state:
+                    st.error("로그인이 필요합니다.")
+                    return
+                
+                login_email = st.session_state.user_email
+                
+                # 입력된 데이터 수집
+                data = {
+                    'kr_last': kr_last,
+                    'kr_first': kr_first,
+                    'en_first': en_first,
+                    'en_last': en_last,
+                    'nationality': nationality,
+                    'gender': gender,
+                    'birth_date': birth_date,
+                    'address': address,
+                    'email': email,
+                    'phone': phone,
+                    'photo_url': photo_url,
+                    'military_status': military_status,
+                    'military_branch': military_branch if military_status == "군필" else None,
+                    'military_rank': military_rank if military_status == "군필" else None,
+                    'veteran_status': veteran_status if military_status == "군필" else None,
+                    'service_start': service_start if military_status == "군필" else None,
+                    'service_end': service_end if military_status == "군필" else None,
+                    'discharge_type': discharge_type if military_status == "군필" else None
+                }
+                
+                if save_personal_info(login_email, data):
+                    st.success("저장되었습니다!")
+                else:
+                    st.error("저장 중 오류가 발생했습니다.")
 
     # 학력 탭
     with tabs[1]:
