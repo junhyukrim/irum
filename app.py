@@ -120,6 +120,16 @@ def main_screen():
     if 'last_clicked_button' not in st.session_state:
         st.session_state.last_clicked_button = 'dashboard'
 
+    # 기본 pages 네비게이션 숨기기
+    st.markdown("""
+        <style>
+        /* 기본 pages 네비게이션 숨기기 */
+        [data-testid="stSidebarNav"] {
+            display: none;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
     # 사이드바 설정
     with st.sidebar:
         setup_sidebar()
