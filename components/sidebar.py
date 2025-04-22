@@ -60,29 +60,39 @@ def setup_sidebar():
         unsafe_allow_html=True
     )
     
-    # 로고 추가
-    st.image("https://i.imgur.com/thQZtYk.png")
+    # 로고 이미지
+    st.image("https://i.imgur.com/thQZtYk.png", width=150)
+    st.markdown("<div style='margin: 3rem 0;'></div>", unsafe_allow_html=True)
     
     # 현재 페이지 상태 초기화
     if 'current_page' not in st.session_state:
         st.session_state.current_page = '대시보드'
 
     # 메뉴 버튼들
-    if st.button('대시보드', key='btn_dashboard', use_container_width=True, type='secondary'):
-        change_page('대시보드')
+    if st.button("대시보드", key="dashboard", use_container_width=True):
+        st.session_state.current_page = '대시보드'
+        st.session_state.last_clicked_button = 'dashboard'
+        st.rerun()
 
-    if st.button('이력관리', key='btn_resume', use_container_width=True, type='secondary'):
-        change_page('이력관리')
+    if st.button("이력관리", key="resume", use_container_width=True):
+        st.session_state.current_page = '이력관리'
+        st.session_state.last_clicked_button = 'resume'
+        st.rerun()
 
-    if st.button('공고관리', key='btn_jobs', use_container_width=True, type='secondary'):
-        change_page('공고관리')
+    if st.button("공고관리", key="jobs", use_container_width=True):
+        st.session_state.current_page = '공고관리'
+        st.session_state.last_clicked_button = 'jobs'
+        st.rerun()
 
-    if st.button('서류관리', key='btn_documents', use_container_width=True, type='secondary'):
-        change_page('서류관리')
+    if st.button("서류관리", key="documents", use_container_width=True):
+        st.write("디버그 - 서류관리 버튼 클릭됨")  # 디버깅용
+        st.session_state.current_page = '서류관리'
+        st.session_state.last_clicked_button = 'documents'
+        st.rerun()
 
     # 빈 공간 추가 (크기 조절)
     st.markdown("<div style='flex-grow: 1; min-height: calc(100vh - 800px);'></div>", unsafe_allow_html=True)
     
     # 로그아웃 버튼
-    if st.button("로그아웃", key="btn_logout", use_container_width=True, type='secondary'):
+    if st.button("로그아웃", key="logout", use_container_width=True):
         st.logout() 
