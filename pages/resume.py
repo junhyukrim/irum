@@ -131,29 +131,48 @@ def show_resume_page():
     
     login_email = st.session_state.user_email
     
+    # 로그인한 이메일 표시
+    st.markdown(f'로그인한 이메일: <span style="color: #4285F4;">{login_email}</span>', unsafe_allow_html=True)
+    
     # DB에서 데이터 로드
-    if 'personal_info' not in st.session_state:
-        data, message = load_personal_info(login_email)
-        if data is None:  # DB 접근 실패
+    try:
+        conn = connect_to_db()
+        if conn is None:
             st.markdown("""
                 <div style="padding: 1rem; background-color: #ffe9e9; border-radius: 0.5rem; margin: 1rem 0;">
                     데이터베이스에 접근할 수 없습니다. 관리자에게 문의해주세요.
                 </div>
             """, unsafe_allow_html=True)
             data = {}
-        elif not data:  # 데이터 없음
-            st.markdown("""
-                <div style="padding: 1rem; background-color: #e9ffe9; border-radius: 0.5rem; margin: 1rem 0;">
-                    더 자세한 정보를 입력하시면 좋은 이력서가 완성됩니다.
-                </div>
-            """, unsafe_allow_html=True)
-        else:  # 데이터 있음
-            st.markdown(f"""
-                <div style="padding: 1rem; background-color: #e9ffe9; border-radius: 0.5rem; margin: 1rem 0;">
-                    {login_email} 님의 정보를 불러왔습니다.
-                </div>
-            """, unsafe_allow_html=True)
-        st.session_state.personal_info = data
+        else:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM tb_resume_personal_info WHERE login_email = %s", (login_email,))
+            data = cursor.fetchone()
+            cursor.close()
+            conn.close()
+            
+            if data:
+                st.markdown(f"""
+                    <div style="padding: 1rem; background-color: #e9ffe9; border-radius: 0.5rem; margin: 1rem 0;">
+                        {login_email} 님의 정보를 불러왔습니다.
+                    </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown("""
+                    <div style="padding: 1rem; background-color: #e9ffe9; border-radius: 0.5rem; margin: 1rem 0;">
+                        더 자세한 정보를 입력하시면 좋은 이력서가 완성됩니다.
+                    </div>
+                """, unsafe_allow_html=True)
+                data = {}
+    except Exception as e:
+        st.markdown(f"""
+            <div style="padding: 1rem; background-color: #ffe9e9; border-radius: 0.5rem; margin: 1rem 0;">
+                데이터베이스 접근 중 오류가 발생했습니다: {str(e)}
+            </div>
+        """, unsafe_allow_html=True)
+        data = {}
+    
+    st.session_state.personal_info = data
 
     # 탭 생성
     tabs = st.tabs([
