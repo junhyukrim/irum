@@ -307,11 +307,11 @@ def show_resume_page():
             cols[i].empty()
         with cols[7]:
             if st.button("저장", key="save_personal", use_container_width=True):
-                if not st.experimental_user.is_logged_in:
+                if 'user_email' not in st.session_state:
                     st.error("로그인이 필요합니다.")
                     return
                 
-                login_email = st.experimental_user.email
+                login_email = st.session_state.user_email
                 
                 # 입력된 데이터 수집
                 data = {

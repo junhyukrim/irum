@@ -120,6 +120,10 @@ def main_screen():
     if 'last_clicked_button' not in st.session_state:
         st.session_state.last_clicked_button = 'dashboard'
 
+    # 로그인한 사용자 이메일 저장
+    if st.experimental_user.email:
+        st.session_state.user_email = st.experimental_user.email
+
     # 기본 pages 네비게이션 숨기기
     st.markdown("""
         <style>
