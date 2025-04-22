@@ -135,12 +135,24 @@ def show_resume_page():
     if 'personal_info' not in st.session_state:
         data, message = load_personal_info(login_email)
         if data is None:  # DB 접근 실패
-            st.error(message)
+            st.markdown("""
+                <div style="padding: 1rem; background-color: #ffe9e9; border-radius: 0.5rem; margin: 1rem 0;">
+                    데이터베이스에 접근할 수 없습니다. 관리자에게 문의해주세요.
+                </div>
+            """, unsafe_allow_html=True)
             data = {}
         elif not data:  # 데이터 없음
-            st.info(message)
+            st.markdown("""
+                <div style="padding: 1rem; background-color: #e9ffe9; border-radius: 0.5rem; margin: 1rem 0;">
+                    더 자세한 정보를 입력하시면 좋은 이력서가 완성됩니다.
+                </div>
+            """, unsafe_allow_html=True)
         else:  # 데이터 있음
-            st.success(message)
+            st.markdown(f"""
+                <div style="padding: 1rem; background-color: #e9ffe9; border-radius: 0.5rem; margin: 1rem 0;">
+                    {login_email} 님의 정보를 불러왔습니다.
+                </div>
+            """, unsafe_allow_html=True)
         st.session_state.personal_info = data
 
     # 탭 생성
