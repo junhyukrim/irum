@@ -20,6 +20,11 @@ def save_personal_info(name_kr, name_en, nationality, gender, birth_date,
                       address, email, phone, photo_url, military_service,
                       military_branch, military_rank, veteran_status, 
                       service_start, service_end, discharge_type):
+    # 필수 필드 검증
+    if not name_kr or not name_en or not nationality or gender == "선택":
+        st.error("필수 정보(이름, 국적, 성별)를 모두 입력해주세요.")
+        return False
+    
     conn = init_db_connection()
     if not conn:
         return False
@@ -29,6 +34,11 @@ def save_personal_info(name_kr, name_en, nationality, gender, birth_date,
         
         # 현재 시간 가져오기
         now = datetime.now()
+        
+        # 날짜 데이터 변환
+        birth_date = birth_date.strftime('%Y-%m-%d') if birth_date else None
+        service_start = service_start.strftime('%Y-%m-%d') if service_start else None
+        service_end = service_end.strftime('%Y-%m-%d') if service_end else None
         
         # SQL 쿼리 작성
         sql = """
@@ -44,21 +54,48 @@ def save_personal_info(name_kr, name_en, nationality, gender, birth_date,
         
         # 데이터 준비
         data = (
-            name_kr, name_en, nationality, gender, birth_date,
-            address, email, phone, photo_url, military_service,
-            military_branch, military_rank, veteran_status,
-            service_start, service_end, discharge_type,
+            name_kr, name_en, nationality, 
+            None if gender == "선택" else gender,
+            birth_date,
+            address if address else None,
+            email if email else None,
+            phone if phone else None,
+            photo_url if photo_url else None,
+            None if military_service == "선택" else military_service,
+            None if military_branch == "선택" else military_branch,
+            None if military_rank == "선택" else military_rank,
+            None if veteran_status == "선택" else veteran_status,
+            service_start,
+            service_end,
+            None if discharge_type == "선택" else discharge_type,
             now, now
         )
         
+        # 쿼리 실행 전 디버깅
+        st.write("실행될 SQL 쿼리:", sql)
+        st.write("입력될 데이터:", data)
+        
         # 쿼리 실행
         cursor.execute(sql, data)
-        conn.commit()
         
+        # 실제로 데이터가 들어갔는지 확인
+        check_sql = "SELECT COUNT(*) FROM tb_resume_personal_info WHERE name_kr = %s AND name_en = %s AND created_at = %s"
+        cursor.execute(check_sql, (name_kr, name_en, now))
+        count = cursor.fetchone()[0]
+        
+        if count == 0:
+            st.error("데이터가 저장되지 않았습니다.")
+            conn.rollback()
+            return False
+            
+        conn.commit()
+        st.write("저장된 데이터 수:", count)
         return True
         
     except Exception as e:
         st.error(f"저장 중 오류 발생: {str(e)}")
+        if conn:
+            conn.rollback()
         return False
         
     finally:
