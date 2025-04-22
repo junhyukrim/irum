@@ -116,27 +116,61 @@ def main_screen():
     if 'current_page' not in st.session_state:
         st.session_state.current_page = '대시보드'
     
-    # 디버깅을 위한 상태 출력
-    st.write("디버그 - 현재 페이지:", st.session_state.current_page)
-    
+    # 마지막으로 클릭된 버튼 상태 관리
+    if 'last_clicked_button' not in st.session_state:
+        st.session_state.last_clicked_button = 'dashboard'
+
+    # 로그인한 사용자 정보 저장
+    if st.experimental_user.email:
+        st.session_state.user_email = st.experimental_user.email
+        st.write("로그인된 이메일:", st.experimental_user.email)
+    else:
+        st.write("로그인 정보 없음")
+        st.write("experimental_user 정보:", st.experimental_user)
+
+    # 기본 pages 네비게이션 숨기기
+    st.markdown("""
+        <style>
+        /* 기본 pages 네비게이션 숨기기 */
+        [data-testid="stSidebarNav"] {
+            display: none;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
     # 사이드바 설정
     with st.sidebar:
         setup_sidebar()
 
+    # 메인 컨텐츠 영역 스타일
+    st.markdown(
+        """
+        <style>
+        .main-header {
+            font-size: 2rem;
+            font-weight: 500;
+            margin-bottom: 2rem;
+            color: #333;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
     # 현재 페이지에 따른 컨텐츠 표시
-    if st.session_state.current_page == '서류관리':
-        st.write("서류관리 페이지로 전환 시도...")
-        show_documents_page()
+    if st.session_state.current_page == '대시보드':
+        st.markdown('<h3 class="main-header">대시보드</h3>', unsafe_allow_html=True)
+        st.write("환영합니다, " + st.experimental_user.name + "님!")
+        
     elif st.session_state.current_page == '이력관리':
         show_resume_page()
+        
     elif st.session_state.current_page == '공고관리':
         show_jobs_page()
-    else:
-        st.title('대시보드')
-        if st.experimental_user and st.experimental_user.email:
-            st.write(f"환영합니다, {st.experimental_user.email}님!")
+        
+    elif st.session_state.current_page == '서류관리':
+        show_documents_page()
 
-# 메인 실행 부분
 if not st.experimental_user.is_logged_in:
     login_screen()
 else:
