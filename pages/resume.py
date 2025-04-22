@@ -154,17 +154,21 @@ def show_resume_page():
         # 인적사항 섹션
         st.markdown('<h5>인적사항</h5>', unsafe_allow_html=True)
         
-        # 한글이름/영문이름/국적/성별/생년월일 (2:2:2:1:1 = 8)
-        cols = st.columns([2, 2, 2, 1, 1])
+        # 한글 성/이름, 영문 성/이름, 국적, 성별, 생년월일 (1:1:1:1:2:1:1 = 8)
+        cols = st.columns([1,1,1,1,2,1,1])
         with cols[0]:
-            name_kr = st.text_input("한글 이름", key="name_kr")
+            kr_last = st.text_input("", placeholder="성", key="kr_last", label_visibility="collapsed")
         with cols[1]:
-            name_en = st.text_input("영문 이름", key="name_en")
+            kr_first = st.text_input("", placeholder="이름", key="kr_first", label_visibility="collapsed")
         with cols[2]:
-            nationality = st.text_input("국적", value="대한민국", key="nationality")
+            en_first = st.text_input("", placeholder="firstname", key="en_first", label_visibility="collapsed")
         with cols[3]:
-            gender = st.selectbox("성별", ["선택", "남성", "여성"], key="gender")
+            en_last = st.text_input("", placeholder="lastname", key="en_last", label_visibility="collapsed")
         with cols[4]:
+            nationality = st.text_input("국적", value="대한민국", key="nationality")
+        with cols[5]:
+            gender = st.selectbox("성별", ["선택", "남성", "여성"], key="gender")
+        with cols[6]:
             birth_date = st.date_input("생년월일", key="birth_date")
         
         # 주소/이메일/연락처 (4:2:2 = 8)
