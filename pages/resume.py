@@ -1,14 +1,15 @@
 import streamlit as st
-import mysql.connector
+import pymysql
 from datetime import datetime
 
 def connect_to_db():
-    return mysql.connector.connect(
+    return pymysql.connect(
         host=st.secrets["mysql"]["host"],
-        port=st.secrets["mysql"]["port"],
+        port=int(st.secrets["mysql"]["port"]),  # port는 정수형으로 변환 필요
         user=st.secrets["mysql"]["user"],
         password=st.secrets["mysql"]["password"],
-        database=st.secrets["mysql"]["database"]
+        database=st.secrets["mysql"]["database"],
+        cursorclass=pymysql.cursors.DictCursor  # 결과를 딕셔너리 형태로 반환
     )
 
 def save_personal_info(login_email, data):
