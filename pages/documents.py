@@ -17,11 +17,11 @@ def connect_to_db():
         return None
 
 def show_documents_page():
-    # 페이지 초기화
-    st.empty()
+    print("서류관리 페이지 함수 실행됨")  # 디버깅용
+    st.write("디버그: show_documents_page 함수가 호출되었습니다.")
     
-    # 페이지 제목
     st.title("서류관리")
+    st.write("현재 페이지:", st.session_state.get('current_page', 'None'))
     
     # DB 연결 테스트 - 단순하게
     try:
@@ -36,9 +36,7 @@ def show_documents_page():
         conn.close()
     except Exception as e:
         st.error(f"DB 연결 실패: {e}")
-    
-    # 여백 추가
-    st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-    
-    # 임시 메시지
-    st.info("서류관리 기능이 곧 추가될 예정입니다.") 
+
+# Streamlit 페이지가 직접 실행될 때를 위한 코드
+if __name__ == "__main__":
+    show_documents_page() 
