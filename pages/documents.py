@@ -28,3 +28,4 @@ def show_documents_page():
     
     # 임시 메시지
     st.info("서류관리 기능이 곧 추가될 예정입니다.") 
+    st.write("Hello World")
