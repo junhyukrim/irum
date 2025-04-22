@@ -1,12 +1,12 @@
 import streamlit as st
-import mysql.connector as mysql
+import pymysql
 from datetime import datetime
 
 def init_db_connection():
     try:
-        conn = mysql.connect(
+        conn = pymysql.connect(
             host=st.secrets["mysql"]["host"],
-            port=st.secrets["mysql"]["port"],
+            port=int(st.secrets["mysql"]["port"]),
             database=st.secrets["mysql"]["database"],
             user=st.secrets["mysql"]["user"],
             password=st.secrets["mysql"]["password"]
