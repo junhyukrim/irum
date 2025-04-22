@@ -19,81 +19,131 @@ def connect_to_db():
         return None
 
 def save_personal_info(login_email, data):
-    conn = connect_to_db()
-    if conn is None:
-        return False
-        
-    cursor = conn.cursor()
+    # 디버깅을 위한 데이터 출력
+    st.write("로그인 이메일:", login_email)
+    st.write("저장할 데이터:", data)
+    
     try:
-        # 기존 데이터가 있는지 확인
-        cursor.execute("SELECT resume_id FROM tb_resume_personal_info WHERE login_email = %s", (login_email,))
-        result = cursor.fetchone()
+        conn = connect_to_db()
+        if conn is None:
+            return False
         
-        if result:
-            # 기존 데이터 업데이트
-            update_query = """
-                UPDATE tb_resume_personal_info SET
-                ko_lastname = %s, ko_firstname = %s, en_firstname = %s, en_lastname = %s,
-                nationality = %s, gender = %s, birth_date = %s, address = %s,
-                email = %s, contact_number = %s, photo_url = %s,
-                military_status = %s, military_type = %s, military_rank = %s,
-                veterans_status = %s, service_start = %s, service_end = %s,
-                discharge_type = %s
-                WHERE login_email = %s
-            """
-            cursor.execute(update_query, (
-                data['kr_last'], data['kr_first'], data['en_first'], data['en_last'],
-                data['nationality'], data['gender'], data['birth_date'], data['address'],
-                data['email'], data['phone'], data['photo_url'],
-                data['military_status'],
-                data['military_branch'] if data['military_status'] == "군필" else None,
-                data['military_rank'] if data['military_status'] == "군필" else None,
-                data['veteran_status'] if data['military_status'] == "군필" else None,
-                data['service_start'] if data['military_status'] == "군필" else None,
-                data['service_end'] if data['military_status'] == "군필" else None,
-                data['discharge_type'] if data['military_status'] == "군필" else None,
-                login_email
-            ))
-        else:
-            # 새로운 데이터 삽입
-            insert_query = """
-                INSERT INTO tb_resume_personal_info (
-                    login_email, ko_lastname, ko_firstname, en_firstname, en_lastname,
-                    nationality, gender, birth_date, address,
-                    email, contact_number, photo_url,
-                    military_status, military_type, military_rank,
-                    veterans_status, service_start, service_end,
-                    discharge_type
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """
-            cursor.execute(insert_query, (
-                login_email,
-                data['kr_last'], data['kr_first'], data['en_first'], data['en_last'],
-                data['nationality'], data['gender'], data['birth_date'], data['address'],
-                data['email'], data['phone'], data['photo_url'],
-                data['military_status'],
-                data['military_branch'] if data['military_status'] == "군필" else None,
-                data['military_rank'] if data['military_status'] == "군필" else None,
-                data['veteran_status'] if data['military_status'] == "군필" else None,
-                data['service_start'] if data['military_status'] == "군필" else None,
-                data['service_end'] if data['military_status'] == "군필" else None,
-                data['discharge_type'] if data['military_status'] == "군필" else None
-            ))
-        
-        conn.commit()
-        return True
+        cursor = conn.cursor()
+        try:
+            # 기존 데이터가 있는지 확인
+            cursor.execute("SELECT resume_id FROM tb_resume_personal_info WHERE login_email = %s", (login_email,))
+            result = cursor.fetchone()
+            
+            if result:
+                st.write("기존 데이터 업데이트")
+                # 기존 데이터 업데이트
+                update_query = """
+                    UPDATE tb_resume_personal_info SET
+                    ko_lastname = %s, ko_firstname = %s, en_firstname = %s, en_lastname = %s,
+                    nationality = %s, gender = %s, birth_date = %s, address = %s,
+                    email = %s, contact_number = %s, photo_url = %s,
+                    military_status = %s, military_type = %s, military_rank = %s,
+                    veterans_status = %s, service_start = %s, service_end = %s,
+                    discharge_type = %s
+                    WHERE login_email = %s
+                """
+                cursor.execute(update_query, (
+                    data['kr_last'], data['kr_first'], data['en_first'], data['en_last'],
+                    data['nationality'], data['gender'], data['birth_date'], data['address'],
+                    data['email'], data['phone'], data['photo_url'],
+                    data['military_status'],
+                    data['military_branch'] if data['military_status'] == "군필" else None,
+                    data['military_rank'] if data['military_status'] == "군필" else None,
+                    data['veteran_status'] if data['military_status'] == "군필" else None,
+                    data['service_start'] if data['military_status'] == "군필" else None,
+                    data['service_end'] if data['military_status'] == "군필" else None,
+                    data['discharge_type'] if data['military_status'] == "군필" else None,
+                    login_email
+                ))
+            else:
+                st.write("새 데이터 삽입")
+                # 새로운 데이터 삽입
+                insert_query = """
+                    INSERT INTO tb_resume_personal_info (
+                        login_email, ko_lastname, ko_firstname, en_firstname, en_lastname,
+                        nationality, gender, birth_date, address,
+                        email, contact_number, photo_url,
+                        military_status, military_type, military_rank,
+                        veterans_status, service_start, service_end,
+                        discharge_type
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """
+                cursor.execute(insert_query, (
+                    login_email,
+                    data['kr_last'], data['kr_first'], data['en_first'], data['en_last'],
+                    data['nationality'], data['gender'], data['birth_date'], data['address'],
+                    data['email'], data['phone'], data['photo_url'],
+                    data['military_status'],
+                    data['military_branch'] if data['military_status'] == "군필" else None,
+                    data['military_rank'] if data['military_status'] == "군필" else None,
+                    data['veteran_status'] if data['military_status'] == "군필" else None,
+                    data['service_start'] if data['military_status'] == "군필" else None,
+                    data['service_end'] if data['military_status'] == "군필" else None,
+                    data['discharge_type'] if data['military_status'] == "군필" else None
+                ))
+            
+            conn.commit()
+            return True
+        except Exception as e:
+            st.error(f"쿼리 실행 중 오류: {str(e)}")
+            conn.rollback()
+            return False
+        finally:
+            cursor.close()
+            conn.close()
     except Exception as e:
-        st.error(f"데이터베이스 쿼리 실행 중 오류: {str(e)}")
-        conn.rollback()
+        st.error(f"데이터베이스 연결 중 오류: {str(e)}")
         return False
-    finally:
-        cursor.close()
-        conn.close()
+
+def load_personal_info(login_email):
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return None, "데이터베이스에 접근할 수 없습니다. 관리자에게 문의해주세요."
+            
+        cursor = conn.cursor()
+        try:
+            cursor.execute("SELECT * FROM tb_resume_personal_info WHERE login_email = %s", (login_email,))
+            result = cursor.fetchone()
+            
+            if result:
+                return result, f"{login_email} 님의 정보를 불러왔습니다."
+            else:
+                return {}, "더 자세한 정보를 입력하시면 좋은 이력서가 완성됩니다."
+        finally:
+            cursor.close()
+            conn.close()
+    except Exception as e:
+        return None, f"데이터베이스 접근 중 오류가 발생했습니다: {str(e)}"
 
 def show_resume_page():
     st.markdown('<h3 class="main-header">이력관리</h3>', unsafe_allow_html=True)
     
-    # 탭 생성 - 각 탭에 고유한 키 부여
+    # 로그인 확인 및 이메일 가져오기
+    if 'user_email' not in st.session_state:
+        st.error("로그인이 필요합니다.")
+        return
+    
+    login_email = st.session_state.user_email
+    
+    # DB에서 데이터 로드
+    if 'personal_info' not in st.session_state:
+        data, message = load_personal_info(login_email)
+        if data is None:  # DB 접근 실패
+            st.error(message)
+            data = {}
+        elif not data:  # 데이터 없음
+            st.info(message)
+        else:  # 데이터 있음
+            st.success(message)
+        st.session_state.personal_info = data
+
+    # 탭 생성
     tabs = st.tabs([
         "개인정보", "학력", "역량", "경력", "수상", "기타활동", "자기소개"
     ])
@@ -244,36 +294,39 @@ def show_resume_page():
         # 인적사항 섹션
         st.markdown('<h5>인적사항</h5>', unsafe_allow_html=True)
         
+        # 기존 데이터가 있다면 사용, 없다면 빈 값
+        personal_info = st.session_state.personal_info
+        
         # 한글 성/이름, 영문 성/이름, 국적, 성별, 생년월일 (1:1:1:1:2:1:1 = 8)
         cols = st.columns([1,1,1,1,2,1,1])
         with cols[0]:
-            kr_last = st.text_input("한글 이름", placeholder="성", key="kr_last")
+            kr_last = st.text_input("한글 이름", value=personal_info.get('ko_lastname', ''), placeholder="성", key="kr_last")
         with cols[1]:
-            kr_first = st.text_input(" ", placeholder="이름", key="kr_first")
+            kr_first = st.text_input(" ", value=personal_info.get('ko_firstname', ''), placeholder="이름", key="kr_first")
         with cols[2]:
-            en_first = st.text_input("영문 이름", placeholder="firstname", key="en_first")
+            en_first = st.text_input("영문 이름", value=personal_info.get('en_firstname', ''), placeholder="firstname", key="en_first")
         with cols[3]:
-            en_last = st.text_input(" ", placeholder="lastname", key="en_last")
+            en_last = st.text_input(" ", value=personal_info.get('en_lastname', ''), placeholder="lastname", key="en_last")
         with cols[4]:
-            nationality = st.text_input("국적", value="대한민국", key="nationality")
+            nationality = st.text_input("국적", value=personal_info.get('nationality', '대한민국'), key="nationality")
         with cols[5]:
-            gender = st.selectbox("성별", ["선택", "남성", "여성"], key="gender")
+            gender = st.selectbox("성별", ["선택", "남성", "여성"], index=["선택", "남성", "여성"].index(personal_info.get('gender', '선택')), key="gender")
         with cols[6]:
-            birth_date = st.date_input("생년월일", key="birth_date")
+            birth_date = st.date_input("생년월일", value=personal_info.get('birth_date', None), key="birth_date")
         
         # 주소/이메일/연락처 (4:2:2 = 8)
         cols = st.columns([4, 2, 2])
         with cols[0]:
-            address = st.text_input("주소", key="address")
+            address = st.text_input("주소", value=personal_info.get('address', ''), key="address")
         with cols[1]:
-            email = st.text_input("이메일", key="email")
+            email = st.text_input("이메일", value=personal_info.get('email', ''), key="email")
         with cols[2]:
-            phone = st.text_input("연락처", key="phone")
+            phone = st.text_input("연락처", value=personal_info.get('contact_number', ''), key="phone")
         
         # 사진 링크 (8 = 8)
         cols = st.columns([8])
         with cols[0]:
-            photo_url = st.text_input("사진 링크", key="photo_url")
+            photo_url = st.text_input("사진 링크", value=personal_info.get('photo_url', ''), key="photo_url")
         
         # 구분선 추가
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
@@ -284,22 +337,22 @@ def show_resume_page():
         # 병역/군별/계급/보훈대상/복무시작일/복무종료일/전역유형 (1:1:1:1:1:1:2)
         cols = st.columns([1, 1, 1, 1, 1, 1, 2])
         with cols[0]:
-            military_status = st.selectbox("병역", ["군필", "미필", "면제", "해당없음"], key="military_service")
+            military_status = st.selectbox("병역", ["군필", "미필", "면제", "해당없음"], index=["군필", "미필", "면제", "해당없음"].index(personal_info.get('military_status', '군필')), key="military_service")
         
         # 군필일 경우에만 나머지 항목 표시
         if military_status == "군필":
             with cols[1]:
-                military_branch = st.selectbox("군별", ["육군", "해군", "공군", "해병대", "의경", "공익", "기타"], key="military_branch")
+                military_branch = st.selectbox("군별", ["육군", "해군", "공군", "해병대", "의경", "공익", "기타"], index=["육군", "해군", "공군", "해병대", "의경", "공익", "기타"].index(personal_info.get('military_branch', '육군')), key="military_branch")
             with cols[2]:
-                military_rank = st.selectbox("계급", ["이병", "일병", "상병", "병장", "하사", "중사", "상사", "원사", "준위", "소위", "중위", "대위", "소령", "중령", "대령"], key="military_rank")
+                military_rank = st.selectbox("계급", ["이병", "일병", "상병", "병장", "하사", "중사", "상사", "원사", "준위", "소위", "중위", "대위", "소령", "중령", "대령"], index=["이병", "일병", "상병", "병장", "하사", "중사", "상사", "원사", "준위", "소위", "중위", "대위", "소령", "중령", "대령"].index(personal_info.get('military_rank', '이병')), key="military_rank")
             with cols[3]:
-                veteran_status = st.selectbox("보훈대상", ["대상", "비대상"], key="veteran_status")
+                veteran_status = st.selectbox("보훈대상", ["대상", "비대상"], index=["대상", "비대상"].index(personal_info.get('veteran_status', '대상')), key="veteran_status")
             with cols[4]:
-                service_start = st.date_input("복무 시작일", key="service_start")
+                service_start = st.date_input("복무 시작일", value=personal_info.get('service_start', None), key="service_start")
             with cols[5]:
-                service_end = st.date_input("복무 종료일", key="service_end")
+                service_end = st.date_input("복무 종료일", value=personal_info.get('service_end', None), key="service_end")
             with cols[6]:
-                discharge_type = st.selectbox("전역 유형", ["만기전역", "의가사제대", "의병전역", "근무부적합", "기타"], key="discharge_type")
+                discharge_type = st.selectbox("전역 유형", ["만기전역", "의가사제대", "의병전역", "근무부적합", "기타"], index=["만기전역", "의가사제대", "의병전역", "근무부적합", "기타"].index(personal_info.get('discharge_type', '만기전역')), key="discharge_type")
         else:
             # 빈 칸으로 남기기 위한 처리
             for i in range(1, 7):
@@ -390,11 +443,11 @@ def show_resume_page():
             # 입학년월/졸업년월/교육기관/학력삭제 버튼 (2:2:3:1 = 8)
             cols = st.columns([2, 2, 3, 1])
             with cols[0]:
-                st.date_input("입학년월", key=f"admission_date_{i}")
+                st.date_input("입학년월", value=personal_info.get(f'admission_date_{i}', None), key=f"admission_date_{i}")
             with cols[1]:
-                st.date_input("졸업년월", key=f"graduation_date_{i}")
+                st.date_input("졸업년월", value=personal_info.get(f'graduation_date_{i}', None), key=f"graduation_date_{i}")
             with cols[2]:
-                st.text_input("교육기관", key=f"institution_{i}")
+                st.text_input("교육기관", value=personal_info.get(f'institution_{i}', ''), key=f"institution_{i}")
             with cols[3]:
                 st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
                 if len(st.session_state.education_data) > 1:
@@ -419,13 +472,13 @@ def show_resume_page():
                 # 학부/전공/학위/성적/삭제/추가 버튼 (2:2:1:1:1:1 = 8)
                 cols = st.columns([2, 2, 1, 1, 1, 1])
                 with cols[0]:
-                    st.text_input("학부 또는 분야", key=f"department_{i}_{j}")
+                    st.text_input("학부 또는 분야", value=personal_info.get(f'department_{i}_{j}', ''), key=f"department_{i}_{j}")
                 with cols[1]:
-                    st.text_input("학과, 전공, 세부내용", key=f"major_{i}_{j}")
+                    st.text_input("학과, 전공, 세부내용", value=personal_info.get(f'major_{i}_{j}', ''), key=f"major_{i}_{j}")
                 with cols[2]:
-                    st.selectbox("학위", ["선택", "고등학교 졸업", "전문학사", "학사", "석사", "박사"], key=f"degree_{i}_{j}")
+                    st.selectbox("학위", ["선택", "고등학교 졸업", "전문학사", "학사", "석사", "박사"], index=["선택", "고등학교 졸업", "전문학사", "학사", "석사", "박사"].index(personal_info.get(f'degree_{i}_{j}', '선택')), key=f"degree_{i}_{j}")
                 with cols[3]:
-                    st.text_input("성적", placeholder="예: 4.0/4.3", key=f"gpa_{i}_{j}")
+                    st.text_input("성적", value=personal_info.get(f'gpa_{i}_{j}', ''), placeholder="예: 4.0/4.3", key=f"gpa_{i}_{j}")
                 with cols[4]:
                     st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
                     if st.session_state.major_counts[i] > 1:
@@ -439,7 +492,7 @@ def show_resume_page():
                         st.rerun()
             
             # 비고
-            st.text_area("비고", key=f"notes_{i}", height=100)
+            st.text_area("비고", value=personal_info.get(f'notes_{i}', ''), key=f"notes_{i}", height=100)
 
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
 
@@ -526,11 +579,11 @@ def show_resume_page():
             # 기술 및 역량 (2:1:4:1)
             cols = st.columns([2, 1, 4, 1])
             with cols[0]:
-                st.text_input("기술 및 역량", key=f"skill_desc_{i}")
+                st.text_input("기술 및 역량", value=personal_info.get(f'skill_desc_{i}', ''), key=f"skill_desc_{i}")
             with cols[1]:
-                st.text_input("성취 수준", key=f"skill_level_{i}")
+                st.text_input("성취 수준", value=personal_info.get(f'skill_level_{i}', ''), key=f"skill_level_{i}")
             with cols[2]:
-                st.text_input("비고", key=f"skill_note_{i}")
+                st.text_input("비고", value=personal_info.get(f'skill_note_{i}', ''), key=f"skill_note_{i}")
             with cols[3]:
                 st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
                 if len(st.session_state.skill_data) > 1:
@@ -553,11 +606,11 @@ def show_resume_page():
                 # 자격증 (3:1:2:1:1)
                 cols = st.columns([3, 1, 2, 1, 1])
                 with cols[0]:
-                    st.text_input("자격증", key=f"cert_name_{i}_{j}")
+                    st.text_input("자격증", value=personal_info.get(f'cert_name_{i}_{j}', ''), key=f"cert_name_{i}_{j}")
                 with cols[1]:
-                    st.date_input("취득년월", key=f"cert_date_{i}_{j}")
+                    st.date_input("취득년월", value=personal_info.get(f'cert_date_{i}_{j}', None), key=f"cert_date_{i}_{j}")
                 with cols[2]:
-                    st.text_input("발급기관", key=f"cert_org_{i}_{j}")
+                    st.text_input("발급기관", value=personal_info.get(f'cert_org_{i}_{j}', ''), key=f"cert_org_{i}_{j}")
                 with cols[3]:
                     st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
                     if st.session_state.cert_counts[i] > 1:
@@ -585,7 +638,7 @@ def show_resume_page():
                 
                 cols = st.columns([6, 1, 1])
                 with cols[0]:
-                    st.text_input("교육: 훈련, 연수, 유학 등", key=f"education_{i}_{j}")
+                    st.text_input("교육: 훈련, 연수, 유학 등", value=personal_info.get(f'education_{i}_{j}', ''), key=f"education_{i}_{j}")
                 with cols[1]:
                     st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
                     if st.session_state.edu_counts[i] > 1:
@@ -665,13 +718,13 @@ def show_resume_page():
             # 회사명/입사년월/퇴사년월/퇴사사유/경력삭제 (2:1:1:3:1)
             cols = st.columns([2, 1, 1, 3, 1])
             with cols[0]:
-                st.text_input("회사명", key=f"company_{i}")
+                st.text_input("회사명", value=personal_info.get(f'company_{i}', ''), key=f"company_{i}")
             with cols[1]:
-                st.date_input("입사년월", key=f"join_date_{i}")
+                st.date_input("입사년월", value=personal_info.get(f'join_date_{i}', None), key=f"join_date_{i}")
             with cols[2]:
-                st.date_input("퇴사년월", key=f"leave_date_{i}")
+                st.date_input("퇴사년월", value=personal_info.get(f'leave_date_{i}', None), key=f"leave_date_{i}")
             with cols[3]:
-                st.text_input("퇴사사유", key=f"leave_reason_{i}")
+                st.text_input("퇴사사유", value=personal_info.get(f'leave_reason_{i}', ''), key=f"leave_reason_{i}")
             with cols[4]:
                 st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
                 if len(st.session_state.career_data) > 1:
@@ -699,11 +752,11 @@ def show_resume_page():
                 # 직위/직책/취임년월/퇴임년월/업무내용 (2:1:1:4)
                 cols = st.columns([2, 1, 1, 4])
                 with cols[0]:
-                    st.text_input("직위/직책", key=f"position_{i}_{j}")
+                    st.text_input("직위/직책", value=personal_info.get(f'position_{i}_{j}', ''), key=f"position_{i}_{j}")
                 with cols[1]:
-                    st.date_input("취임년월", key=f"position_start_{i}_{j}")
+                    st.date_input("취임년월", value=personal_info.get(f'position_start_{i}_{j}', None), key=f"position_start_{i}_{j}")
                 with cols[2]:
-                    st.date_input("퇴임년월", key=f"position_end_{i}_{j}")
+                    st.date_input("퇴임년월", value=personal_info.get(f'position_end_{i}_{j}', None), key=f"position_end_{i}_{j}")
                 
                 # 업무 내용 입력란
                 if j not in st.session_state.task_counts[i]:
@@ -713,7 +766,7 @@ def show_resume_page():
                     if k > 0:
                         st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
                     with cols[3]:
-                        st.text_input("업무내용", key=f"task_{i}_{j}_{k}")
+                        st.text_input("업무내용", value=personal_info.get(f'task_{i}_{j}_{k}', ''), key=f"task_{i}_{j}_{k}")
                 
                 # 버튼들 (4:1:1:1:1)
                 cols = st.columns([4, 1, 1, 1, 1])
@@ -784,13 +837,13 @@ def show_resume_page():
             # 상명/수상일/수여기관/비고/삭제 버튼 (1:1:1:4:1)
             cols = st.columns([2, 1, 1, 3, 1])
             with cols[0]:
-                st.text_input("상명", key=f"award_name_{i}")
+                st.text_input("상명", value=personal_info.get(f'award_name_{i}', ''), key=f"award_name_{i}")
             with cols[1]:
-                st.date_input("수상년월", key=f"award_date_{i}")
+                st.date_input("수상년월", value=personal_info.get(f'award_date_{i}', None), key=f"award_date_{i}")
             with cols[2]:
-                st.text_input("수여기관", key=f"award_org_{i}")
+                st.text_input("수여기관", value=personal_info.get(f'award_org_{i}', ''), key=f"award_org_{i}")
             with cols[3]:
-                st.text_input("비고", key=f"award_note_{i}")
+                st.text_input("비고", value=personal_info.get(f'award_note_{i}', ''), key=f"award_note_{i}")
             with cols[4]:
                 st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
                 if len(st.session_state.award_data) > 1:
@@ -840,15 +893,15 @@ def show_resume_page():
             # 활동명/소속/시작년월/종료년월/직책/역할/삭제 버튼 (2:2:1:1:1:1)
             cols = st.columns([2, 2, 1, 1, 1, 1])
             with cols[0]:
-                st.text_input("활동명", key=f"activity_name_{i}")
+                st.text_input("활동명", value=personal_info.get(f'activity_name_{i}', ''), key=f"activity_name_{i}")
             with cols[1]:
-                st.text_input("소속", key=f"activity_org_{i}")
+                st.text_input("소속", value=personal_info.get(f'activity_org_{i}', ''), key=f"activity_org_{i}")
             with cols[2]:
-                st.date_input("시작년월", key=f"activity_start_{i}")
+                st.date_input("시작년월", value=personal_info.get(f'activity_start_{i}', None), key=f"activity_start_{i}")
             with cols[3]:
-                st.date_input("종료년월", key=f"activity_end_{i}")
+                st.date_input("종료년월", value=personal_info.get(f'activity_end_{i}', None), key=f"activity_end_{i}")
             with cols[4]:
-                st.text_input("직책/역할", key=f"activity_role_{i}")
+                st.text_input("직책/역할", value=personal_info.get(f'activity_role_{i}', ''), key=f"activity_role_{i}")
             with cols[5]:
                 st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
                 if len(st.session_state.activity_data) > 1:
@@ -864,9 +917,9 @@ def show_resume_page():
             # 링크와 활동 세부내역 (4:4)
             cols = st.columns([4, 4])
             with cols[0]:
-                st.text_input("링크", key=f"activity_link_{i}", placeholder="관련 웹사이트나 문서 링크를 입력하세요")
+                st.text_input("링크", value=personal_info.get(f'activity_link_{i}', ''), key=f"activity_link_{i}", placeholder="관련 웹사이트나 문서 링크를 입력하세요")
             with cols[1]:
-                st.text_input("활동세부내역", key=f"activity_detail_{i}")
+                st.text_input("활동세부내역", value=personal_info.get(f'activity_detail_{i}', ''), key=f"activity_detail_{i}")
 
         # 활동 추가 버튼 (1:7)
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
@@ -910,12 +963,14 @@ def show_resume_page():
                 st.selectbox(
                     "자기소개분야",
                     ["자기소개분야1", "자기소개분야2", "자기소개분야3"],
+                    index=["자기소개분야1", "자기소개분야2", "자기소개분야3"].index(personal_info.get(f'intro_category_{i}', '자기소개분야1')),
                     key=f"intro_category_{i}"
                 )
             with cols[1]:
                 st.selectbox(
                     "주제",
                     ["주제1", "주제2", "주제3"],
+                    index=["주제1", "주제2", "주제3"].index(personal_info.get(f'intro_topic_{i}', '주제1')),
                     key=f"intro_topic_{i}"
                 )
             with cols[2]:
@@ -933,7 +988,7 @@ def show_resume_page():
             # 자기소개문 (8)
             cols = st.columns([8])
             with cols[0]:
-                st.text_area("자기소개문", height=200, key=f"intro_answer_{i}")
+                st.text_area("자기소개문", value=personal_info.get(f'intro_answer_{i}', ''), height=200, key=f"intro_answer_{i}")
 
         # 자기소개 추가 버튼 (1:7)
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
