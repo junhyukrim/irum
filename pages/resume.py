@@ -157,13 +157,13 @@ def show_resume_page():
         # 한글 성/이름, 영문 성/이름, 국적, 성별, 생년월일 (1:1:1:1:2:1:1 = 8)
         cols = st.columns([1,1,1,1,2,1,1])
         with cols[0]:
-            kr_last = st.text_input("", placeholder="성", key="kr_last", label_visibility="collapsed")
+            kr_last = st.text_input("한글 이름", placeholder="성", key="kr_last", label_visibility="collapsed")
         with cols[1]:
-            kr_first = st.text_input("", placeholder="이름", key="kr_first", label_visibility="collapsed")
+            kr_first = st.text_input(" ", placeholder="이름", key="kr_first", label_visibility="collapsed")
         with cols[2]:
-            en_first = st.text_input("", placeholder="firstname", key="en_first", label_visibility="collapsed")
+            en_first = st.text_input("영문 이름", placeholder="firstname", key="en_first", label_visibility="collapsed")
         with cols[3]:
-            en_last = st.text_input("", placeholder="lastname", key="en_last", label_visibility="collapsed")
+            en_last = st.text_input(" ", placeholder="lastname", key="en_last", label_visibility="collapsed")
         with cols[4]:
             nationality = st.text_input("국적", value="대한민국", key="nationality")
         with cols[5]:
