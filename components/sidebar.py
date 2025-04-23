@@ -17,7 +17,7 @@ def setup_sidebar():
         /* 이메일 표시 스타일 */
         .email-container {
             color: white;
-            padding: 1rem 2rem;
+            padding: 1rem 2rem 1rem 0;
             font-size: 0.9rem;
             opacity: 0.9;
             margin-bottom: -1rem;
