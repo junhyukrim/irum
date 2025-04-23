@@ -14,6 +14,15 @@ def setup_sidebar():
             width: 250px !important;
         }
         
+        /* 이메일 표시 스타일 */
+        .email-container {
+            color: white;
+            padding: 1rem 2rem;
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: -1rem;
+        }
+        
         /* 이미지 컨테이너 스타일 */
         div.element-container:has(img) {
             padding: 0 !important;
@@ -59,6 +68,10 @@ def setup_sidebar():
         """,
         unsafe_allow_html=True
     )
+    
+    # 로그인된 이메일 표시
+    if 'user_email' in st.session_state:
+        st.markdown(f'<div class="email-container">로그인된 이메일: {st.session_state.user_email}</div>', unsafe_allow_html=True)
     
     # 로고 추가
     st.image("https://i.imgur.com/thQZtYk.png")
