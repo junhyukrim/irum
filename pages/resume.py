@@ -19,10 +19,6 @@ def connect_to_db():
         return None
 
 def save_personal_info(login_email, data):
-    # 디버깅을 위한 데이터 출력
-    st.write("로그인 이메일:", login_email)
-    st.write("저장할 데이터:", data)
-    
     try:
         conn = connect_to_db()
         if conn is None:
@@ -35,7 +31,6 @@ def save_personal_info(login_email, data):
             result = cursor.fetchone()
             
             if result:
-                st.write("기존 데이터 업데이트")
                 # 기존 데이터 업데이트
                 update_query = """
                     UPDATE tb_resume_personal_info SET
@@ -61,7 +56,6 @@ def save_personal_info(login_email, data):
                     login_email
                 ))
             else:
-                st.write("새 데이터 삽입")
                 # 새로운 데이터 삽입
                 insert_query = """
                     INSERT INTO tb_resume_personal_info (
