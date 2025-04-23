@@ -119,7 +119,6 @@ def save_education_info(login_email, data):
     try:
         conn = connect_to_db()
         if conn is None:
-            st.error("데이터베이스 연결 실패")
             return False
         
         cursor = conn.cursor()
@@ -127,69 +126,116 @@ def save_education_info(login_email, data):
             for edu_idx in data:
                 education_data = data[edu_idx]
                 
-                # 디버깅을 위한 SQL 쿼리 출력
-                st.write(f"학력 {edu_idx} 처리 중...")
-                
-                # 기본 학력 정보 저장/업데이트
+                # 기존 학력 정보가 있는지 확인
                 if education_data.get('id'):  # 기존 데이터 업데이트
                     update_query = """
-                        UPDATE tb_resume_education 
-                        SET start_date = %s, end_date = %s, institution = %s, note = %s
+                        UPDATE tb_resume_education SET
+                        start_date = %s, end_date = %s, institution = %s, note = %s
                         WHERE id = %s AND login_email = %s
                     """
-                    values = (
+                    cursor.execute(update_query, (
                         education_data['admission_date'],
                         education_data['graduation_date'],
                         education_data['institution'],
                         education_data['notes'],
                         education_data['id'],
                         login_email
-                    )
-                    st.write("Update query:", update_query)
-                    st.write("Values:", values)
-                    cursor.execute(update_query, values)
+                    ))
                     education_id = education_data['id']
-                else:  # 새 데이터 삽입
+                    
+                    # 기존 전공 정보 조회
+                    cursor.execute("""
+                        SELECT id, department, major, degree, gpa 
+                        FROM tb_resume_education_major 
+                        WHERE education_id = %s
+                    """, (education_id,))
+                    existing_majors = cursor.fetchall()
+                    
+                    # 전공 정보 매핑 생성
+                    existing_major_map = {
+                        (major['department'], major['major']): major['id']
+                        for major in existing_majors
+                    }
+                    
+                else:  # 새 학력 정보 삽입
                     insert_query = """
                         INSERT INTO tb_resume_education 
                         (login_email, start_date, end_date, institution, note)
                         VALUES (%s, %s, %s, %s, %s)
                     """
-                    values = (
+                    cursor.execute(insert_query, (
                         login_email,
                         education_data['admission_date'],
                         education_data['graduation_date'],
                         education_data['institution'],
                         education_data['notes']
-                    )
-                    st.write("Insert query:", insert_query)
-                    st.write("Values:", values)
-                    cursor.execute(insert_query, values)
+                    ))
                     education_id = cursor.lastrowid
-                
-                st.write(f"Education ID: {education_id}")
+                    existing_major_map = {}
 
-                # 기존 전공 정보 삭제 (업데이트를 위해)
-                if education_data.get('id'):
-                    cursor.execute("DELETE FROM tb_resume_education_major WHERE education_id = %s", (education_id,))
-
-                # 전공 정보 저장
+                # 새로운 전공 정보 처리
+                new_majors = []
+                update_majors = []
                 for major_idx in range(education_data['major_count']):
+                    department = education_data[f'department_{major_idx}']
+                    major = education_data[f'major_{major_idx}']
+                    degree = education_data[f'degree_{major_idx}']
+                    gpa = education_data[f'gpa_{major_idx}']
+                    
+                    major_key = (department, major)
+                    if major_key in existing_major_map:
+                        # 기존 전공 정보 업데이트
+                        update_majors.append({
+                            'id': existing_major_map[major_key],
+                            'degree': degree,
+                            'gpa': gpa
+                        })
+                    else:
+                        # 새로운 전공 정보 추가
+                        new_majors.append({
+                            'department': department,
+                            'major': major,
+                            'degree': degree,
+                            'gpa': gpa
+                        })
+
+                # 기존 전공 정보 업데이트
+                if update_majors:
+                    for major in update_majors:
+                        cursor.execute("""
+                            UPDATE tb_resume_education_major 
+                            SET degree = %s, gpa = %s
+                            WHERE id = %s
+                        """, (major['degree'], major['gpa'], major['id']))
+
+                # 새로운 전공 정보 삽입
+                if new_majors:
                     insert_major_query = """
                         INSERT INTO tb_resume_education_major 
                         (education_id, department, major, degree, gpa)
                         VALUES (%s, %s, %s, %s, %s)
                     """
-                    major_values = (
-                        education_id,
-                        education_data[f'department_{major_idx}'],
-                        education_data[f'major_{major_idx}'],
-                        education_data[f'degree_{major_idx}'],
-                        education_data[f'gpa_{major_idx}']
-                    )
-                    st.write("Insert major query:", insert_major_query)
-                    st.write("Major values:", major_values)
-                    cursor.execute(insert_major_query, major_values)
+                    for major in new_majors:
+                        cursor.execute(insert_major_query, (
+                            education_id,
+                            major['department'],
+                            major['major'],
+                            major['degree'],
+                            major['gpa']
+                        ))
+
+                # 삭제된 전공 정보 처리
+                if education_data.get('id'):
+                    current_majors = {
+                        (education_data[f'department_{idx}'], education_data[f'major_{idx}'])
+                        for idx in range(education_data['major_count'])
+                    }
+                    for old_major_key, old_major_id in existing_major_map.items():
+                        if old_major_key not in current_majors:
+                            cursor.execute("""
+                                DELETE FROM tb_resume_education_major 
+                                WHERE id = %s
+                            """, (old_major_id,))
 
             conn.commit()
             return True
@@ -317,7 +363,7 @@ def show_resume_page():
                 """, unsafe_allow_html=True)
             else:
                 st.markdown("""
-                    <div style="padding: 1rem; background-color: #e9ffe9; border-radius: 0.5rem; margin: 1rem 0;">
+                    <div style="padding: 1rem; background-color: #cfe0fc; border-radius: 0.5rem; margin: 1rem 0;">
                         더 자세한 정보를 입력하시면 좋은 이력서가 완성됩니다.
                     </div>
                 """, unsafe_allow_html=True)
