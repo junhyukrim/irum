@@ -123,6 +123,16 @@ def save_education_info(login_email, data):
         
         cursor = conn.cursor()
         try:
+            # 현재 사용자의 모든 학력 정보 조회
+            cursor.execute("""
+                SELECT id FROM tb_resume_education 
+                WHERE login_email = %s
+            """, (login_email,))
+            existing_education_ids = {row['id'] for row in cursor.fetchall()}
+            
+            # 현재 폼에 있는 학력 ID 수집
+            current_education_ids = set()
+            
             for edu_idx in data:
                 education_data = data[edu_idx]
                 
@@ -132,6 +142,7 @@ def save_education_info(login_email, data):
                 
                 # 기존 학력 정보가 있는지 확인
                 if education_data.get('id'):  # 기존 데이터 업데이트
+                    current_education_ids.add(education_data['id'])
                     update_query = """
                         UPDATE tb_resume_education SET
                         start_date = %s, end_date = %s, institution = %s, note = %s
@@ -175,6 +186,7 @@ def save_education_info(login_email, data):
                         education_data['notes']
                     ))
                     education_id = cursor.lastrowid
+                    current_education_ids.add(education_id)
                     existing_major_map = {}
 
                 # 새로운 전공 정보 처리
@@ -250,6 +262,15 @@ def save_education_info(login_email, data):
                                 DELETE FROM tb_resume_education_major 
                                 WHERE id = %s
                             """, (old_major_id,))
+            
+            # 삭제된 학력 정보 처리
+            deleted_education_ids = existing_education_ids - current_education_ids
+            if deleted_education_ids:
+                delete_query = """
+                    DELETE FROM tb_resume_education 
+                    WHERE id IN ({})
+                """.format(','.join(['%s'] * len(deleted_education_ids)))
+                cursor.execute(delete_query, tuple(deleted_education_ids))
 
             conn.commit()
             return True
@@ -665,12 +686,54 @@ def show_resume_page():
                 padding-bottom: 20px;
                 margin-bottom: 20px;
             }
+
+            /* 도움말 아이콘 스타일링 */
+            .help-icon {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background-color: #E0E0E0;
+                color: #505050;
+                font-size: 14px;
+                margin-left: 8px;
+                cursor: help;
+            }
+
+            /* 도움말 컨테이너 스타일링 */
+            .help-container {
+                display: flex;
+                align-items: center;
+                margin-bottom: 1rem;
+            }
             </style>
             """,
             unsafe_allow_html=True
         )
         
-        st.markdown('<h5>학력</h5>', unsafe_allow_html=True)
+        # 학력 섹션 헤더와 도움말
+        st.markdown(
+            """
+            <div class="help-container">
+                <h5 style="margin: 0;">학력</h5>
+                <div class="help-icon" title="학력 정보 입력 도움말">?</div>
+            </div>
+            """, 
+            unsafe_allow_html=True
+        )
+
+        # 도움말 확장 섹션
+        with st.expander("📚 학력 정보 입력 가이드"):
+            st.markdown("""
+                ### 학위 변경 시나리오 안내
+                1. 학위 변경만 원할 경우: 기존 전공의 학위 정보만 변경
+                2. 같은 학력에 전공 추가를 원할 경우: '전공 추가' 사용
+                3. 새로운 학력 추가를 원할 경우: '학력 추가' 사용
+            """)
+        
+        st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
         
         # 로그인 확인
         if 'user_email' not in st.session_state:
