@@ -21,6 +21,7 @@ def setup_sidebar():
             font-size: 0.9rem;
             opacity: 0.9;
             margin-bottom: -1rem;
+            text-align: left;
         }
         
         /* 이미지 컨테이너 스타일 */
@@ -28,11 +29,13 @@ def setup_sidebar():
             padding: 0 !important;
             display: flex !important;
             justify-content: center !important;
+            align-items: center !important;
+            min-height: 150px !important;
         }
         
         img {
             width: 150px;
-            margin-bottom: 3rem;
+            margin: 0 !important;
         }
         
         /* 버튼 기본 스타일 */
