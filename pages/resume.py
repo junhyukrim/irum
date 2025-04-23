@@ -125,9 +125,6 @@ def show_resume_page():
     
     login_email = st.session_state.user_email
     
-    # 로그인한 이메일 표시
-    st.markdown(f'로그인한 이메일: <span style="color: #4285F4;">{login_email}</span>', unsafe_allow_html=True)
-    
     # DB에서 데이터 로드
     try:
         conn = connect_to_db()
