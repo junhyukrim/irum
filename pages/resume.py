@@ -119,12 +119,16 @@ def save_education_info(login_email, data):
     try:
         conn = connect_to_db()
         if conn is None:
+            st.error("데이터베이스 연결 실패")
             return False
         
         cursor = conn.cursor()
         try:
             for edu_idx in data:
                 education_data = data[edu_idx]
+                
+                # 디버깅을 위한 SQL 쿼리 출력
+                st.write(f"학력 {edu_idx} 처리 중...")
                 
                 # 기본 학력 정보 저장/업데이트
                 if education_data.get('id'):  # 기존 데이터 업데이트
@@ -133,14 +137,17 @@ def save_education_info(login_email, data):
                         SET start_date = %s, end_date = %s, institution = %s, note = %s
                         WHERE id = %s AND login_email = %s
                     """
-                    cursor.execute(update_query, (
+                    values = (
                         education_data['admission_date'],
                         education_data['graduation_date'],
                         education_data['institution'],
                         education_data['notes'],
                         education_data['id'],
                         login_email
-                    ))
+                    )
+                    st.write("Update query:", update_query)
+                    st.write("Values:", values)
+                    cursor.execute(update_query, values)
                     education_id = education_data['id']
                 else:  # 새 데이터 삽입
                     insert_query = """
@@ -148,14 +155,19 @@ def save_education_info(login_email, data):
                         (login_email, start_date, end_date, institution, note)
                         VALUES (%s, %s, %s, %s, %s)
                     """
-                    cursor.execute(insert_query, (
+                    values = (
                         login_email,
                         education_data['admission_date'],
                         education_data['graduation_date'],
                         education_data['institution'],
                         education_data['notes']
-                    ))
+                    )
+                    st.write("Insert query:", insert_query)
+                    st.write("Values:", values)
+                    cursor.execute(insert_query, values)
                     education_id = cursor.lastrowid
+                
+                st.write(f"Education ID: {education_id}")
 
                 # 기존 전공 정보 삭제 (업데이트를 위해)
                 if education_data.get('id'):
@@ -168,13 +180,16 @@ def save_education_info(login_email, data):
                         (education_id, department, major, degree, gpa)
                         VALUES (%s, %s, %s, %s, %s)
                     """
-                    cursor.execute(insert_major_query, (
+                    major_values = (
                         education_id,
                         education_data[f'department_{major_idx}'],
                         education_data[f'major_{major_idx}'],
                         education_data[f'degree_{major_idx}'],
                         education_data[f'gpa_{major_idx}']
-                    ))
+                    )
+                    st.write("Insert major query:", insert_major_query)
+                    st.write("Major values:", major_values)
+                    cursor.execute(insert_major_query, major_values)
 
             conn.commit()
             return True
@@ -758,6 +773,9 @@ def show_resume_page():
                         education_data[i][f'major_{j}'] = st.session_state[f'major_{i}_{j}']
                         education_data[i][f'degree_{j}'] = st.session_state[f'degree_{i}_{j}']
                         education_data[i][f'gpa_{j}'] = st.session_state[f'gpa_{i}_{j}']
+                
+                # 디버깅을 위한 데이터 출력
+                st.write("저장할 데이터:", education_data)
                 
                 if save_education_info(st.session_state.user_email, education_data):
                     st.success("저장되었습니다!")
