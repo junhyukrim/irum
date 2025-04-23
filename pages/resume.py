@@ -126,6 +126,10 @@ def save_education_info(login_email, data):
             for edu_idx in data:
                 education_data = data[edu_idx]
                 
+                # 날짜 데이터 처리
+                admission_date = education_data['admission_date']
+                graduation_date = education_data['graduation_date']
+                
                 # 기존 학력 정보가 있는지 확인
                 if education_data.get('id'):  # 기존 데이터 업데이트
                     update_query = """
@@ -134,8 +138,8 @@ def save_education_info(login_email, data):
                         WHERE id = %s AND login_email = %s
                     """
                     cursor.execute(update_query, (
-                        education_data['admission_date'],
-                        education_data['graduation_date'],
+                        admission_date,
+                        graduation_date,
                         education_data['institution'],
                         education_data['notes'],
                         education_data['id'],
@@ -165,8 +169,8 @@ def save_education_info(login_email, data):
                     """
                     cursor.execute(insert_query, (
                         login_email,
-                        education_data['admission_date'],
-                        education_data['graduation_date'],
+                        admission_date,
+                        graduation_date,
                         education_data['institution'],
                         education_data['notes']
                     ))
@@ -181,6 +185,14 @@ def save_education_info(login_email, data):
                     major = education_data[f'major_{major_idx}']
                     degree = education_data[f'degree_{major_idx}']
                     gpa = education_data[f'gpa_{major_idx}']
+                    
+                    # degree가 '선택'인 경우 스킵
+                    if degree == '선택':
+                        continue
+                    
+                    # 빈 department와 major인 경우 스킵
+                    if not department.strip() and not major.strip():
+                        continue
                     
                     major_key = (department, major)
                     if major_key in existing_major_map:
@@ -229,6 +241,8 @@ def save_education_info(login_email, data):
                     current_majors = {
                         (education_data[f'department_{idx}'], education_data[f'major_{idx}'])
                         for idx in range(education_data['major_count'])
+                        if education_data[f'degree_{idx}'] != '선택' and 
+                           (education_data[f'department_{idx}'].strip() or education_data[f'major_{idx}'].strip())
                     }
                     for old_major_key, old_major_id in existing_major_map.items():
                         if old_major_key not in current_majors:
