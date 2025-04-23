@@ -687,6 +687,12 @@ def show_resume_page():
                 margin-bottom: 20px;
             }
 
+            /* 도움말 아이콘과 툴팁 컨테이너 */
+            .help-tooltip-container {
+                position: relative;
+                display: inline-block;
+            }
+
             /* 도움말 아이콘 스타일링 */
             .help-icon {
                 display: inline-flex;
@@ -700,6 +706,48 @@ def show_resume_page():
                 font-size: 14px;
                 margin-left: 8px;
                 cursor: help;
+            }
+
+            /* 툴팁 스타일링 */
+            .tooltip-text {
+                visibility: hidden;
+                position: absolute;
+                z-index: 1;
+                width: 300px;
+                background-color: #333;
+                color: white;
+                text-align: left;
+                padding: 10px;
+                border-radius: 6px;
+                font-size: 14px;
+                line-height: 1.5;
+                
+                /* 위치 조정 */
+                bottom: 125%;
+                left: 50%;
+                transform: translateX(-50%);
+                
+                /* 페이드 효과 */
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+
+            /* 화살표 */
+            .tooltip-text::after {
+                content: "";
+                position: absolute;
+                top: 100%;
+                left: 50%;
+                margin-left: -5px;
+                border-width: 5px;
+                border-style: solid;
+                border-color: #333 transparent transparent transparent;
+            }
+
+            /* 호버 시 툴팁 표시 */
+            .help-tooltip-container:hover .tooltip-text {
+                visibility: visible;
+                opacity: 1;
             }
 
             /* 도움말 컨테이너 스타일링 */
@@ -718,20 +766,25 @@ def show_resume_page():
             """
             <div class="help-container">
                 <h5 style="margin: 0;">학력</h5>
-                <div class="help-icon" title="학력 정보 입력 도움말">?</div>
+                <div class="help-tooltip-container">
+                    <div class="help-icon">?</div>
+                    <div class="tooltip-text">
+                        <strong>학위 변경 시나리오 안내</strong><br><br>
+                        1. <strong>학위 변경만 원할 경우:</strong><br>
+                           - 기존 전공의 학위 정보만 변경<br>
+                           - 예: 경영학부 회계재무학과 학사 → 석사<br><br>
+                        2. <strong>같은 학력에 전공 추가:</strong><br>
+                           - '전공 추가' 버튼 사용<br>
+                           - 예: 경영학부 회계재무학과(학사) + 재무회계(석사)<br><br>
+                        3. <strong>새로운 학력 추가:</strong><br>
+                           - '학력 추가' 버튼 사용<br>
+                           - 예: 학사(2019-2023) + 석사(2023-2025)
+                    </div>
+                </div>
             </div>
             """, 
             unsafe_allow_html=True
         )
-
-        # 도움말 확장 섹션
-        with st.expander("📚 학력 정보 입력 가이드"):
-            st.markdown("""
-                ### 학위 변경 시나리오 안내
-                1. 학위 변경만 원할 경우: 기존 전공의 학위 정보만 변경
-                2. 같은 학력에 전공 추가를 원할 경우: '전공 추가' 사용
-                3. 새로운 학력 추가를 원할 경우: '학력 추가' 사용
-            """)
         
         st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
         
