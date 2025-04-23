@@ -115,6 +115,158 @@ def load_personal_info(login_email):
     except Exception as e:
         return None, f"데이터베이스 접근 중 오류가 발생했습니다: {str(e)}"
 
+def save_education_info(login_email, data):
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return False
+        
+        cursor = conn.cursor()
+        try:
+            for edu_idx in data:
+                education_data = data[edu_idx]
+                
+                # 기본 학력 정보 저장/업데이트
+                if education_data.get('id'):  # 기존 데이터 업데이트
+                    update_query = """
+                        UPDATE tb_resume_education 
+                        SET start_date = %s, end_date = %s, institution = %s, note = %s
+                        WHERE id = %s AND login_email = %s
+                    """
+                    cursor.execute(update_query, (
+                        education_data['admission_date'],
+                        education_data['graduation_date'],
+                        education_data['institution'],
+                        education_data['notes'],
+                        education_data['id'],
+                        login_email
+                    ))
+                    education_id = education_data['id']
+                else:  # 새 데이터 삽입
+                    insert_query = """
+                        INSERT INTO tb_resume_education 
+                        (login_email, start_date, end_date, institution, note)
+                        VALUES (%s, %s, %s, %s, %s)
+                    """
+                    cursor.execute(insert_query, (
+                        login_email,
+                        education_data['admission_date'],
+                        education_data['graduation_date'],
+                        education_data['institution'],
+                        education_data['notes']
+                    ))
+                    education_id = cursor.lastrowid
+
+                # 기존 전공 정보 삭제 (업데이트를 위해)
+                if education_data.get('id'):
+                    cursor.execute("DELETE FROM tb_resume_education_major WHERE education_id = %s", (education_id,))
+
+                # 전공 정보 저장
+                for major_idx in range(education_data['major_count']):
+                    insert_major_query = """
+                        INSERT INTO tb_resume_education_major 
+                        (education_id, department, major, degree, gpa)
+                        VALUES (%s, %s, %s, %s, %s)
+                    """
+                    cursor.execute(insert_major_query, (
+                        education_id,
+                        education_data[f'department_{major_idx}'],
+                        education_data[f'major_{major_idx}'],
+                        education_data[f'degree_{major_idx}'],
+                        education_data[f'gpa_{major_idx}']
+                    ))
+
+            conn.commit()
+            return True
+        except Exception as e:
+            st.error(f"쿼리 실행 중 오류: {str(e)}")
+            conn.rollback()
+            return False
+        finally:
+            cursor.close()
+            conn.close()
+    except Exception as e:
+        st.error(f"데이터베이스 연결 중 오류: {str(e)}")
+        return False
+
+def load_education_info(login_email):
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return None, "데이터베이스 연결 실패"
+        
+        cursor = conn.cursor()
+        try:
+            # 기본 학력 정보 조회
+            cursor.execute("""
+                SELECT id, start_date, end_date, institution, note 
+                FROM tb_resume_education 
+                WHERE login_email = %s
+                ORDER BY start_date DESC
+            """, (login_email,))
+            educations = cursor.fetchall()
+            
+            # 각 학력의 전공 정보 조회
+            result = []
+            for edu in educations:
+                cursor.execute("""
+                    SELECT department, major, degree, gpa 
+                    FROM tb_resume_education_major 
+                    WHERE education_id = %s
+                """, (edu['id'],))
+                majors = cursor.fetchall()
+                
+                edu_data = {
+                    'id': edu['id'],
+                    'start_date': edu['start_date'],
+                    'end_date': edu['end_date'],
+                    'institution': edu['institution'],
+                    'note': edu['note'],
+                    'majors': majors
+                }
+                result.append(edu_data)
+            
+            return result, None
+        except Exception as e:
+            return None, f"데이터 조회 중 오류: {str(e)}"
+        finally:
+            cursor.close()
+            conn.close()
+    except Exception as e:
+        return None, f"데이터베이스 연결 중 오류: {str(e)}"
+
+def delete_education(education_id, login_email):
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return False
+        
+        cursor = conn.cursor()
+        try:
+            # 해당 학력이 현재 로그인한 사용자의 것인지 확인
+            cursor.execute("""
+                SELECT id FROM tb_resume_education 
+                WHERE id = %s AND login_email = %s
+            """, (education_id, login_email))
+            
+            if not cursor.fetchone():
+                return False
+            
+            # CASCADE 설정으로 인해 tb_resume_education_major의 데이터도 자동 삭제됨
+            cursor.execute("DELETE FROM tb_resume_education WHERE id = %s", (education_id,))
+            conn.commit()
+            return True
+        except Exception as e:
+            st.error(f"삭제 중 오류: {str(e)}")
+            conn.rollback()
+            return False
+        finally:
+            cursor.close()
+            conn.close()
+    except Exception as e:
+        st.error(f"데이터베이스 연결 중 오류: {str(e)}")
+        return False
+
 def show_resume_page():
     st.markdown('<h3 class="main-header">이력관리</h3>', unsafe_allow_html=True)
     
@@ -445,6 +597,46 @@ def show_resume_page():
         
         st.markdown('<h5>학력</h5>', unsafe_allow_html=True)
         
+        # 로그인 확인
+        if 'user_email' not in st.session_state:
+            st.error("로그인이 필요합니다.")
+            return
+            
+        # 기존 데이터 로드
+        if 'education_loaded' not in st.session_state:
+            educations, error = load_education_info(st.session_state.user_email)
+            if error:
+                st.error(error)
+            elif educations:
+                # 기존 데이터로 session_state 초기화
+                st.session_state.education_data = []
+                st.session_state.major_counts = {}
+                
+                for idx, edu in enumerate(educations):
+                    st.session_state.education_data.append(idx)
+                    st.session_state[f'education_id_{idx}'] = edu['id']
+                    st.session_state[f'admission_date_{idx}'] = edu['start_date']
+                    st.session_state[f'graduation_date_{idx}'] = edu['end_date']
+                    st.session_state[f'institution_{idx}'] = edu['institution']
+                    st.session_state[f'notes_{idx}'] = edu['note']
+                    
+                    # 전공 정보 설정
+                    st.session_state.major_counts[idx] = len(edu['majors'])
+                    for major_idx, major in enumerate(edu['majors']):
+                        st.session_state[f'department_{idx}_{major_idx}'] = major['department']
+                        st.session_state[f'major_{idx}_{major_idx}'] = major['major']
+                        st.session_state[f'degree_{idx}_{major_idx}'] = major['degree']
+                        st.session_state[f'gpa_{idx}_{major_idx}'] = major['gpa']
+                
+                st.session_state.education_count = len(educations)
+            else:
+                # 초기 상태 설정
+                st.session_state.education_count = 1
+                st.session_state.education_data = [0]
+                st.session_state.major_counts = {0: 1}
+            
+            st.session_state.education_loaded = True
+        
         # 학력 카운터 초기화
         if 'education_count' not in st.session_state:
             st.session_state.education_count = 1
@@ -474,14 +666,22 @@ def show_resume_page():
                 st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
                 if len(st.session_state.education_data) > 1:
                     if st.button("학력 삭제", key=f"delete_education_{i}", use_container_width=True):
-                        st.session_state.education_data.remove(i)
-                        if i in st.session_state.major_counts:
-                            del st.session_state.major_counts[i]
-                        if len(st.session_state.education_data) == 0:
-                            st.session_state.education_count = 1
-                            st.session_state.education_data = [0]
-                            st.session_state.major_counts = {0: 1}
-                        st.rerun()
+                        if st.session_state.get(f'education_id_{i}'):  # 기존 데이터인 경우
+                            if delete_education(st.session_state[f'education_id_{i}'], st.session_state.user_email):
+                                st.session_state.education_data.remove(i)
+                                if i in st.session_state.major_counts:
+                                    del st.session_state.major_counts[i]
+                                st.session_state.education_loaded = False  # 다시 로드하도록 설정
+                                st.rerun()
+                        else:  # 새로 추가했다가 삭제하는 경우
+                            st.session_state.education_data.remove(i)
+                            if i in st.session_state.major_counts:
+                                del st.session_state.major_counts[i]
+                            if len(st.session_state.education_data) == 0:
+                                st.session_state.education_count = 1
+                                st.session_state.education_data = [0]
+                                st.session_state.major_counts = {0: 1}
+                            st.rerun()
 
             # 전공 정보 (여러 개 추가 가능)
             if i not in st.session_state.major_counts:
@@ -536,7 +736,33 @@ def show_resume_page():
             cols[i].empty()
         with cols[7]:  # 마지막 컬럼에 버튼 배치
             if st.button("저장", key="save_education", use_container_width=True):
-                st.success("저장되었습니다!")
+                if 'user_email' not in st.session_state:
+                    st.error("로그인이 필요합니다.")
+                    return
+                
+                # 현재 입력된 모든 학력 데이터 수집
+                education_data = {}
+                for i in st.session_state.education_data:
+                    education_data[i] = {
+                        'id': st.session_state.get(f'education_id_{i}'),  # 기존 데이터의 경우 ID 존재
+                        'admission_date': st.session_state[f'admission_date_{i}'],
+                        'graduation_date': st.session_state[f'graduation_date_{i}'],
+                        'institution': st.session_state[f'institution_{i}'],
+                        'notes': st.session_state[f'notes_{i}'],
+                        'major_count': st.session_state.major_counts[i]
+                    }
+                    
+                    # 각 전공 정보 추가
+                    for j in range(st.session_state.major_counts[i]):
+                        education_data[i][f'department_{j}'] = st.session_state[f'department_{i}_{j}']
+                        education_data[i][f'major_{j}'] = st.session_state[f'major_{i}_{j}']
+                        education_data[i][f'degree_{j}'] = st.session_state[f'degree_{i}_{j}']
+                        education_data[i][f'gpa_{j}'] = st.session_state[f'gpa_{i}_{j}']
+                
+                if save_education_info(st.session_state.user_email, education_data):
+                    st.success("저장되었습니다!")
+                else:
+                    st.error("저장 중 오류가 발생했습니다.")
 
     # 역량 탭
     with tabs[2]:
