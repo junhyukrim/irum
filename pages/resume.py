@@ -743,14 +743,13 @@ def show_resume_page():
                 st.session_state.education_count += 1
                 st.rerun()
 
+        # 저장 버튼 (7:1)
         st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
-
-        # 저장 버튼 (7:1 = 8, right align)
         cols = st.columns(8)
         for i in range(7):  # 처음 7개 컬럼은 빈 공간
             cols[i].empty()
         with cols[7]:  # 마지막 컬럼에 버튼 배치
-            if st.button("저장", key="save_education", use_container_width=True):
+            if st.button("저장", key="save_education_tab", use_container_width=True):
                 if 'user_email' not in st.session_state:
                     st.error("로그인이 필요합니다.")
                     return
@@ -759,7 +758,7 @@ def show_resume_page():
                 education_data = {}
                 for i in st.session_state.education_data:
                     education_data[i] = {
-                        'id': st.session_state.get(f'education_id_{i}'),  # 기존 데이터의 경우 ID 존재
+                        'id': st.session_state.get(f'education_id_{i}'),
                         'admission_date': st.session_state[f'admission_date_{i}'],
                         'graduation_date': st.session_state[f'graduation_date_{i}'],
                         'institution': st.session_state[f'institution_{i}'],
@@ -779,6 +778,9 @@ def show_resume_page():
                 
                 if save_education_info(st.session_state.user_email, education_data):
                     st.success("저장되었습니다!")
+                    # 저장 성공 시 데이터 다시 로드하도록 설정
+                    st.session_state.education_loaded = False
+                    st.rerun()
                 else:
                     st.error("저장 중 오류가 발생했습니다.")
 
@@ -935,7 +937,7 @@ def show_resume_page():
         for i in range(7):  # 처음 7개 컬럼은 빈 공간
             cols[i].empty()
         with cols[7]:  # 마지막 컬럼에 버튼 배치
-            if st.button("저장", key="save_skill", use_container_width=True):
+            if st.button("저장", key="save_skill_tab", use_container_width=True):
                 st.success("저장되었습니다!")
 
     # 경력 탭
@@ -1080,7 +1082,7 @@ def show_resume_page():
         for i in range(7):  # 처음 7개 컬럼은 빈 공간
             cols[i].empty()
         with cols[7]:  # 마지막 컬럼에 버튼 배치
-            if st.button("저장", key="save_career", use_container_width=True):
+            if st.button("저장", key="save_career_tab", use_container_width=True):
                 st.success("저장되었습니다!")
 
     # 수상 탭
@@ -1136,7 +1138,7 @@ def show_resume_page():
         for i in range(7):  # 처음 7개 컬럼은 빈 공간
             cols[i].empty()
         with cols[7]:  # 마지막 컬럼에 버튼 배치
-            if st.button("저장", key="save_award", use_container_width=True):
+            if st.button("저장", key="save_award_tab", use_container_width=True):
                 st.success("저장되었습니다!")
 
     # 기타활동 탭
@@ -1203,7 +1205,7 @@ def show_resume_page():
         for i in range(7):  # 처음 7개 컬럼은 빈 공간
             cols[i].empty()
         with cols[7]:  # 마지막 컬럼에 버튼 배치
-            if st.button("저장", key="save_activity", use_container_width=True):
+            if st.button("저장", key="save_activity_tab", use_container_width=True):
                 st.success("저장되었습니다!")
 
     # 자기소개 탭
@@ -1272,5 +1274,5 @@ def show_resume_page():
         for i in range(7):  # 처음 7개 컬럼은 빈 공간
             cols[i].empty()
         with cols[7]:  # 마지막 컬럼에 버튼 배치
-            if st.button("저장", key="save_intro", use_container_width=True):
+            if st.button("저장", key="save_introduction_tab", use_container_width=True):
                 st.success("저장되었습니다!") 
