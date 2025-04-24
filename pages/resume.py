@@ -398,7 +398,7 @@ def show_resume_page():
                 """, unsafe_allow_html=True)
             else:
                 st.markdown("""
-                    <div style="padding: 1rem; background-color: #cfe0fc; border-radius: 0.5rem; margin: 1rem 0;">
+                    <div style="padding: 1rem; background-color: #d8e6fd; border-radius: 0.5rem; margin: 1rem 0;">
                         더 자세한 정보를 입력하시면 좋은 이력서가 완성됩니다.
                     </div>
                 """, unsafe_allow_html=True)
@@ -706,30 +706,37 @@ def show_resume_page():
                 font-size: 14px;
                 margin-left: 8px;
                 cursor: help;
+                transition: background-color 0.3s;
+            }
+
+            .help-icon:hover {
+                background-color: #4285F4;
+                color: white;
             }
 
             /* 툴팁 스타일링 */
             .tooltip-text {
                 visibility: hidden;
                 position: absolute;
-                z-index: 1;
-                width: 300px;
-                background-color: #333;
-                color: white;
+                z-index: 1000;
+                width: 400px;
+                background-color: #ffffff;
+                color: #333333;
                 text-align: left;
-                padding: 10px;
-                border-radius: 6px;
+                padding: 15px;
+                border-radius: 8px;
                 font-size: 14px;
-                line-height: 1.5;
+                line-height: 1.6;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                border: 1px solid #e0e0e0;
                 
                 /* 위치 조정 */
-                bottom: 125%;
-                left: 50%;
-                transform: translateX(-50%);
+                bottom: 150%;
+                left: -380px;
                 
                 /* 페이드 효과 */
                 opacity: 0;
-                transition: opacity 0.3s;
+                transition: opacity 0.3s, visibility 0.3s;
             }
 
             /* 화살표 */
@@ -737,11 +744,12 @@ def show_resume_page():
                 content: "";
                 position: absolute;
                 top: 100%;
-                left: 50%;
+                right: 15px;
                 margin-left: -5px;
-                border-width: 5px;
+                border-width: 8px;
                 border-style: solid;
-                border-color: #333 transparent transparent transparent;
+                border-color: #ffffff transparent transparent transparent;
+                filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
             }
 
             /* 호버 시 툴팁 표시 */
@@ -755,6 +763,7 @@ def show_resume_page():
                 display: flex;
                 align-items: center;
                 margin-bottom: 1rem;
+                position: relative;
             }
             </style>
             """,
@@ -769,16 +778,24 @@ def show_resume_page():
                 <div class="help-tooltip-container">
                     <div class="help-icon">?</div>
                     <div class="tooltip-text">
-                        <strong>학위 변경 시나리오 안내</strong><br><br>
-                        1. <strong>학위 변경만 원할 경우:</strong><br>
-                           - 기존 전공의 학위 정보만 변경<br>
-                           - 예: 경영학부 회계재무학과 학사 → 석사<br><br>
-                        2. <strong>같은 학력에 전공 추가:</strong><br>
-                           - '전공 추가' 버튼 사용<br>
-                           - 예: 경영학부 회계재무학과(학사) + 재무회계(석사)<br><br>
-                        3. <strong>새로운 학력 추가:</strong><br>
-                           - '학력 추가' 버튼 사용<br>
-                           - 예: 학사(2019-2023) + 석사(2023-2025)
+                        <strong style="font-size: 16px; color: #4285F4;">학위 변경 시나리오 안내</strong>
+                        <div style="margin-top: 12px;">
+                            <div style="margin-bottom: 15px;">
+                                <strong style="color: #4285F4;">1. 학위 변경만 원할 경우:</strong><br>
+                                • 기존 전공의 학위 정보만 변경<br>
+                                • 예: 경영학부 회계재무학과 학사 → 석사
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <strong style="color: #4285F4;">2. 같은 학력에 전공 추가:</strong><br>
+                                • '전공 추가' 버튼 사용<br>
+                                • 예: 경영학부 회계재무학과(학사) + 재무회계(석사)
+                            </div>
+                            <div>
+                                <strong style="color: #4285F4;">3. 새로운 학력 추가:</strong><br>
+                                • '학력 추가' 버튼 사용<br>
+                                • 예: 학사(2019-2023) + 석사(2023-2025)
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
