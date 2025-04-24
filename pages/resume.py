@@ -1374,15 +1374,14 @@ def show_resume_page():
                 st.text_input("기술 및 역량", value=personal_info.get(f'skill_desc_{i}', ''), key=f"skill_desc_{i}")
             with cols[1]:
                 level_options = ["1", "2", "3", "4", "5"]
-                raw_level = str(personal_info.get(f'skill_level_{i}', "3"))
+                skill_level_key = f"skill_level_{i}"
                 selected_level = st.selectbox(
                 "성취 수준",
                 level_options,
-                index=level_options.index(raw_level) if raw_level in level_options else 2,
-                key=f"skill_level_{i}",
+                key=skill_level_key,
                 help="1: 기초 수준, 2: 초급 수준, 3: 중급 수준, 4: 고급 수준, 5: 전문가 수준"
             )
-                
+                            
                 # 저장 버튼 클릭 시 모든 항목은 반드시 기술명과 성취 수준을 모두 유효하게 입력해야 함
                 for i in st.session_state.skill_data:
                     skill_name = st.session_state[f'skill_desc_{i}'].strip()
