@@ -1966,18 +1966,7 @@ def show_resume_page():
         for i in range(7):  # 처음 7개 컬럼은 빈 공간
             cols[i].empty()
         with cols[7]:  # 마지막 컬럼에 버튼 배치
-            if st.button("저장", key="save_introduction_tab", use_container_width=True):
-                st.success("저장되었습니다!") 
-
-        st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-
-        # 저장 버튼 (7:1)
-        st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
-        cols = st.columns(8)
-        for i in range(7):  # 처음 7개 컬럼은 빈 공간
-            cols[i].empty()
-        with cols[7]:  # 마지막 컬럼에 버튼 배치
-            if st.button("저장", key="save_skill_tab", use_container_width=True):
+            if st.button("저장", key="save_intro_tab", use_container_width=True):
                 if 'user_email' not in st.session_state:
                     st.error("로그인이 필요합니다.")
                     return
