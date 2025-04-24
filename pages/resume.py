@@ -455,16 +455,6 @@ def save_certifications_info(login_email, data):
             current_cert_ids = set()
             
             for skill_idx in data:
-                # 먼저 skill_id를 가져옵니다
-                cursor.execute("""
-                    SELECT id FROM tb_resume_skills 
-                    WHERE login_email = %s AND skill_name = %s
-                """, (login_email, data[skill_idx]['skill_name']))
-                skill_result = cursor.fetchone()
-                if not skill_result:
-                    continue
-                skill_id = skill_result['id']
-                
                 for cert_idx in range(data[skill_idx]['cert_count']):
                     cert_data = data[skill_idx]['certifications'][cert_idx]
                     
@@ -473,32 +463,29 @@ def save_certifications_info(login_email, data):
                         current_cert_ids.add(cert_data['id'])
                         update_query = """
                             UPDATE tb_resume_certifications SET
-                            skill_id = %s,
                             certification_name = %s,
                             issue_date = %s,
-                            issuing_org = %s
+                            issuing_agency = %s
                             WHERE id = %s AND login_email = %s
                         """
                         cursor.execute(update_query, (
-                            skill_id,
-                            cert_data['cert_name'],
+                            cert_data['certification_name'],
                             cert_data['issue_date'],
-                            cert_data['issuing_org'],
+                            cert_data['issuing_agency'],
                             cert_data['id'],
                             login_email
                         ))
                     else:  # 새 자격증 정보 삽입
                         insert_query = """
                             INSERT INTO tb_resume_certifications 
-                            (login_email, skill_id, certification_name, issue_date, issuing_org)
-                            VALUES (%s, %s, %s, %s, %s)
+                            (login_email, certification_name, issue_date, issuing_agency)
+                            VALUES (%s, %s, %s, %s)
                         """
                         cursor.execute(insert_query, (
                             login_email,
-                            skill_id,
-                            cert_data['cert_name'],
+                            cert_data['certification_name'],
                             cert_data['issue_date'],
-                            cert_data['issuing_org']
+                            cert_data['issuing_agency']
                         ))
                         cert_id = cursor.lastrowid
                         current_cert_ids.add(cert_id)
@@ -544,16 +531,6 @@ def save_training_info(login_email, data):
             current_training_ids = set()
             
             for skill_idx in data:
-                # 먼저 skill_id를 가져옵니다
-                cursor.execute("""
-                    SELECT id FROM tb_resume_skills 
-                    WHERE login_email = %s AND skill_name = %s
-                """, (login_email, data[skill_idx]['skill_name']))
-                skill_result = cursor.fetchone()
-                if not skill_result:
-                    continue
-                skill_id = skill_result['id']
-                
                 for edu_idx in range(data[skill_idx]['edu_count']):
                     edu_data = data[skill_idx]['training'][edu_idx]
                     
@@ -562,12 +539,10 @@ def save_training_info(login_email, data):
                         current_training_ids.add(edu_data['id'])
                         update_query = """
                             UPDATE tb_resume_training SET
-                            skill_id = %s,
                             description = %s
                             WHERE id = %s AND login_email = %s
                         """
                         cursor.execute(update_query, (
-                            skill_id,
                             edu_data['description'],
                             edu_data['id'],
                             login_email
@@ -575,12 +550,11 @@ def save_training_info(login_email, data):
                     else:  # 새 교육 정보 삽입
                         insert_query = """
                             INSERT INTO tb_resume_training 
-                            (login_email, skill_id, description)
-                            VALUES (%s, %s, %s)
+                            (login_email, description)
+                            VALUES (%s, %s)
                         """
                         cursor.execute(insert_query, (
                             login_email,
-                            skill_id,
                             edu_data['description']
                         ))
                         training_id = cursor.lastrowid
@@ -632,16 +606,16 @@ def load_skills_info(login_email):
                 cursor.execute("""
                     SELECT id, certification_name, issue_date, issuing_agency 
                     FROM tb_resume_certifications 
-                    WHERE login_email = %s AND skill_id = %s
-                """, (login_email, skill['id']))
+                    WHERE login_email = %s
+                """, (login_email,))
                 certifications = cursor.fetchall()
                 
                 # 교육 정보 조회
                 cursor.execute("""
                     SELECT id, description 
                     FROM tb_resume_training 
-                    WHERE login_email = %s AND skill_id = %s
-                """, (login_email, skill['id']))
+                    WHERE login_email = %s
+                """, (login_email,))
                 training = cursor.fetchall()
                 
                 skill_data = {
@@ -1355,9 +1329,9 @@ def show_resume_page():
                     st.session_state.cert_counts[idx] = len(skill['certifications'])
                     for cert_idx, cert in enumerate(skill['certifications']):
                         st.session_state[f'cert_id_{idx}_{cert_idx}'] = cert['id']
-                        st.session_state[f'cert_name_{idx}_{cert_idx}'] = cert['cert_name']
+                        st.session_state[f'certification_name_{idx}_{cert_idx}'] = cert['certification_name']
                         st.session_state[f'cert_date_{idx}_{cert_idx}'] = cert['issue_date']
-                        st.session_state[f'cert_org_{idx}_{cert_idx}'] = cert['issuing_org']
+                        st.session_state[f'cert_org_{idx}_{cert_idx}'] = cert['issuing_agency']
                     
                     # 교육 정보 설정
                     st.session_state.edu_counts[idx] = len(skill['training'])
@@ -1443,7 +1417,7 @@ def show_resume_page():
                         # 자격증 (3:1:2:1:1)
                         cols = st.columns([3, 1, 2, 1, 1])
                         with cols[0]:
-                            st.text_input("자격증명", value=personal_info.get(f'cert_name_{i}_{j}', ''), key=f"cert_name_{i}_{j}")
+                            st.text_input("자격증명", value=personal_info.get(f'certification_name_{i}_{j}', ''), key=f"certification_name_{i}_{j}")
                         with cols[1]:
                             st.date_input("취득년월", value=personal_info.get(f'cert_date_{i}_{j}', None), key=f"cert_date_{i}_{j}")
                         with cols[2]:
@@ -1520,9 +1494,9 @@ def show_resume_page():
                     for j in range(st.session_state.cert_counts[i]):
                         certifications_data[i]['certifications'].append({
                             'id': st.session_state.get(f'cert_id_{i}_{j}'),
-                            'cert_name': st.session_state[f'cert_name_{i}_{j}'],
+                            'certification_name': st.session_state[f'certification_name_{i}_{j}'],
                             'issue_date': st.session_state[f'cert_date_{i}_{j}'],
-                            'issuing_org': st.session_state[f'cert_org_{i}_{j}']
+                            'issuing_agency': st.session_state[f'cert_org_{i}_{j}']
                         })
                     
                     # 교육 데이터
