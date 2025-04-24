@@ -586,35 +586,35 @@ def save_training_info(login_email, data):
             # 현재 폼에 있는 교육 ID 수집
             current_training_ids = set()
             
-            for skill_idx in data:
-                for edu_idx in range(data[skill_idx]['edu_count']):
-                    edu_data = data[skill_idx]['training'][edu_idx]
-                    
-                    # 기존 교육 정보가 있는지 확인
-                    if edu_data.get('id'):  # 기존 데이터 업데이트
-                        current_training_ids.add(edu_data['id'])
-                        update_query = """
-                            UPDATE tb_resume_training SET
-                            description = %s
-                            WHERE id = %s AND login_email = %s
-                        """
-                        cursor.execute(update_query, (
-                            edu_data['description'],
-                            edu_data['id'],
-                            login_email
-                        ))
-                    else:  # 새 교육 정보 삽입
-                        insert_query = """
-                            INSERT INTO tb_resume_training 
-                            (login_email, description)
-                            VALUES (%s, %s)
-                        """
-                        cursor.execute(insert_query, (
-                            login_email,
-                            edu_data['description']
-                        ))
-                        training_id = cursor.lastrowid
-                        current_training_ids.add(training_id)
+            # 데이터 구조 변경에 맞게 처리
+            for idx in data:
+                edu_data = data[idx]
+                
+                # 기존 교육 정보가 있는지 확인
+                if edu_data.get('id'):  # 기존 데이터 업데이트
+                    current_training_ids.add(edu_data['id'])
+                    update_query = """
+                        UPDATE tb_resume_training SET
+                        description = %s
+                        WHERE id = %s AND login_email = %s
+                    """
+                    cursor.execute(update_query, (
+                        edu_data['description'],
+                        edu_data['id'],
+                        login_email
+                    ))
+                else:  # 새 교육 정보 삽입
+                    insert_query = """
+                        INSERT INTO tb_resume_training 
+                        (login_email, description)
+                        VALUES (%s, %s)
+                    """
+                    cursor.execute(insert_query, (
+                        login_email,
+                        edu_data['description']
+                    ))
+                    training_id = cursor.lastrowid
+                    current_training_ids.add(training_id)
             
             # 삭제된 교육 정보 처리
             deleted_training_ids = existing_training_ids - current_training_ids
