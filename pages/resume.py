@@ -1510,7 +1510,7 @@ def show_resume_page():
                 with button_cols[0]:
                     st.markdown("<div style='height: 2px;'></div>", unsafe_allow_html=True)
                     if len(st.session_state.skill_data) > 1:
-                        if st.button("삭제", key=f"delete_skill_{i}", use_container_width=True):
+                        if st.button("기술 삭제", key=f"delete_skill_{i}", use_container_width=True):
                             st.session_state.skill_data.remove(i)
                             if len(st.session_state.skill_data) == 0:
                                 st.session_state.skill_count = 1
@@ -1523,11 +1523,11 @@ def show_resume_page():
 
                 with button_cols[1]:
                     st.markdown("<div style='height: 2px;'></div>", unsafe_allow_html=True)
-                    if st.button("추가", key=f"add_skill_{i}", use_container_width=True):
+                    if st.button("기술 추가", key=f"add_skill_{i}", use_container_width=True):
                         new_idx = max(st.session_state.skill_data) + 1 if st.session_state.skill_data else 0
                         st.session_state.skill_data.append(new_idx)
-                        st.session_state.cert_counts[new_idx] = 1  # 기본 자격증 1개
-                        st.session_state.edu_counts[new_idx] = 1   # 기본 교육 1개
+                        st.session_state.cert_counts[new_idx] = 0
+                        st.session_state.edu_counts[new_idx] = 0
                         st.session_state.skill_count += 1
                         st.rerun()
 
@@ -1584,12 +1584,12 @@ def show_resume_page():
                                     placeholder="예: 한국산업인력공단")
                     with cols[3]:
                         st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
-                        if st.button("삭제", key=f"delete_cert_{i}_{j}", use_container_width=True):
+                        if st.button("자격증 삭제", key=f"delete_cert_{i}_{j}", use_container_width=True):
                             st.session_state.cert_counts[i] -= 1
                             st.rerun()
                     with cols[4]:
                         st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
-                        if st.button("추가", key=f"add_cert_{i}_{j}", use_container_width=True):
+                        if st.button("자격증 추가", key=f"add_cert_{i}_{j}", use_container_width=True):
                             st.session_state.cert_counts[i] += 1
                             st.rerun()
 
@@ -1598,19 +1598,6 @@ def show_resume_page():
 
             # 교육 섹션
             st.markdown('<div class="section-header">교육: 훈련, 연수, 유학 등</div>', unsafe_allow_html=True)
-            
-            # 교육 추가/삭제 버튼 (6:1:1)
-            edu_cols = st.columns([6, 1, 1])
-            with edu_cols[1]:
-                st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
-                if st.button("교육 삭제", key=f"delete_edu_section_{i}", use_container_width=True):
-                    st.session_state.edu_counts[i] = 0
-                    st.rerun()
-            with edu_cols[2]:
-                st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
-                if st.button("교육 추가", key=f"add_edu_section_{i}", use_container_width=True):
-                    st.session_state.edu_counts[i] = st.session_state.edu_counts.get(i, 0) + 1
-                    st.rerun()
             
             # 교육 입력 필드들
             if i in st.session_state.edu_counts and st.session_state.edu_counts[i] > 0:
@@ -1627,12 +1614,12 @@ def show_resume_page():
                                    placeholder="교육명:\n교육기관:\n교육기간:\n교육내용:")
                     with cols[1]:
                         st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
-                        if st.button("삭제", key=f"delete_edu_{i}_{j}", use_container_width=True):
+                        if st.button("교육 삭제", key=f"delete_edu_{i}_{j}", use_container_width=True):
                             st.session_state.edu_counts[i] -= 1
                             st.rerun()
                     with cols[2]:
                         st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
-                        if st.button("추가", key=f"add_edu_{i}_{j}", use_container_width=True):
+                        if st.button("교육 추가", key=f"add_edu_{i}_{j}", use_container_width=True):
                             st.session_state.edu_counts[i] += 1
                             st.rerun()
 
