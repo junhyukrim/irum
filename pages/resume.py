@@ -363,6 +363,278 @@ def delete_education(education_id, login_email):
         st.error(f"데이터베이스 연결 중 오류: {str(e)}")
         return False
 
+def save_skills_info(login_email, data):
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return False
+        
+        cursor = conn.cursor()
+        try:
+            # 현재 사용자의 모든 기술 정보 조회
+            cursor.execute("""
+                SELECT id FROM tb_resume_skills 
+                WHERE login_email = %s
+            """, (login_email,))
+            existing_skill_ids = {row['id'] for row in cursor.fetchall()}
+            
+            # 현재 폼에 있는 기술 ID 수집
+            current_skill_ids = set()
+            
+            for skill_idx in data:
+                skill_data = data[skill_idx]
+                
+                # 기존 기술 정보가 있는지 확인
+                if skill_data.get('id'):  # 기존 데이터 업데이트
+                    current_skill_ids.add(skill_data['id'])
+                    update_query = """
+                        UPDATE tb_resume_skills SET
+                        skill_name = %s, skill_level = %s, note = %s
+                        WHERE id = %s AND login_email = %s
+                    """
+                    cursor.execute(update_query, (
+                        skill_data['skill_name'],
+                        skill_data['skill_level'],
+                        skill_data['note'],
+                        skill_data['id'],
+                        login_email
+                    ))
+                else:  # 새 기술 정보 삽입
+                    insert_query = """
+                        INSERT INTO tb_resume_skills 
+                        (login_email, skill_name, skill_level, note)
+                        VALUES (%s, %s, %s, %s)
+                    """
+                    cursor.execute(insert_query, (
+                        login_email,
+                        skill_data['skill_name'],
+                        skill_data['skill_level'],
+                        skill_data['note']
+                    ))
+                    skill_id = cursor.lastrowid
+                    current_skill_ids.add(skill_id)
+            
+            # 삭제된 기술 정보 처리
+            deleted_skill_ids = existing_skill_ids - current_skill_ids
+            if deleted_skill_ids:
+                delete_query = """
+                    DELETE FROM tb_resume_skills 
+                    WHERE id IN ({})
+                """.format(','.join(['%s'] * len(deleted_skill_ids)))
+                cursor.execute(delete_query, tuple(deleted_skill_ids))
+
+            conn.commit()
+            return True
+        except Exception as e:
+            st.error(f"쿼리 실행 중 오류: {str(e)}")
+            conn.rollback()
+            return False
+        finally:
+            cursor.close()
+            conn.close()
+    except Exception as e:
+        st.error(f"데이터베이스 연결 중 오류: {str(e)}")
+        return False
+
+def save_certifications_info(login_email, data):
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return False
+        
+        cursor = conn.cursor()
+        try:
+            # 현재 사용자의 모든 자격증 정보 조회
+            cursor.execute("""
+                SELECT id FROM tb_resume_certifications 
+                WHERE login_email = %s
+            """, (login_email,))
+            existing_cert_ids = {row['id'] for row in cursor.fetchall()}
+            
+            # 현재 폼에 있는 자격증 ID 수집
+            current_cert_ids = set()
+            
+            for skill_idx in data:
+                for cert_idx in range(data[skill_idx]['cert_count']):
+                    cert_data = data[skill_idx]['certifications'][cert_idx]
+                    
+                    # 기존 자격증 정보가 있는지 확인
+                    if cert_data.get('id'):  # 기존 데이터 업데이트
+                        current_cert_ids.add(cert_data['id'])
+                        update_query = """
+                            UPDATE tb_resume_certifications SET
+                            cert_name = %s, acquisition_date = %s, issuing_org = %s
+                            WHERE id = %s AND login_email = %s
+                        """
+                        cursor.execute(update_query, (
+                            cert_data['cert_name'],
+                            cert_data['acquisition_date'],
+                            cert_data['issuing_org'],
+                            cert_data['id'],
+                            login_email
+                        ))
+                    else:  # 새 자격증 정보 삽입
+                        insert_query = """
+                            INSERT INTO tb_resume_certifications 
+                            (login_email, cert_name, acquisition_date, issuing_org)
+                            VALUES (%s, %s, %s, %s)
+                        """
+                        cursor.execute(insert_query, (
+                            login_email,
+                            cert_data['cert_name'],
+                            cert_data['acquisition_date'],
+                            cert_data['issuing_org']
+                        ))
+                        cert_id = cursor.lastrowid
+                        current_cert_ids.add(cert_id)
+            
+            # 삭제된 자격증 정보 처리
+            deleted_cert_ids = existing_cert_ids - current_cert_ids
+            if deleted_cert_ids:
+                delete_query = """
+                    DELETE FROM tb_resume_certifications 
+                    WHERE id IN ({})
+                """.format(','.join(['%s'] * len(deleted_cert_ids)))
+                cursor.execute(delete_query, tuple(deleted_cert_ids))
+
+            conn.commit()
+            return True
+        except Exception as e:
+            st.error(f"쿼리 실행 중 오류: {str(e)}")
+            conn.rollback()
+            return False
+        finally:
+            cursor.close()
+            conn.close()
+    except Exception as e:
+        st.error(f"데이터베이스 연결 중 오류: {str(e)}")
+        return False
+
+def save_training_info(login_email, data):
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return False
+        
+        cursor = conn.cursor()
+        try:
+            # 현재 사용자의 모든 교육 정보 조회
+            cursor.execute("""
+                SELECT id FROM tb_resume_training 
+                WHERE login_email = %s
+            """, (login_email,))
+            existing_training_ids = {row['id'] for row in cursor.fetchall()}
+            
+            # 현재 폼에 있는 교육 ID 수집
+            current_training_ids = set()
+            
+            for skill_idx in data:
+                for edu_idx in range(data[skill_idx]['edu_count']):
+                    edu_data = data[skill_idx]['training'][edu_idx]
+                    
+                    # 기존 교육 정보가 있는지 확인
+                    if edu_data.get('id'):  # 기존 데이터 업데이트
+                        current_training_ids.add(edu_data['id'])
+                        update_query = """
+                            UPDATE tb_resume_training SET
+                            training_desc = %s
+                            WHERE id = %s AND login_email = %s
+                        """
+                        cursor.execute(update_query, (
+                            edu_data['training_desc'],
+                            edu_data['id'],
+                            login_email
+                        ))
+                    else:  # 새 교육 정보 삽입
+                        insert_query = """
+                            INSERT INTO tb_resume_training 
+                            (login_email, training_desc)
+                            VALUES (%s, %s)
+                        """
+                        cursor.execute(insert_query, (
+                            login_email,
+                            edu_data['training_desc']
+                        ))
+                        training_id = cursor.lastrowid
+                        current_training_ids.add(training_id)
+            
+            # 삭제된 교육 정보 처리
+            deleted_training_ids = existing_training_ids - current_training_ids
+            if deleted_training_ids:
+                delete_query = """
+                    DELETE FROM tb_resume_training 
+                    WHERE id IN ({})
+                """.format(','.join(['%s'] * len(deleted_training_ids)))
+                cursor.execute(delete_query, tuple(deleted_training_ids))
+
+            conn.commit()
+            return True
+        except Exception as e:
+            st.error(f"쿼리 실행 중 오류: {str(e)}")
+            conn.rollback()
+            return False
+        finally:
+            cursor.close()
+            conn.close()
+    except Exception as e:
+        st.error(f"데이터베이스 연결 중 오류: {str(e)}")
+        return False
+
+def load_skills_info(login_email):
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return None, "데이터베이스 연결 실패"
+        
+        cursor = conn.cursor()
+        try:
+            # 기본 기술 정보 조회
+            cursor.execute("""
+                SELECT id, skill_name, skill_level, note 
+                FROM tb_resume_skills 
+                WHERE login_email = %s
+                ORDER BY id
+            """, (login_email,))
+            skills = cursor.fetchall()
+            
+            # 각 기술에 대한 자격증과 교육 정보 조회
+            result = []
+            for skill in skills:
+                # 자격증 정보 조회
+                cursor.execute("""
+                    SELECT id, cert_name, acquisition_date, issuing_org 
+                    FROM tb_resume_certifications 
+                    WHERE login_email = %s AND skill_id = %s
+                """, (login_email, skill['id']))
+                certifications = cursor.fetchall()
+                
+                # 교육 정보 조회
+                cursor.execute("""
+                    SELECT id, training_desc 
+                    FROM tb_resume_training 
+                    WHERE login_email = %s AND skill_id = %s
+                """, (login_email, skill['id']))
+                training = cursor.fetchall()
+                
+                skill_data = {
+                    'id': skill['id'],
+                    'skill_name': skill['skill_name'],
+                    'skill_level': skill['skill_level'],
+                    'note': skill['note'],
+                    'certifications': certifications,
+                    'training': training
+                }
+                result.append(skill_data)
+            
+            return result, None
+        except Exception as e:
+            return None, f"데이터 조회 중 오류: {str(e)}"
+        finally:
+            cursor.close()
+            conn.close()
+    except Exception as e:
+        return None, f"데이터베이스 연결 중 오류: {str(e)}"
+
 def show_resume_page():
     st.markdown('<h3 class="main-header">이력관리</h3>', unsafe_allow_html=True)
     
@@ -1018,6 +1290,53 @@ def show_resume_page():
         
         st.markdown('<h5>역량</h5>', unsafe_allow_html=True)
         
+        # 로그인 확인
+        if 'user_email' not in st.session_state:
+            st.error("로그인이 필요합니다.")
+            return
+        
+        # 기존 데이터 로드
+        if 'skills_loaded' not in st.session_state:
+            skills, error = load_skills_info(st.session_state.user_email)
+            if error:
+                st.error(error)
+            elif skills:
+                # 기존 데이터로 session_state 초기화
+                st.session_state.skill_data = []
+                st.session_state.cert_counts = {}
+                st.session_state.edu_counts = {}
+                
+                for idx, skill in enumerate(skills):
+                    st.session_state.skill_data.append(idx)
+                    st.session_state[f'skill_id_{idx}'] = skill['id']
+                    st.session_state[f'skill_desc_{idx}'] = skill['skill_name']
+                    st.session_state[f'skill_level_{idx}'] = skill['skill_level']
+                    st.session_state[f'skill_note_{idx}'] = skill['note']
+                    
+                    # 자격증 정보 설정
+                    st.session_state.cert_counts[idx] = len(skill['certifications'])
+                    for cert_idx, cert in enumerate(skill['certifications']):
+                        st.session_state[f'cert_id_{idx}_{cert_idx}'] = cert['id']
+                        st.session_state[f'cert_name_{idx}_{cert_idx}'] = cert['cert_name']
+                        st.session_state[f'cert_date_{idx}_{cert_idx}'] = cert['acquisition_date']
+                        st.session_state[f'cert_org_{idx}_{cert_idx}'] = cert['issuing_org']
+                    
+                    # 교육 정보 설정
+                    st.session_state.edu_counts[idx] = len(skill['training'])
+                    for edu_idx, edu in enumerate(skill['training']):
+                        st.session_state[f'edu_id_{idx}_{edu_idx}'] = edu['id']
+                        st.session_state[f'education_{idx}_{edu_idx}'] = edu['training_desc']
+                
+                st.session_state.skill_count = len(skills)
+            else:
+                # 초기 상태 설정
+                st.session_state.skill_count = 1
+                st.session_state.skill_data = [0]
+                st.session_state.cert_counts = {0: 1}
+                st.session_state.edu_counts = {0: 1}
+            
+            st.session_state.skills_loaded = True
+        
         # 역량 카운터 초기화
         if 'skill_count' not in st.session_state:
             st.session_state.skill_count = 1
@@ -1137,7 +1456,67 @@ def show_resume_page():
             cols[i].empty()
         with cols[7]:  # 마지막 컬럼에 버튼 배치
             if st.button("저장", key="save_skill_tab", use_container_width=True):
-                st.success("저장되었습니다!")
+                if 'user_email' not in st.session_state:
+                    st.error("로그인이 필요합니다.")
+                    return
+                
+                # 현재 입력된 모든 역량 데이터 수집
+                skills_data = {}
+                certifications_data = {}
+                training_data = {}
+                
+                for i in st.session_state.skill_data:
+                    # 기술 및 역량 데이터
+                    skills_data[i] = {
+                        'id': st.session_state.get(f'skill_id_{i}'),
+                        'skill_name': st.session_state[f'skill_desc_{i}'],
+                        'skill_level': st.session_state[f'skill_level_{i}'],
+                        'note': st.session_state[f'skill_note_{i}']
+                    }
+                    
+                    # 자격증 데이터
+                    certifications_data[i] = {
+                        'cert_count': st.session_state.cert_counts[i],
+                        'certifications': []
+                    }
+                    for j in range(st.session_state.cert_counts[i]):
+                        certifications_data[i]['certifications'].append({
+                            'id': st.session_state.get(f'cert_id_{i}_{j}'),
+                            'cert_name': st.session_state[f'cert_name_{i}_{j}'],
+                            'acquisition_date': st.session_state[f'cert_date_{i}_{j}'],
+                            'issuing_org': st.session_state[f'cert_org_{i}_{j}']
+                        })
+                    
+                    # 교육 데이터
+                    training_data[i] = {
+                        'edu_count': st.session_state.edu_counts[i],
+                        'training': []
+                    }
+                    for j in range(st.session_state.edu_counts[i]):
+                        training_data[i]['training'].append({
+                            'id': st.session_state.get(f'edu_id_{i}_{j}'),
+                            'training_desc': st.session_state[f'education_{i}_{j}']
+                        })
+                
+                # 각 데이터 저장
+                success = True
+                if not save_skills_info(st.session_state.user_email, skills_data):
+                    success = False
+                    st.error("기술 및 역량 정보 저장 중 오류가 발생했습니다.")
+                
+                if not save_certifications_info(st.session_state.user_email, certifications_data):
+                    success = False
+                    st.error("자격증 정보 저장 중 오류가 발생했습니다.")
+                
+                if not save_training_info(st.session_state.user_email, training_data):
+                    success = False
+                    st.error("교육 정보 저장 중 오류가 발생했습니다.")
+                
+                if success:
+                    st.success("저장되었습니다!")
+                    # 저장 성공 시 데이터 다시 로드하도록 설정
+                    st.session_state.skills_loaded = False
+                    st.rerun()
 
     # 경력 탭
     with tabs[3]:
