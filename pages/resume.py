@@ -1375,6 +1375,9 @@ def show_resume_page():
             with cols[1]:
                 level_options = ["1", "2", "3", "4", "5"]
                 skill_level_key = f"skill_level_{i}"
+                # session_state 값이 유효한지 확인하고, 유효하지 않다면 제거
+                if skill_level_key in st.session_state and st.session_state[skill_level_key] not in level_options:
+                    del st.session_state[skill_level_key]  # 에러 방지를 위해 잘못된 값 삭제
                 selected_level = st.selectbox(
                 "성취 수준",
                 level_options,
