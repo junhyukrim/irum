@@ -719,7 +719,7 @@ def show_resume_page():
                 visibility: hidden;
                 position: absolute;
                 z-index: 1000;
-                width: 400px;
+                width: 350px;
                 background-color: #ffffff;
                 color: #333333;
                 text-align: left;
@@ -731,8 +731,8 @@ def show_resume_page():
                 border: 1px solid #e0e0e0;
                 
                 /* 위치 조정 */
-                bottom: 150%;
-                left: 20px;
+                bottom: 155%;
+                left: 25px;
                 
                 /* 페이드 효과 */
                 opacity: 0;
@@ -744,7 +744,7 @@ def show_resume_page():
                 content: "";
                 position: absolute;
                 top: 100%;
-                left: 15px;
+                left: 10px;
                 margin-left: -5px;
                 border-width: 8px;
                 border-style: solid;
@@ -1042,7 +1042,13 @@ def show_resume_page():
             with cols[0]:
                 st.text_input("기술 및 역량", value=personal_info.get(f'skill_desc_{i}', ''), key=f"skill_desc_{i}")
             with cols[1]:
-                st.text_input("성취 수준", value=personal_info.get(f'skill_level_{i}', ''), key=f"skill_level_{i}")
+                st.selectbox(
+                    "성취 수준",
+                    ["1", "2", "3", "4", "5"],
+                    index=["1", "2", "3", "4", "5"].index(personal_info.get(f'skill_level_{i}', '1')),
+                    key=f"skill_level_{i}",
+                    help="1: 기초 수준, 2: 초급 수준, 3: 중급 수준, 4: 고급 수준, 5: 전문가 수준"
+                )
             with cols[2]:
                 st.text_input("비고", value=personal_info.get(f'skill_note_{i}', ''), key=f"skill_note_{i}")
             with cols[3]:
