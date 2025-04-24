@@ -510,41 +510,41 @@ def save_certifications_info(login_email, data):
             # 현재 폼에 있는 자격증 ID 수집
             current_cert_ids = set()
             
-            for skill_idx in data:
-                for cert_idx in range(data[skill_idx]['cert_count']):
-                    cert_data = data[skill_idx]['certifications'][cert_idx]
-                    
-                    # 기존 자격증 정보가 있는지 확인
-                    if cert_data.get('id'):  # 기존 데이터 업데이트
-                        current_cert_ids.add(cert_data['id'])
-                        update_query = """
-                            UPDATE tb_resume_certifications SET
-                            certification_name = %s,
-                            issue_date = %s,
-                            issuing_agency = %s
-                            WHERE id = %s AND login_email = %s
-                        """
-                        cursor.execute(update_query, (
-                            cert_data['certification_name'],
-                            cert_data['issue_date'],
-                            cert_data['issuing_agency'],
-                            cert_data['id'],
-                            login_email
-                        ))
-                    else:  # 새 자격증 정보 삽입
-                        insert_query = """
-                            INSERT INTO tb_resume_certifications 
-                            (login_email, certification_name, issue_date, issuing_agency)
-                            VALUES (%s, %s, %s, %s)
-                        """
-                        cursor.execute(insert_query, (
-                            login_email,
-                            cert_data['certification_name'],
-                            cert_data['issue_date'],
-                            cert_data['issuing_agency']
-                        ))
-                        cert_id = cursor.lastrowid
-                        current_cert_ids.add(cert_id)
+            # 데이터 구조 변경에 맞게 처리
+            for idx in data:
+                cert_data = data[idx]
+                
+                # 기존 자격증 정보가 있는지 확인
+                if cert_data.get('id'):  # 기존 데이터 업데이트
+                    current_cert_ids.add(cert_data['id'])
+                    update_query = """
+                        UPDATE tb_resume_certifications SET
+                        certification_name = %s,
+                        issue_date = %s,
+                        issuing_agency = %s
+                        WHERE id = %s AND login_email = %s
+                    """
+                    cursor.execute(update_query, (
+                        cert_data['certification_name'],
+                        cert_data['issue_date'],
+                        cert_data['issuing_agency'],
+                        cert_data['id'],
+                        login_email
+                    ))
+                else:  # 새 자격증 정보 삽입
+                    insert_query = """
+                        INSERT INTO tb_resume_certifications 
+                        (login_email, certification_name, issue_date, issuing_agency)
+                        VALUES (%s, %s, %s, %s)
+                    """
+                    cursor.execute(insert_query, (
+                        login_email,
+                        cert_data['certification_name'],
+                        cert_data['issue_date'],
+                        cert_data['issuing_agency']
+                    ))
+                    cert_id = cursor.lastrowid
+                    current_cert_ids.add(cert_id)
             
             # 삭제된 자격증 정보 처리
             deleted_cert_ids = existing_cert_ids - current_cert_ids
