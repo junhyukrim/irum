@@ -715,13 +715,15 @@ def show_resume_page():
         st.session_state.skills_loaded = False
     
     if 'skill_data' not in st.session_state:
-        st.session_state.skill_data = [0]  # 최소 하나의 기술 항목
+        st.session_state.skill_data = [0]
     
-    if 'cert_counts' not in st.session_state:
+    if 'cert_counts' not in st.session_state or not st.session_state.cert_counts:
         st.session_state.cert_counts = defaultdict(int)
+        st.session_state.cert_counts[0] = 1
     
-    if 'edu_counts' not in st.session_state:
+    if 'edu_counts' not in st.session_state or not st.session_state.edu_counts:
         st.session_state.edu_counts = defaultdict(int)
+        st.session_state.edu_counts[0] = 1
     
     # 사용자가 로그인한 경우에만 데이터 로드
     if 'user_email' in st.session_state and not st.session_state.skills_loaded:
@@ -1484,7 +1486,7 @@ def show_resume_page():
                 st.markdown("<hr>", unsafe_allow_html=True)
             
             # 기술 및 역량 (2:1:4:1:1)
-            cols = st.columns([2, 1, 4, 1, 1])
+            cols = st.columns([2, 1, 3, 2, 2])
             with cols[0]:
                 st.text_input("기술 및 역량", value=personal_info.get(f'skill_desc_{i}', ''), key=f"skill_desc_{i}")
             with cols[1]:
@@ -1502,25 +1504,32 @@ def show_resume_page():
             with cols[2]:
                 st.text_input("비고", value=personal_info.get(f'skill_note_{i}', ''), key=f"skill_note_{i}")
             with cols[3]:
-                st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
-                if len(st.session_state.skill_data) > 1:
-                    if st.button("기술/역량 삭제", key=f"delete_skill_{i}", use_container_width=True):
-                        st.session_state.skill_data.remove(i)
-                        if len(st.session_state.skill_data) == 0:
-                            st.session_state.skill_count = 1
-                            st.session_state.skill_data = [0]
-                            st.session_state.cert_counts = defaultdict(int)
-                            st.session_state.edu_counts = defaultdict(int)
+                st.markdown("<div style='height: 5px;'></div>", unsafe_allow_html=True)
+                button_cols = st.columns(2)
+
+                with button_cols[0]:
+                    st.markdown("<div style='height: 2px;'></div>", unsafe_allow_html=True)
+                    if len(st.session_state.skill_data) > 1:
+                        if st.button("삭제", key=f"delete_skill_{i}", use_container_width=True):
+                            st.session_state.skill_data.remove(i)
+                            if len(st.session_state.skill_data) == 0:
+                                st.session_state.skill_count = 1
+                                st.session_state.skill_data = [0]
+                                st.session_state.cert_counts = defaultdict(int)
+                                st.session_state.edu_counts = defaultdict(int)
+                            st.rerun()
+                    else:
+                        st.empty()
+
+                with button_cols[1]:
+                    st.markdown("<div style='height: 2px;'></div>", unsafe_allow_html=True)
+                    if st.button("추가", key=f"add_skill_{i}", use_container_width=True):
+                        new_idx = max(st.session_state.skill_data) + 1 if st.session_state.skill_data else 0
+                        st.session_state.skill_data.append(new_idx)
+                        st.session_state.cert_counts[new_idx] = 1  # 기본 자격증 1개
+                        st.session_state.edu_counts[new_idx] = 1   # 기본 교육 1개
+                        st.session_state.skill_count += 1
                         st.rerun()
-            with cols[4]:
-                st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
-                if st.button("기술/역량 추가", key=f"add_skill_{i}", use_container_width=True):
-                    new_idx = max(st.session_state.skill_data) + 1 if st.session_state.skill_data else 0
-                    st.session_state.skill_data.append(new_idx)
-                    st.session_state.cert_counts[new_idx] = 0
-                    st.session_state.edu_counts[new_idx] = 0
-                    st.session_state.skill_count += 1
-                    st.rerun()
 
             # 데이터 유효성 검사는 여기서 수행
             if 'save_skill_tab' in st.session_state:
