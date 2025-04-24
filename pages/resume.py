@@ -455,6 +455,16 @@ def save_certifications_info(login_email, data):
             current_cert_ids = set()
             
             for skill_idx in data:
+                # 먼저 skill_id를 가져옵니다
+                cursor.execute("""
+                    SELECT id FROM tb_resume_skills 
+                    WHERE login_email = %s AND skill_name = %s
+                """, (login_email, data[skill_idx]['skill_name']))
+                skill_result = cursor.fetchone()
+                if not skill_result:
+                    continue
+                skill_id = skill_result['id']
+                
                 for cert_idx in range(data[skill_idx]['cert_count']):
                     cert_data = data[skill_idx]['certifications'][cert_idx]
                     
@@ -463,10 +473,14 @@ def save_certifications_info(login_email, data):
                         current_cert_ids.add(cert_data['id'])
                         update_query = """
                             UPDATE tb_resume_certifications SET
-                            cert_name = %s, acquisition_date = %s, issuing_org = %s
+                            skill_id = %s,
+                            certification_name = %s,
+                            acquisition_date = %s,
+                            issuing_org = %s
                             WHERE id = %s AND login_email = %s
                         """
                         cursor.execute(update_query, (
+                            skill_id,
                             cert_data['cert_name'],
                             cert_data['acquisition_date'],
                             cert_data['issuing_org'],
@@ -476,11 +490,12 @@ def save_certifications_info(login_email, data):
                     else:  # 새 자격증 정보 삽입
                         insert_query = """
                             INSERT INTO tb_resume_certifications 
-                            (login_email, cert_name, acquisition_date, issuing_org)
-                            VALUES (%s, %s, %s, %s)
+                            (login_email, skill_id, certification_name, acquisition_date, issuing_org)
+                            VALUES (%s, %s, %s, %s, %s)
                         """
                         cursor.execute(insert_query, (
                             login_email,
+                            skill_id,
                             cert_data['cert_name'],
                             cert_data['acquisition_date'],
                             cert_data['issuing_org']
@@ -529,6 +544,16 @@ def save_training_info(login_email, data):
             current_training_ids = set()
             
             for skill_idx in data:
+                # 먼저 skill_id를 가져옵니다
+                cursor.execute("""
+                    SELECT id FROM tb_resume_skills 
+                    WHERE login_email = %s AND skill_name = %s
+                """, (login_email, data[skill_idx]['skill_name']))
+                skill_result = cursor.fetchone()
+                if not skill_result:
+                    continue
+                skill_id = skill_result['id']
+                
                 for edu_idx in range(data[skill_idx]['edu_count']):
                     edu_data = data[skill_idx]['training'][edu_idx]
                     
@@ -537,10 +562,12 @@ def save_training_info(login_email, data):
                         current_training_ids.add(edu_data['id'])
                         update_query = """
                             UPDATE tb_resume_training SET
-                            training_desc = %s
+                            skill_id = %s,
+                            training_description = %s
                             WHERE id = %s AND login_email = %s
                         """
                         cursor.execute(update_query, (
+                            skill_id,
                             edu_data['training_desc'],
                             edu_data['id'],
                             login_email
@@ -548,11 +575,12 @@ def save_training_info(login_email, data):
                     else:  # 새 교육 정보 삽입
                         insert_query = """
                             INSERT INTO tb_resume_training 
-                            (login_email, training_desc)
-                            VALUES (%s, %s)
+                            (login_email, skill_id, training_description)
+                            VALUES (%s, %s, %s)
                         """
                         cursor.execute(insert_query, (
                             login_email,
+                            skill_id,
                             edu_data['training_desc']
                         ))
                         training_id = cursor.lastrowid
@@ -1282,6 +1310,16 @@ def show_resume_page():
                 background-color: #F1F3F4 !important;
                 color: #1557B0 !important;
                 border-color: #1557B0 !important;
+            }
+
+            /* 성공 메시지 스타일 수정 */
+            div.element-container div[data-testid="stMarkdownContainer"] div.stSuccess {
+                background-color: #d8e6fd !important;
+                color: #1967D2 !important;
+                border: none !important;
+                border-radius: 0.5rem !important;
+                padding: 1rem !important;
+                margin: 1rem 0 !important;
             }
             </style>
             """,
