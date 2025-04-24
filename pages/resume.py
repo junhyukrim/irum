@@ -1526,8 +1526,6 @@ def show_resume_page():
                     if st.button("기술 추가", key=f"add_skill_{i}", use_container_width=True):
                         new_idx = max(st.session_state.skill_data) + 1 if st.session_state.skill_data else 0
                         st.session_state.skill_data.append(new_idx)
-                        st.session_state.cert_counts[new_idx] = 0
-                        st.session_state.edu_counts[new_idx] = 0
                         st.session_state.skill_count += 1
                         st.rerun()
 
@@ -1549,19 +1547,6 @@ def show_resume_page():
             
             # 자격증 섹션
             st.markdown('<div class="section-header">자격증</div>', unsafe_allow_html=True)
-            
-            # 자격증 추가/삭제 버튼 (6:1:1)
-            cert_cols = st.columns([6, 1, 1])
-            with cert_cols[1]:
-                st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
-                if st.button("자격증 삭제", key=f"delete_cert_section_{i}", use_container_width=True):
-                    st.session_state.cert_counts[i] = 0
-                    st.rerun()
-            with cert_cols[2]:
-                st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
-                if st.button("자격증 추가", key=f"add_cert_section_{i}", use_container_width=True):
-                    st.session_state.cert_counts[i] = st.session_state.cert_counts.get(i, 0) + 1
-                    st.rerun()
             
             # 자격증 입력 필드들
             if i in st.session_state.cert_counts and st.session_state.cert_counts[i] > 0:
