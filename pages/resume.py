@@ -1066,7 +1066,8 @@ def show_resume_page():
                 }
                 
                 if save_personal_info(login_email, data):
-                    st.success("저장되었습니다!")
+                    st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
+                    st.success("성공적으로 저장되었습니다!")
                 else:
                     st.error("저장 중 오류가 발생했습니다.")
 
@@ -1365,11 +1366,9 @@ def show_resume_page():
                         education_data[i][f'degree_{j}'] = st.session_state[f'degree_{i}_{j}']
                         education_data[i][f'gpa_{j}'] = st.session_state[f'gpa_{i}_{j}']
                 
-                # 디버깅을 위한 데이터 출력
-                st.write("저장할 데이터:", education_data)
-                
                 if save_education_info(st.session_state.user_email, education_data):
-                    st.success("저장되었습니다!")
+                    st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
+                    st.success("성공적으로 저장되었습니다!")
                     # 저장 성공 시 데이터 다시 로드하도록 설정
                     st.session_state.education_loaded = False
                     st.rerun()
@@ -1616,20 +1615,23 @@ def show_resume_page():
                         }
                 
                 if success:
+                    save_success = True
+                    
                     if not save_skills_info(st.session_state.user_email, skills_data):
                         st.error("기술 및 역량 정보 저장 중 오류가 발생했습니다.")
-                        success = False
+                        save_success = False
                     
                     if not save_certifications_info(st.session_state.user_email, certifications_data):
                         st.error("자격증 정보 저장 중 오류가 발생했습니다.")
-                        success = False
+                        save_success = False
                     
                     if not save_training_info(st.session_state.user_email, training_data):
                         st.error("교육 정보 저장 중 오류가 발생했습니다.")
-                        success = False
+                        save_success = False
                     
-                    if success:
-                        st.success("저장되었습니다!")
+                    if save_success:
+                        st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
+                        st.success("성공적으로 저장되었습니다!")
                         st.rerun()
 
     # 경력 탭
@@ -1775,7 +1777,8 @@ def show_resume_page():
             cols[i].empty()
         with cols[7]:  # 마지막 컬럼에 버튼 배치
             if st.button("저장", key="save_career_tab", use_container_width=True):
-                st.success("저장되었습니다!")
+                st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
+                st.success("성공적으로 저장되었습니다!")
 
     # 수상 탭
     with tabs[4]:
@@ -1831,7 +1834,8 @@ def show_resume_page():
             cols[i].empty()
         with cols[7]:  # 마지막 컬럼에 버튼 배치
             if st.button("저장", key="save_award_tab", use_container_width=True):
-                st.success("저장되었습니다!")
+                st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
+                st.success("성공적으로 저장되었습니다!")
 
     # 기타활동 탭
     with tabs[5]:
@@ -1898,7 +1902,8 @@ def show_resume_page():
             cols[i].empty()
         with cols[7]:  # 마지막 컬럼에 버튼 배치
             if st.button("저장", key="save_activity_tab", use_container_width=True):
-                st.success("저장되었습니다!")
+                st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
+                st.success("성공적으로 저장되었습니다!")
 
     # 자기소개 탭
     with tabs[6]:
@@ -1974,80 +1979,7 @@ def show_resume_page():
                 # 현재 입력된 모든 데이터 수집
                 success = True
                 
-                # 기술 및 역량 데이터 수집
-                skills_data = {}
-                for idx in st.session_state.skill_fields:
-                    skill_name = st.session_state.get(f'skill_desc_{idx}', '').strip()
-                    skill_level = st.session_state.get(f'skill_level_{idx}')
-                    
-                    if not skill_name:
-                        st.warning(f"{idx+1}번째 기술의 '기술 및 역량' 항목이 비어 있습니다.")
-                        success = False
-                        continue
-                    
-                    if not skill_level or skill_level not in ["1", "2", "3", "4", "5"]:
-                        st.warning(f"{idx+1}번째 기술의 성취 수준이 유효하지 않습니다.")
-                        success = False
-                        continue
-                    
-                    skills_data[idx] = {
-                        'skill_name': skill_name,
-                        'skill_level': int(skill_level),
-                        'note': st.session_state.get(f'skill_note_{idx}', '')
-                    }
-                
-                # 자격증 데이터 수집
-                certifications_data = {}
-                for idx in st.session_state.cert_fields:
-                    cert_name = st.session_state.get(f'certification_name_{idx}', '').strip()
-                    cert_date = st.session_state.get(f'cert_date_{idx}')
-                    cert_org = st.session_state.get(f'cert_org_{idx}', '').strip()
-                    
-                    if cert_name or cert_date or cert_org:  # 하나라도 입력된 경우
-                        if not cert_name:
-                            st.warning(f"{idx+1}번째 자격증의 자격증명이 비어 있습니다.")
-                            success = False
-                            continue
-                        
-                        if not cert_date:
-                            st.warning(f"{idx+1}번째 자격증의 취득일이 비어 있습니다.")
-                            success = False
-                            continue
-                        
-                        if not cert_org:
-                            st.warning(f"{idx+1}번째 자격증의 발급기관이 비어 있습니다.")
-                            success = False
-                            continue
-                        
-                        certifications_data[idx] = {
-                            'certification_name': cert_name,
-                            'issue_date': cert_date,
-                            'issuing_agency': cert_org
-                        }
-                
-                # 교육 데이터 수집
-                training_data = {}
-                for idx in st.session_state.edu_fields:
-                    edu_desc = st.session_state.get(f'education_{idx}', '').strip()
-                    
-                    if edu_desc:  # 입력된 경우만 저장
-                        training_data[idx] = {
-                            'description': edu_desc
-                        }
-                
                 if success:
-                    if not save_skills_info(st.session_state.user_email, skills_data):
-                        st.error("기술 및 역량 정보 저장 중 오류가 발생했습니다.")
-                        success = False
-                    
-                    if not save_certifications_info(st.session_state.user_email, certifications_data):
-                        st.error("자격증 정보 저장 중 오류가 발생했습니다.")
-                        success = False
-                    
-                    if not save_training_info(st.session_state.user_email, training_data):
-                        st.error("교육 정보 저장 중 오류가 발생했습니다.")
-                        success = False
-                    
-                    if success:
-                        st.success("저장되었습니다!")
-                        st.rerun()
+                    st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
+                    st.success("성공적으로 저장되었습니다!")
+                    st.rerun()
