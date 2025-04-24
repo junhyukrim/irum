@@ -1,6 +1,7 @@
 import streamlit as st
 import pymysql
 from datetime import datetime
+from collections import defaultdict
 
 def connect_to_db():
     try:
@@ -637,7 +638,127 @@ def load_skills_info(login_email):
     except Exception as e:
         return None, f"데이터베이스 연결 중 오류: {str(e)}"
 
+def load_certifications_info(login_email):
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return None
+        
+        cursor = conn.cursor()
+        try:
+            # 자격증 정보 조회
+            cursor.execute("""
+                SELECT id, certification_name, issue_date, issuing_agency 
+                FROM tb_resume_certifications 
+                WHERE login_email = %s
+                ORDER BY issue_date DESC
+            """, (login_email,))
+            certifications = cursor.fetchall()
+            
+            # 자격증 데이터를 스킬별로 그룹화
+            result = {}
+            for cert in certifications:
+                skill_idx = 0  # 기본값으로 첫 번째 스킬에 할당
+                if skill_idx not in result:
+                    result[skill_idx] = {
+                        'cert_count': 0,
+                        'certifications': []
+                    }
+                result[skill_idx]['certifications'].append(cert)
+                result[skill_idx]['cert_count'] += 1
+            
+            return result
+        finally:
+            cursor.close()
+            conn.close()
+    except Exception as e:
+        return None
+
+def load_training_info(login_email):
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return None
+        
+        cursor = conn.cursor()
+        try:
+            # 교육 정보 조회
+            cursor.execute("""
+                SELECT id, description 
+                FROM tb_resume_training 
+                WHERE login_email = %s
+            """, (login_email,))
+            training = cursor.fetchall()
+            
+            # 교육 데이터를 스킬별로 그룹화
+            result = {}
+            for edu in training:
+                skill_idx = 0  # 기본값으로 첫 번째 스킬에 할당
+                if skill_idx not in result:
+                    result[skill_idx] = {
+                        'edu_count': 0,
+                        'training': []
+                    }
+                result[skill_idx]['training'].append(edu)
+                result[skill_idx]['edu_count'] += 1
+            
+            return result
+        finally:
+            cursor.close()
+            conn.close()
+    except Exception as e:
+        return None
+
 def show_resume_page():
+    # 세션 상태 초기화
+    if 'skills_loaded' not in st.session_state:
+        st.session_state.skills_loaded = False
+    
+    if 'skill_data' not in st.session_state:
+        st.session_state.skill_data = [0]  # 최소 하나의 기술 항목
+    
+    if 'cert_counts' not in st.session_state:
+        st.session_state.cert_counts = defaultdict(int)
+    
+    if 'edu_counts' not in st.session_state:
+        st.session_state.edu_counts = defaultdict(int)
+    
+    # 사용자가 로그인한 경우에만 데이터 로드
+    if 'user_email' in st.session_state and not st.session_state.skills_loaded:
+        # 기술 및 역량 데이터 로드
+        skills_info = load_skills_info(st.session_state.user_email)
+        if skills_info:
+            st.session_state.skill_data = list(range(len(skills_info)))
+            for i, skill in enumerate(skills_info):
+                st.session_state[f'skill_id_{i}'] = skill.get('id')
+                st.session_state[f'skill_desc_{i}'] = skill.get('skill_name', '')
+                st.session_state[f'skill_level_{i}'] = str(skill.get('skill_level', '1'))
+                st.session_state[f'skill_note_{i}'] = skill.get('note', '')
+        
+        # 자격증 데이터 로드
+        cert_info = load_certifications_info(st.session_state.user_email)
+        if cert_info:
+            for skill_idx, cert_data in cert_info.items():
+                skill_idx = int(skill_idx)
+                st.session_state.cert_counts[skill_idx] = cert_data.get('cert_count', 0)
+                for j, cert in enumerate(cert_data.get('certifications', [])):
+                    st.session_state[f'cert_id_{skill_idx}_{j}'] = cert.get('id')
+                    st.session_state[f'certification_name_{skill_idx}_{j}'] = cert.get('certification_name', '')
+                    st.session_state[f'cert_date_{skill_idx}_{j}'] = cert.get('issue_date', '')
+                    st.session_state[f'cert_org_{skill_idx}_{j}'] = cert.get('issuing_agency', '')
+        
+        # 교육 데이터 로드
+        training_info = load_training_info(st.session_state.user_email)
+        if training_info:
+            for skill_idx, edu_data in training_info.items():
+                skill_idx = int(skill_idx)
+                st.session_state.edu_counts[skill_idx] = edu_data.get('edu_count', 0)
+                for j, edu in enumerate(edu_data.get('training', [])):
+                    st.session_state[f'edu_id_{skill_idx}_{j}'] = edu.get('id')
+                    st.session_state[f'education_{skill_idx}_{j}'] = edu.get('description', '')
+        
+        st.session_state.skills_loaded = True
+    
     st.markdown('<h3 class="main-header">이력관리</h3>', unsafe_allow_html=True)
     
     # 로그인 확인 및 이메일 가져오기
@@ -1315,8 +1436,8 @@ def show_resume_page():
             elif skills:
                 # 기존 데이터로 session_state 초기화
                 st.session_state.skill_data = []
-                st.session_state.cert_counts = {}
-                st.session_state.edu_counts = {}
+                st.session_state.cert_counts = defaultdict(int)
+                st.session_state.edu_counts = defaultdict(int)
                 
                 for idx, skill in enumerate(skills):
                     st.session_state.skill_data.append(idx)
@@ -1339,15 +1460,7 @@ def show_resume_page():
                         st.session_state[f'edu_id_{idx}_{edu_idx}'] = edu['id']
                         st.session_state[f'education_{idx}_{edu_idx}'] = edu['description']
                 
-                st.session_state.skill_count = len(skills)
-            else:
-                # 초기 상태 설정
-                st.session_state.skill_count = 1
-                st.session_state.skill_data = [0]
-                st.session_state.cert_counts = {0: 1}
-                st.session_state.edu_counts = {0: 1}
-            
-            st.session_state.skills_loaded = True
+                st.session_state.skills_loaded = True
         
         # 역량 카운터 초기화
         if 'skill_count' not in st.session_state:
@@ -1355,9 +1468,9 @@ def show_resume_page():
         
         # 자격증, 교육 카운터 초기화
         if 'cert_counts' not in st.session_state:
-            st.session_state.cert_counts = {0: 1}
+            st.session_state.cert_counts = defaultdict(int)
         if 'edu_counts' not in st.session_state:
-            st.session_state.edu_counts = {0: 1}
+            st.session_state.edu_counts = defaultdict(int)
 
         # 역량 데이터 초기화
         if 'skill_data' not in st.session_state:
@@ -1379,35 +1492,11 @@ def show_resume_page():
                 if skill_level_key in st.session_state and st.session_state[skill_level_key] not in level_options:
                     del st.session_state[skill_level_key]  # 에러 방지를 위해 잘못된 값 삭제
                 selected_level = st.selectbox(
-                "성취 수준",
-                level_options,
-                key=skill_level_key,
-                help="1: 기초 수준, 2: 초급 수준, 3: 중급 수준, 4: 고급 수준, 5: 전문가 수준"
-            )
-                
-                skills_data = {}
-                # 저장 버튼 클릭 시 모든 항목은 반드시 기술명과 성취 수준을 모두 유효하게 입력해야 함
-                for i in st.session_state.skill_data:
-                    skill_name = st.session_state[f'skill_desc_{i}'].strip()
-                    selected_level = st.session_state[f'skill_level_{i}']
-
-                    if not skill_name:
-                        st.warning(f"{i+1}번째 기술의 '기술 및 역량' 항목이 비어 있어 저장되지 않습니다.")
-                        success = False
-                        continue
-
-                    if selected_level not in ["1", "2", "3", "4", "5"]:
-                        st.warning(f"{i+1}번째 기술의 성취 수준이 유효하지 않아 저장되지 않습니다.")
-                        success = False
-                        continue
-
-                    skills_data[i] = {
-                        'id': st.session_state.get(f'skill_id_{i}'),
-                        'skill_name': skill_name,
-                        'skill_level': int(selected_level),
-                        'note': st.session_state[f'skill_note_{i}']
-                    }
-
+                    "성취 수준",
+                    level_options,
+                    key=skill_level_key,
+                    help="1: 기초 수준, 2: 초급 수준, 3: 중급 수준, 4: 고급 수준, 5: 전문가 수준"
+                )
             with cols[2]:
                 st.text_input("비고", value=personal_info.get(f'skill_note_{i}', ''), key=f"skill_note_{i}")
             with cols[3]:
@@ -1418,23 +1507,49 @@ def show_resume_page():
                         if len(st.session_state.skill_data) == 0:
                             st.session_state.skill_count = 1
                             st.session_state.skill_data = [0]
-                            st.session_state.cert_counts = {0: 1}
-                            st.session_state.edu_counts = {0: 1}
+                            st.session_state.cert_counts = defaultdict(int)
+                            st.session_state.edu_counts = defaultdict(int)
                         st.rerun()
             with cols[4]:
                 st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
-                if st.button("기술 및 역량 추가", key=f"add_skill_{i}", use_container_width=True):
+                if st.button("추가", key=f"add_skill_{i}", use_container_width=True):
                     new_idx = max(st.session_state.skill_data) + 1 if st.session_state.skill_data else 0
                     st.session_state.skill_data.append(new_idx)
                     st.session_state.cert_counts[new_idx] = 0
                     st.session_state.edu_counts[new_idx] = 0
                     st.session_state.skill_count += 1
                     st.rerun()
-            
+
+            # 데이터 유효성 검사는 여기서 수행
+            if 'save_skill_tab' in st.session_state:
+                skill_name = st.session_state.get(f'skill_desc_{i}', '').strip()
+                selected_level = st.session_state.get(f'skill_level_{i}')
+
+                if not skill_name:
+                    st.warning(f"{i+1}번째 기술의 '기술 및 역량' 항목이 비어 있어 저장되지 않습니다.")
+                    success = False
+
+                if not selected_level or selected_level not in level_options:
+                    st.warning(f"{i+1}번째 기술의 성취 수준이 유효하지 않아 저장되지 않습니다.")
+                    success = False
+
             st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
             
             # 자격증 섹션
             st.markdown('<div class="section-header">자격증</div>', unsafe_allow_html=True)
+            
+            # 자격증 추가/삭제 버튼 (6:1:1)
+            cols = st.columns([6, 1, 1])
+            with cols[1]:
+                st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
+                if st.button("자격증 삭제", key=f"delete_cert_section_{i}", use_container_width=True):
+                    st.session_state.cert_counts[i] = 0
+                    st.rerun()
+            with cols[2]:
+                st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
+                if st.button("자격증 추가", key=f"add_cert_section_{i}", use_container_width=True):
+                    st.session_state.cert_counts[i] = st.session_state.cert_counts.get(i, 0) + 1
+                    st.rerun()
             
             certifications_data = {}
             for i in st.session_state.skill_data:
@@ -1466,6 +1581,19 @@ def show_resume_page():
 
             # 교육 섹션
             st.markdown('<div class="section-header">교육: 훈련, 연수, 유학 등</div>', unsafe_allow_html=True)
+            
+            # 교육 추가/삭제 버튼 (6:1:1)
+            cols = st.columns([6, 1, 1])
+            with cols[1]:
+                st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
+                if st.button("교육 삭제", key=f"delete_edu_section_{i}", use_container_width=True):
+                    st.session_state.edu_counts[i] = 0
+                    st.rerun()
+            with cols[2]:
+                st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
+                if st.button("교육 추가", key=f"add_edu_section_{i}", use_container_width=True):
+                    st.session_state.edu_counts[i] = st.session_state.edu_counts.get(i, 0) + 1
+                    st.rerun()
             
             training_data = {}
             for i in st.session_state.skill_data:
