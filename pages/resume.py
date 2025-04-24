@@ -630,7 +630,7 @@ def load_skills_info(login_email):
             for skill in skills:
                 # 자격증 정보 조회
                 cursor.execute("""
-                    SELECT id, cert_name, issue_date, issuing_org 
+                    SELECT id, certification_name, issue_date, issuing_agency 
                     FROM tb_resume_certifications 
                     WHERE login_email = %s AND skill_id = %s
                 """, (login_email, skill['id']))
@@ -1394,8 +1394,8 @@ def show_resume_page():
             if idx > 0:
                 st.markdown("<hr>", unsafe_allow_html=True)
             
-            # 기술 및 역량 (2:1:4:1)
-            cols = st.columns([2, 1, 4, 1])
+            # 기술 및 역량 (2:1:4:1:1)
+            cols = st.columns([2, 1, 4, 1, 1])
             with cols[0]:
                 st.text_input("기술 및 역량", value=personal_info.get(f'skill_desc_{i}', ''), key=f"skill_desc_{i}")
             with cols[1]:
@@ -1411,7 +1411,7 @@ def show_resume_page():
             with cols[3]:
                 st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
                 if len(st.session_state.skill_data) > 1:
-                    if st.button("역량 삭제", key=f"delete_skill_{i}", use_container_width=True):
+                    if st.button("기술 및 역량 삭제", key=f"delete_skill_{i}", use_container_width=True):
                         st.session_state.skill_data.remove(i)
                         if len(st.session_state.skill_data) == 0:
                             st.session_state.skill_count = 1
@@ -1419,6 +1419,15 @@ def show_resume_page():
                             st.session_state.cert_counts = {0: 1}
                             st.session_state.edu_counts = {0: 1}
                         st.rerun()
+            with cols[4]:
+                st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
+                if st.button("기술 및 역량 추가", key=f"add_skill_{i}", use_container_width=True):
+                    new_idx = max(st.session_state.skill_data) + 1 if st.session_state.skill_data else 0
+                    st.session_state.skill_data.append(new_idx)
+                    st.session_state.cert_counts[new_idx] = 0
+                    st.session_state.edu_counts[new_idx] = 0
+                    st.session_state.skill_count += 1
+                    st.rerun()
             
             st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
             
@@ -1444,23 +1453,11 @@ def show_resume_page():
                             if st.button("삭제", key=f"delete_cert_{i}_{j}", use_container_width=True):
                                 st.session_state.cert_counts[i] -= 1
                                 st.rerun()
-
-            # 자격증 추가 버튼
-            cols = st.columns([8])
-            with cols[0]:
-                if st.button("+ 자격증 추가", use_container_width=True):
-                    # 첫 번째 기술이 없다면 자동으로 추가
-                    if not st.session_state.skill_data:
-                        st.session_state.skill_data.append(0)
-                        st.session_state.cert_counts[0] = 0
-                        st.session_state.edu_counts[0] = 0
-                    
-                    # 첫 번째 기술에 자격증 추가
-                    first_skill = st.session_state.skill_data[0]
-                    if first_skill not in st.session_state.cert_counts:
-                        st.session_state.cert_counts[first_skill] = 0
-                    st.session_state.cert_counts[first_skill] += 1
-                    st.rerun()
+                        with cols[4]:
+                            st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
+                            if st.button("추가", key=f"add_cert_{i}_{j}", use_container_width=True):
+                                st.session_state.cert_counts[i] += 1
+                                st.rerun()
 
             st.markdown("<hr>", unsafe_allow_html=True)
 
@@ -1482,37 +1479,13 @@ def show_resume_page():
                             if st.button("삭제", key=f"delete_edu_{i}_{j}", use_container_width=True):
                                 st.session_state.edu_counts[i] -= 1
                                 st.rerun()
-
-            # 교육 추가 버튼
-            cols = st.columns([8])
-            with cols[0]:
-                if st.button("+ 교육 추가", use_container_width=True):
-                    # 첫 번째 기술이 없다면 자동으로 추가
-                    if not st.session_state.skill_data:
-                        st.session_state.skill_data.append(0)
-                        st.session_state.cert_counts[0] = 0
-                        st.session_state.edu_counts[0] = 0
-                    
-                    # 첫 번째 기술에 교육 추가
-                    first_skill = st.session_state.skill_data[0]
-                    if first_skill not in st.session_state.edu_counts:
-                        st.session_state.edu_counts[first_skill] = 0
-                    st.session_state.edu_counts[first_skill] += 1
-                    st.rerun()
+                        with cols[2]:
+                            st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
+                            if st.button("추가", key=f"add_edu_{i}_{j}", use_container_width=True):
+                                st.session_state.edu_counts[i] += 1
+                                st.rerun()
 
             st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-
-        # 역량 추가 버튼 (1:7)
-        st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-        cols = st.columns(8)
-        with cols[0]:
-            if st.button("역량 추가", use_container_width=True):
-                new_idx = max(st.session_state.skill_data) + 1 if st.session_state.skill_data else 0
-                st.session_state.skill_data.append(new_idx)
-                st.session_state.cert_counts[new_idx] = 1
-                st.session_state.edu_counts[new_idx] = 1
-                st.session_state.skill_count += 1
-                st.rerun()
 
         # 저장 버튼 (7:1)
         st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
