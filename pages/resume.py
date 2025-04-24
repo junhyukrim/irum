@@ -1504,7 +1504,7 @@ def show_resume_page():
             with cols[3]:
                 st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
                 if len(st.session_state.skill_data) > 1:
-                    if st.button("기술 및 역량 삭제", key=f"delete_skill_{i}", use_container_width=True):
+                    if st.button("기술/역량 삭제", key=f"delete_skill_{i}", use_container_width=True):
                         st.session_state.skill_data.remove(i)
                         if len(st.session_state.skill_data) == 0:
                             st.session_state.skill_count = 1
@@ -1514,7 +1514,7 @@ def show_resume_page():
                         st.rerun()
             with cols[4]:
                 st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
-                if st.button("추가", key=f"add_skill_{i}", use_container_width=True):
+                if st.button("기술/역량 추가", key=f"add_skill_{i}", use_container_width=True):
                     new_idx = max(st.session_state.skill_data) + 1 if st.session_state.skill_data else 0
                     st.session_state.skill_data.append(new_idx)
                     st.session_state.cert_counts[new_idx] = 0
@@ -1535,10 +1535,11 @@ def show_resume_page():
                     st.warning(f"{i+1}번째 기술의 성취 수준이 유효하지 않아 저장되지 않습니다.")
                     success = False
 
-            st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
+            # 섹션 구분선 추가
+            st.markdown("<hr style='margin: 2rem 0; border-top: 2px solid #eee;'>", unsafe_allow_html=True)
             
             # 자격증 섹션
-            st.markdown('<div class="section-header">자격증</div>', unsafe_allow_html=True)
+            st.markdown('<div class="section-header" style="font-weight: bold; margin-bottom: 1rem;">자격증</div>', unsafe_allow_html=True)
             
             # 자격증 추가/삭제 버튼 (6:1:1)
             cols = st.columns([6, 1, 1])
@@ -1560,12 +1561,12 @@ def show_resume_page():
                         if j > 0:
                             st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
                         
-                        # 자격증 (3:1:2:1:1)
-                        cols = st.columns([3, 1, 2, 1, 1])
+                        # 자격증 (3:2:2:1:1)
+                        cols = st.columns([3, 2, 2, 1, 1])
                         with cols[0]:
                             st.text_input("자격증명", value=personal_info.get(f'certification_name_{i}_{j}', ''), key=f"certification_name_{i}_{j}")
                         with cols[1]:
-                            st.date_input("취득년월", value=personal_info.get(f'cert_date_{i}_{j}', None), key=f"cert_date_{i}_{j}")
+                            st.date_input("취득일", value=personal_info.get(f'cert_date_{i}_{j}', None), key=f"cert_date_{i}_{j}")
                         with cols[2]:
                             st.text_input("발급기관", value=personal_info.get(f'cert_org_{i}_{j}', ''), key=f"cert_org_{i}_{j}")
                         with cols[3]:
@@ -1579,10 +1580,11 @@ def show_resume_page():
                                 st.session_state.cert_counts[i] += 1
                                 st.rerun()
 
-            st.markdown("<hr>", unsafe_allow_html=True)
+            # 섹션 구분선 추가
+            st.markdown("<hr style='margin: 2rem 0; border-top: 2px solid #eee;'>", unsafe_allow_html=True)
 
             # 교육 섹션
-            st.markdown('<div class="section-header">교육: 훈련, 연수, 유학 등</div>', unsafe_allow_html=True)
+            st.markdown('<div class="section-header" style="font-weight: bold; margin-bottom: 1rem;">교육: 훈련, 연수, 유학 등</div>', unsafe_allow_html=True)
             
             # 교육 추가/삭제 버튼 (6:1:1)
             cols = st.columns([6, 1, 1])
@@ -1607,7 +1609,10 @@ def show_resume_page():
                         # 교육 (6:1:1)
                         cols = st.columns([6, 1, 1])
                         with cols[0]:
-                            st.text_area("교육 내용", value=personal_info.get(f'education_{i}_{j}', ''), key=f"education_{i}_{j}", height=100)
+                            st.text_area("교육 내용", value=personal_info.get(f'education_{i}_{j}', ''), 
+                                       key=f"education_{i}_{j}", 
+                                       height=100,
+                                       placeholder="교육명, 교육기관, 교육기간, 교육내용 등을 자유롭게 입력해주세요.")
                         with cols[1]:
                             st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
                             if st.button("삭제", key=f"delete_edu_{i}_{j}", use_container_width=True):
