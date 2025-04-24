@@ -1384,7 +1384,8 @@ def show_resume_page():
                 key=skill_level_key,
                 help="1: 기초 수준, 2: 초급 수준, 3: 중급 수준, 4: 고급 수준, 5: 전문가 수준"
             )
-                            
+                
+                skills_data = {}
                 # 저장 버튼 클릭 시 모든 항목은 반드시 기술명과 성취 수준을 모두 유효하게 입력해야 함
                 for i in st.session_state.skill_data:
                     skill_name = st.session_state[f'skill_desc_{i}'].strip()
@@ -1435,6 +1436,7 @@ def show_resume_page():
             # 자격증 섹션
             st.markdown('<div class="section-header">자격증</div>', unsafe_allow_html=True)
             
+            certifications_data = {}
             for i in st.session_state.skill_data:
                 if i in st.session_state.cert_counts:
                     for j in range(st.session_state.cert_counts[i]):
@@ -1465,6 +1467,7 @@ def show_resume_page():
             # 교육 섹션
             st.markdown('<div class="section-header">교육: 훈련, 연수, 유학 등</div>', unsafe_allow_html=True)
             
+            training_data = {}
             for i in st.session_state.skill_data:
                 if i in st.session_state.edu_counts:
                     for j in range(st.session_state.edu_counts[i]):
