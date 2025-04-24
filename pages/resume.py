@@ -1483,8 +1483,8 @@ def show_resume_page():
             if idx > 0:
                 st.markdown("<hr>", unsafe_allow_html=True)
             
-            # 기술 및 역량 (2:1:4:2)
-            cols = st.columns([2, 1, 4, 2])
+            # 기술 및 역량 (2:1:4:1:1)
+            cols = st.columns([2, 1, 4, 1, 1])
             with cols[0]:
                 st.text_input("기술 및 역량", value=personal_info.get(f'skill_desc_{i}', ''), key=f"skill_desc_{i}")
             with cols[1]:
@@ -1502,27 +1502,25 @@ def show_resume_page():
             with cols[2]:
                 st.text_input("비고", value=personal_info.get(f'skill_note_{i}', ''), key=f"skill_note_{i}")
             with cols[3]:
-                subcols = st.columns(2)
-                with subcols[0]:
-                    st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
-                    if len(st.session_state.skill_data) > 1:
-                        if st.button("기술/역량 삭제", key=f"delete_skill_{i}", use_container_width=True):
-                            st.session_state.skill_data.remove(i)
-                            if len(st.session_state.skill_data) == 0:
-                                st.session_state.skill_count = 1
-                                st.session_state.skill_data = [0]
-                                st.session_state.cert_counts = defaultdict(int)
-                                st.session_state.edu_counts = defaultdict(int)
-                            st.rerun()
-                with subcols[1]:
-                    st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
-                    if st.button("기술/역량 추가", key=f"add_skill_{i}", use_container_width=True):
-                        new_idx = max(st.session_state.skill_data) + 1 if st.session_state.skill_data else 0
-                        st.session_state.skill_data.append(new_idx)
-                        st.session_state.cert_counts[new_idx] = 0
-                        st.session_state.edu_counts[new_idx] = 0
-                        st.session_state.skill_count += 1
+                st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
+                if len(st.session_state.skill_data) > 1:
+                    if st.button("기술/역량 삭제", key=f"delete_skill_{i}", use_container_width=True):
+                        st.session_state.skill_data.remove(i)
+                        if len(st.session_state.skill_data) == 0:
+                            st.session_state.skill_count = 1
+                            st.session_state.skill_data = [0]
+                            st.session_state.cert_counts = defaultdict(int)
+                            st.session_state.edu_counts = defaultdict(int)
                         st.rerun()
+            with cols[4]:
+                st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
+                if st.button("기술/역량 추가", key=f"add_skill_{i}", use_container_width=True):
+                    new_idx = max(st.session_state.skill_data) + 1 if st.session_state.skill_data else 0
+                    st.session_state.skill_data.append(new_idx)
+                    st.session_state.cert_counts[new_idx] = 0
+                    st.session_state.edu_counts[new_idx] = 0
+                    st.session_state.skill_count += 1
+                    st.rerun()
 
             # 데이터 유효성 검사는 여기서 수행
             if 'save_skill_tab' in st.session_state:
@@ -1556,8 +1554,8 @@ def show_resume_page():
                     st.session_state.cert_counts[i] = st.session_state.cert_counts.get(i, 0) + 1
                     st.rerun()
             
-            certifications_data = {}
-            if i in st.session_state.cert_counts:
+            # 자격증 입력 필드들
+            if i in st.session_state.cert_counts and st.session_state.cert_counts[i] > 0:
                 for j in range(st.session_state.cert_counts[i]):
                     if j > 0:
                         st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
@@ -1565,14 +1563,14 @@ def show_resume_page():
                     # 자격증 (3:2:2:1:1)
                     cols = st.columns([3, 2, 2, 1, 1])
                     with cols[0]:
-                        st.text_input("자격증명", value=personal_info.get(f'certification_name_{i}_{j}', ''), 
+                        st.text_input("자격증명", value=st.session_state.get(f'certification_name_{i}_{j}', ''), 
                                     key=f"certification_name_{i}_{j}",
                                     placeholder="예: 정보처리기사")
                     with cols[1]:
-                        st.date_input("취득일", value=personal_info.get(f'cert_date_{i}_{j}', None), 
+                        st.date_input("취득일", value=st.session_state.get(f'cert_date_{i}_{j}', None), 
                                     key=f"cert_date_{i}_{j}")
                     with cols[2]:
-                        st.text_input("발급기관", value=personal_info.get(f'cert_org_{i}_{j}', ''), 
+                        st.text_input("발급기관", value=st.session_state.get(f'cert_org_{i}_{j}', ''), 
                                     key=f"cert_org_{i}_{j}",
                                     placeholder="예: 한국산업인력공단")
                     with cols[3]:
@@ -1605,8 +1603,8 @@ def show_resume_page():
                     st.session_state.edu_counts[i] = st.session_state.edu_counts.get(i, 0) + 1
                     st.rerun()
             
-            training_data = {}
-            if i in st.session_state.edu_counts:
+            # 교육 입력 필드들
+            if i in st.session_state.edu_counts and st.session_state.edu_counts[i] > 0:
                 for j in range(st.session_state.edu_counts[i]):
                     if j > 0:
                         st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
@@ -1614,7 +1612,7 @@ def show_resume_page():
                     # 교육 (6:1:1)
                     cols = st.columns([6, 1, 1])
                     with cols[0]:
-                        st.text_area("교육 내용", value=personal_info.get(f'education_{i}_{j}', ''), 
+                        st.text_area("교육 내용", value=st.session_state.get(f'education_{i}_{j}', ''), 
                                    key=f"education_{i}_{j}", 
                                    height=100,
                                    placeholder="교육명:\n교육기관:\n교육기간:\n교육내용:")
