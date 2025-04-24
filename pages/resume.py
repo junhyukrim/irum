@@ -732,7 +732,7 @@ def show_resume_page():
                 
                 /* 위치 조정 */
                 bottom: 150%;
-                left: -380px;
+                left: 20px;
                 
                 /* 페이드 효과 */
                 opacity: 0;
@@ -744,7 +744,7 @@ def show_resume_page():
                 content: "";
                 position: absolute;
                 top: 100%;
-                right: 15px;
+                left: 15px;
                 margin-left: -5px;
                 border-width: 8px;
                 border-style: solid;
