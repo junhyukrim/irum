@@ -116,6 +116,61 @@ def load_personal_info(login_email):
     except Exception as e:
         return None, f"데이터베이스 접근 중 오류가 발생했습니다: {str(e)}"
 
+def load_skills_info(login_email):
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return None, "데이터베이스 연결 실패"
+        
+        cursor = conn.cursor()
+        try:
+            # 기본 기술 정보 조회
+            cursor.execute("""
+                SELECT id, skill_name, skill_level, note 
+                FROM tb_resume_skills 
+                WHERE login_email = %s
+                ORDER BY id
+            """, (login_email,))
+            skills = cursor.fetchall()
+            
+            # 각 기술에 대한 자격증과 교육 정보 조회
+            result = []
+            for skill in skills:
+                # 자격증 정보 조회
+                cursor.execute("""
+                    SELECT id, certification_name, issue_date, issuing_agency 
+                    FROM tb_resume_certifications 
+                    WHERE login_email = %s
+                """, (login_email,))
+                certifications = cursor.fetchall()
+                
+                # 교육 정보 조회
+                cursor.execute("""
+                    SELECT id, description 
+                    FROM tb_resume_training 
+                    WHERE login_email = %s
+                """, (login_email,))
+                training = cursor.fetchall()
+                
+                skill_data = {
+                    'id': skill['id'],
+                    'skill_name': skill['skill_name'],
+                    'skill_level': skill['skill_level'],
+                    'note': skill['note'],
+                    'certifications': certifications,
+                    'training': training
+                }
+                result.append(skill_data)
+            
+            return result, None
+        except Exception as e:
+            return None, f"데이터 조회 중 오류: {str(e)}"
+        finally:
+            cursor.close()
+            conn.close()
+    except Exception as e:
+        return None, f"데이터베이스 연결 중 오류: {str(e)}"
+
 def save_education_info(login_email, data):
     try:
         conn = connect_to_db()
@@ -583,61 +638,6 @@ def save_training_info(login_email, data):
         st.error(f"데이터베이스 연결 중 오류: {str(e)}")
         return False
 
-def load_skills_info(login_email):
-    try:
-        conn = connect_to_db()
-        if conn is None:
-            return None, "데이터베이스 연결 실패"
-        
-        cursor = conn.cursor()
-        try:
-            # 기본 기술 정보 조회
-            cursor.execute("""
-                SELECT id, skill_name, skill_level, note 
-                FROM tb_resume_skills 
-                WHERE login_email = %s
-                ORDER BY id
-            """, (login_email,))
-            skills = cursor.fetchall()
-            
-            # 각 기술에 대한 자격증과 교육 정보 조회
-            result = []
-            for skill in skills:
-                # 자격증 정보 조회
-                cursor.execute("""
-                    SELECT id, certification_name, issue_date, issuing_agency 
-                    FROM tb_resume_certifications 
-                    WHERE login_email = %s
-                """, (login_email,))
-                certifications = cursor.fetchall()
-                
-                # 교육 정보 조회
-                cursor.execute("""
-                    SELECT id, description 
-                    FROM tb_resume_training 
-                    WHERE login_email = %s
-                """, (login_email,))
-                training = cursor.fetchall()
-                
-                skill_data = {
-                    'id': skill['id'],
-                    'skill_name': skill['skill_name'],
-                    'skill_level': skill['skill_level'],
-                    'note': skill['note'],
-                    'certifications': certifications,
-                    'training': training
-                }
-                result.append(skill_data)
-            
-            return result, None
-        except Exception as e:
-            return None, f"데이터 조회 중 오류: {str(e)}"
-        finally:
-            cursor.close()
-            conn.close()
-    except Exception as e:
-        return None, f"데이터베이스 연결 중 오류: {str(e)}"
-
 def load_certifications_info(login_email):
     try:
         conn = connect_to_db()
@@ -726,8 +726,10 @@ def show_resume_page():
     # 사용자가 로그인한 경우에만 데이터 로드
     if 'user_email' in st.session_state and not st.session_state.skills_loaded:
         # 기술 및 역량 데이터 로드
-        skills_info = load_skills_info(st.session_state.user_email)
-        if skills_info:
+        skills_info, error = load_skills_info(st.session_state.user_email)
+        if error:
+            st.error(error)
+        elif skills_info:
             st.session_state.skill_data = list(range(len(skills_info)))
             for i, skill in enumerate(skills_info):
                 st.session_state[f'skill_id_{i}'] = skill.get('id')
