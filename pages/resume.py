@@ -1470,77 +1470,76 @@ def show_resume_page():
         # 자격증 섹션
         st.markdown('<div class="section-header">자격증</div>', unsafe_allow_html=True)
         
+        # 자격증 필드 초기화
+        if 'cert_fields' not in st.session_state:
+            st.session_state.cert_fields = [0]
+        
         # 자격증 입력 필드들
-        if i in st.session_state.cert_counts and st.session_state.cert_counts[i] > 0:
-            for j in range(st.session_state.cert_counts[i]):
-                if j > 0:
-                    st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
-                
-                # 자격증 (3:2:2:1:1)
-                cols = st.columns([3, 2, 2, 1, 1])
-                with cols[0]:
-                    st.text_input("자격증명", value=st.session_state.get(f'certification_name_{i}_{j}', ''), 
-                                key=f"certification_name_{i}_{j}",
-                                placeholder="예: 정보처리기사")
-                with cols[1]:
-                    st.date_input("취득일", value=st.session_state.get(f'cert_date_{i}_{j}', None), 
-                                key=f"cert_date_{i}_{j}")
-                with cols[2]:
-                    st.text_input("발급기관", value=st.session_state.get(f'cert_org_{i}_{j}', ''), 
-                                key=f"cert_org_{i}_{j}",
-                                placeholder="예: 한국산업인력공단")
-                with cols[3]:
-                    st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
-                    if st.button("자격증 삭제", key=f"delete_cert_{i}_{j}", use_container_width=True):
-                        st.session_state.cert_counts[i] -= 1
+        for cert_idx in st.session_state.cert_fields:
+            if cert_idx > 0:
+                st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
+            
+            # 자격증 (3:2:2:1:1)
+            cols = st.columns([3, 2, 2, 1, 1])
+            with cols[0]:
+                st.text_input("자격증명", key=f"certification_name_{cert_idx}",
+                            placeholder="예: 정보처리기사")
+            with cols[1]:
+                st.date_input("취득일", key=f"cert_date_{cert_idx}")
+            with cols[2]:
+                st.text_input("발급기관", key=f"cert_org_{cert_idx}",
+                            placeholder="예: 한국산업인력공단")
+            with cols[3]:
+                st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
+                if len(st.session_state.cert_fields) > 1:
+                    if st.button("자격증 삭제", key=f"delete_cert_{cert_idx}", use_container_width=True):
+                        st.session_state.cert_fields.remove(cert_idx)
                         st.rerun()
-                with cols[4]:
-                    st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
-                    if st.button("자격증 추가", key=f"add_cert_{i}_{j}", use_container_width=True):
-                        st.session_state.cert_counts[i] += 1
-                        st.rerun()
+                else:
+                    st.empty()
+            with cols[4]:
+                st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
+                if st.button("자격증 추가", key=f"add_cert_{cert_idx}", use_container_width=True):
+                    new_idx = max(st.session_state.cert_fields) + 1 if st.session_state.cert_fields else 0
+                    st.session_state.cert_fields.append(new_idx)
+                    st.rerun()
 
         st.markdown("<hr style='margin: 2rem 0; border-top: 2px solid #eee;'>", unsafe_allow_html=True)
 
         # 교육 섹션
         st.markdown('<div class="section-header">교육: 훈련, 연수, 유학 등</div>', unsafe_allow_html=True)
         
+        # 교육 필드 초기화
+        if 'edu_fields' not in st.session_state:
+            st.session_state.edu_fields = [0]
+        
         # 교육 입력 필드들
-        if i in st.session_state.edu_counts and st.session_state.edu_counts[i] > 0:
-            for j in range(st.session_state.edu_counts[i]):
-                if j > 0:
-                    st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
-                
-                # 교육 (6:1:1)
-                cols = st.columns([6, 1, 1])
-                with cols[0]:
-                    st.text_area("교육 내용", value=st.session_state.get(f'education_{i}_{j}', ''), 
-                               key=f"education_{i}_{j}", 
-                               height=100,
-                               placeholder="교육명:\n교육기관:\n교육기간:\n교육내용:")
-                with cols[1]:
-                    st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
-                    if st.button("교육 삭제", key=f"delete_edu_{i}_{j}", use_container_width=True):
-                        st.session_state.edu_counts[i] -= 1
+        for edu_idx in st.session_state.edu_fields:
+            if edu_idx > 0:
+                st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
+            
+            # 교육 (6:1:1)
+            cols = st.columns([6, 1, 1])
+            with cols[0]:
+                st.text_area("교육 내용", key=f"education_{edu_idx}", 
+                           height=100,
+                           placeholder="교육명:\n교육기관:\n교육기간:\n교육내용:")
+            with cols[1]:
+                st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
+                if len(st.session_state.edu_fields) > 1:
+                    if st.button("교육 삭제", key=f"delete_edu_{edu_idx}", use_container_width=True):
+                        st.session_state.edu_fields.remove(edu_idx)
                         st.rerun()
-                with cols[2]:
-                    st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
-                    if st.button("교육 추가", key=f"add_edu_{i}_{j}", use_container_width=True):
-                        st.session_state.edu_counts[i] += 1
-                        st.rerun()
+                else:
+                    st.empty()
+            with cols[2]:
+                st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
+                if st.button("교육 추가", key=f"add_edu_{edu_idx}", use_container_width=True):
+                    new_idx = max(st.session_state.edu_fields) + 1 if st.session_state.edu_fields else 0
+                    st.session_state.edu_fields.append(new_idx)
+                    st.rerun()
 
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-
-        # 저장 버튼 (7:1)
-        st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
-        cols = st.columns(8)
-        for i in range(7):  # 처음 7개 컬럼은 빈 공간
-            cols[i].empty()
-        with cols[7]:  # 마지막 컬럼에 버튼 배치
-            if st.button("저장", key="save_skill_tab", use_container_width=True):
-                if 'user_email' not in st.session_state:
-                    st.error("로그인이 필요합니다.")
-                    return
 
     # 경력 탭
     with tabs[3]:
@@ -1878,3 +1877,97 @@ def show_resume_page():
         with cols[7]:  # 마지막 컬럼에 버튼 배치
             if st.button("저장", key="save_introduction_tab", use_container_width=True):
                 st.success("저장되었습니다!") 
+
+        st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
+
+        # 저장 버튼 (7:1)
+        st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
+        cols = st.columns(8)
+        for i in range(7):  # 처음 7개 컬럼은 빈 공간
+            cols[i].empty()
+        with cols[7]:  # 마지막 컬럼에 버튼 배치
+            if st.button("저장", key="save_skill_tab", use_container_width=True):
+                if 'user_email' not in st.session_state:
+                    st.error("로그인이 필요합니다.")
+                    return
+                
+                # 현재 입력된 모든 데이터 수집
+                success = True
+                
+                # 기술 및 역량 데이터 수집
+                skills_data = {}
+                for idx in st.session_state.skill_fields:
+                    skill_name = st.session_state.get(f'skill_desc_{idx}', '').strip()
+                    skill_level = st.session_state.get(f'skill_level_{idx}')
+                    
+                    if not skill_name:
+                        st.warning(f"{idx+1}번째 기술의 '기술 및 역량' 항목이 비어 있습니다.")
+                        success = False
+                        continue
+                    
+                    if not skill_level or skill_level not in ["1", "2", "3", "4", "5"]:
+                        st.warning(f"{idx+1}번째 기술의 성취 수준이 유효하지 않습니다.")
+                        success = False
+                        continue
+                    
+                    skills_data[idx] = {
+                        'skill_name': skill_name,
+                        'skill_level': int(skill_level),
+                        'note': st.session_state.get(f'skill_note_{idx}', '')
+                    }
+                
+                # 자격증 데이터 수집
+                certifications_data = {}
+                for idx in st.session_state.cert_fields:
+                    cert_name = st.session_state.get(f'certification_name_{idx}', '').strip()
+                    cert_date = st.session_state.get(f'cert_date_{idx}')
+                    cert_org = st.session_state.get(f'cert_org_{idx}', '').strip()
+                    
+                    if cert_name or cert_date or cert_org:  # 하나라도 입력된 경우
+                        if not cert_name:
+                            st.warning(f"{idx+1}번째 자격증의 자격증명이 비어 있습니다.")
+                            success = False
+                            continue
+                        
+                        if not cert_date:
+                            st.warning(f"{idx+1}번째 자격증의 취득일이 비어 있습니다.")
+                            success = False
+                            continue
+                        
+                        if not cert_org:
+                            st.warning(f"{idx+1}번째 자격증의 발급기관이 비어 있습니다.")
+                            success = False
+                            continue
+                        
+                        certifications_data[idx] = {
+                            'certification_name': cert_name,
+                            'issue_date': cert_date,
+                            'issuing_agency': cert_org
+                        }
+                
+                # 교육 데이터 수집
+                training_data = {}
+                for idx in st.session_state.edu_fields:
+                    edu_desc = st.session_state.get(f'education_{idx}', '').strip()
+                    
+                    if edu_desc:  # 입력된 경우만 저장
+                        training_data[idx] = {
+                            'description': edu_desc
+                        }
+                
+                if success:
+                    if not save_skills_info(st.session_state.user_email, skills_data):
+                        st.error("기술 및 역량 정보 저장 중 오류가 발생했습니다.")
+                        success = False
+                    
+                    if not save_certifications_info(st.session_state.user_email, certifications_data):
+                        st.error("자격증 정보 저장 중 오류가 발생했습니다.")
+                        success = False
+                    
+                    if not save_training_info(st.session_state.user_email, training_data):
+                        st.error("교육 정보 저장 중 오류가 발생했습니다.")
+                        success = False
+                    
+                    if success:
+                        st.success("저장되었습니다!")
+                        st.rerun()
