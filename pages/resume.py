@@ -1376,7 +1376,7 @@ def show_resume_page():
                 st.selectbox(
                     "성취 수준",
                     ["1", "2", "3", "4", "5"],
-                    index=["1", "2", "3", "4", "5"].index(personal_info.get(f'skill_level_{i}', '1')),
+                    index=0 if not personal_info.get(f'skill_level_{i}') else ["1", "2", "3", "4", "5"].index(personal_info.get(f'skill_level_{i}')),
                     key=f"skill_level_{i}",
                     help="1: 기초 수준, 2: 초급 수준, 3: 중급 수준, 4: 고급 수준, 5: 전문가 수준"
                 )
