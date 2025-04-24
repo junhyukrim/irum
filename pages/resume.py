@@ -475,14 +475,14 @@ def save_certifications_info(login_email, data):
                             UPDATE tb_resume_certifications SET
                             skill_id = %s,
                             certification_name = %s,
-                            acquisition_date = %s,
+                            issue_date = %s,
                             issuing_org = %s
                             WHERE id = %s AND login_email = %s
                         """
                         cursor.execute(update_query, (
                             skill_id,
                             cert_data['cert_name'],
-                            cert_data['acquisition_date'],
+                            cert_data['issue_date'],
                             cert_data['issuing_org'],
                             cert_data['id'],
                             login_email
@@ -490,14 +490,14 @@ def save_certifications_info(login_email, data):
                     else:  # 새 자격증 정보 삽입
                         insert_query = """
                             INSERT INTO tb_resume_certifications 
-                            (login_email, skill_id, certification_name, acquisition_date, issuing_org)
+                            (login_email, skill_id, certification_name, issue_date, issuing_org)
                             VALUES (%s, %s, %s, %s, %s)
                         """
                         cursor.execute(insert_query, (
                             login_email,
                             skill_id,
                             cert_data['cert_name'],
-                            cert_data['acquisition_date'],
+                            cert_data['issue_date'],
                             cert_data['issuing_org']
                         ))
                         cert_id = cursor.lastrowid
@@ -563,25 +563,25 @@ def save_training_info(login_email, data):
                         update_query = """
                             UPDATE tb_resume_training SET
                             skill_id = %s,
-                            training_description = %s
+                            description = %s
                             WHERE id = %s AND login_email = %s
                         """
                         cursor.execute(update_query, (
                             skill_id,
-                            edu_data['training_desc'],
+                            edu_data['description'],
                             edu_data['id'],
                             login_email
                         ))
                     else:  # 새 교육 정보 삽입
                         insert_query = """
                             INSERT INTO tb_resume_training 
-                            (login_email, skill_id, training_description)
+                            (login_email, skill_id, description)
                             VALUES (%s, %s, %s)
                         """
                         cursor.execute(insert_query, (
                             login_email,
                             skill_id,
-                            edu_data['training_desc']
+                            edu_data['description']
                         ))
                         training_id = cursor.lastrowid
                         current_training_ids.add(training_id)
@@ -630,7 +630,7 @@ def load_skills_info(login_email):
             for skill in skills:
                 # 자격증 정보 조회
                 cursor.execute("""
-                    SELECT id, cert_name, acquisition_date, issuing_org 
+                    SELECT id, cert_name, issue_date, issuing_org 
                     FROM tb_resume_certifications 
                     WHERE login_email = %s AND skill_id = %s
                 """, (login_email, skill['id']))
@@ -638,7 +638,7 @@ def load_skills_info(login_email):
                 
                 # 교육 정보 조회
                 cursor.execute("""
-                    SELECT id, training_desc 
+                    SELECT id, description 
                     FROM tb_resume_training 
                     WHERE login_email = %s AND skill_id = %s
                 """, (login_email, skill['id']))
@@ -1356,14 +1356,14 @@ def show_resume_page():
                     for cert_idx, cert in enumerate(skill['certifications']):
                         st.session_state[f'cert_id_{idx}_{cert_idx}'] = cert['id']
                         st.session_state[f'cert_name_{idx}_{cert_idx}'] = cert['cert_name']
-                        st.session_state[f'cert_date_{idx}_{cert_idx}'] = cert['acquisition_date']
+                        st.session_state[f'cert_date_{idx}_{cert_idx}'] = cert['issue_date']
                         st.session_state[f'cert_org_{idx}_{cert_idx}'] = cert['issuing_org']
                     
                     # 교육 정보 설정
                     st.session_state.edu_counts[idx] = len(skill['training'])
                     for edu_idx, edu in enumerate(skill['training']):
                         st.session_state[f'edu_id_{idx}_{edu_idx}'] = edu['id']
-                        st.session_state[f'education_{idx}_{edu_idx}'] = edu['training_desc']
+                        st.session_state[f'education_{idx}_{edu_idx}'] = edu['description']
                 
                 st.session_state.skill_count = len(skills)
             else:
@@ -1423,57 +1423,84 @@ def show_resume_page():
             st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
             
             # 자격증 섹션
-            if i not in st.session_state.cert_counts:
-                st.session_state.cert_counts[i] = 1
+            st.markdown('<div class="section-header">자격증</div>', unsafe_allow_html=True)
+            
+            for i in st.session_state.skill_data:
+                if i in st.session_state.cert_counts:
+                    for j in range(st.session_state.cert_counts[i]):
+                        if j > 0:
+                            st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
+                        
+                        # 자격증 (3:1:2:1:1)
+                        cols = st.columns([3, 1, 2, 1, 1])
+                        with cols[0]:
+                            st.text_input("자격증명", value=personal_info.get(f'cert_name_{i}_{j}', ''), key=f"cert_name_{i}_{j}")
+                        with cols[1]:
+                            st.date_input("취득년월", value=personal_info.get(f'cert_date_{i}_{j}', None), key=f"cert_date_{i}_{j}")
+                        with cols[2]:
+                            st.text_input("발급기관", value=personal_info.get(f'cert_org_{i}_{j}', ''), key=f"cert_org_{i}_{j}")
+                        with cols[3]:
+                            st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
+                            if st.button("삭제", key=f"delete_cert_{i}_{j}", use_container_width=True):
+                                st.session_state.cert_counts[i] -= 1
+                                st.rerun()
 
-            for j in range(st.session_state.cert_counts[i]):
-                # 자격증 (3:1:2:1:1)
-                cols = st.columns([3, 1, 2, 1, 1])
-                with cols[0]:
-                    st.text_input("자격증", value=personal_info.get(f'cert_name_{i}_{j}', ''), key=f"cert_name_{i}_{j}")
-                with cols[1]:
-                    st.date_input("취득년월", value=personal_info.get(f'cert_date_{i}_{j}', None), key=f"cert_date_{i}_{j}")
-                with cols[2]:
-                    st.text_input("발급기관", value=personal_info.get(f'cert_org_{i}_{j}', ''), key=f"cert_org_{i}_{j}")
-                with cols[3]:
-                    st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
-                    if st.session_state.cert_counts[i] > 1:
-                        if st.button("자격증 삭제", key=f"delete_cert_{i}_{j}", use_container_width=True):
-                            st.session_state.cert_counts[i] -= 1
-                            st.rerun()
-                with cols[4]:
-                    st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
-                    if st.button("자격증 추가", key=f"add_cert_{i}_{j}", use_container_width=True):
-                        st.session_state.cert_counts[i] += 1
-                        st.rerun()
+            # 자격증 추가 버튼
+            cols = st.columns([8])
+            with cols[0]:
+                if st.button("+ 자격증 추가", use_container_width=True):
+                    # 첫 번째 기술이 없다면 자동으로 추가
+                    if not st.session_state.skill_data:
+                        st.session_state.skill_data.append(0)
+                        st.session_state.cert_counts[0] = 0
+                        st.session_state.edu_counts[0] = 0
+                    
+                    # 첫 번째 기술에 자격증 추가
+                    first_skill = st.session_state.skill_data[0]
+                    if first_skill not in st.session_state.cert_counts:
+                        st.session_state.cert_counts[first_skill] = 0
+                    st.session_state.cert_counts[first_skill] += 1
+                    st.rerun()
 
-                if j < st.session_state.cert_counts[i] - 1:
-                    st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
+            st.markdown("<hr>", unsafe_allow_html=True)
 
-            st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
+            # 교육 섹션
+            st.markdown('<div class="section-header">교육: 훈련, 연수, 유학 등</div>', unsafe_allow_html=True)
+            
+            for i in st.session_state.skill_data:
+                if i in st.session_state.edu_counts:
+                    for j in range(st.session_state.edu_counts[i]):
+                        if j > 0:
+                            st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
+                        
+                        # 교육 (6:1:1)
+                        cols = st.columns([6, 1, 1])
+                        with cols[0]:
+                            st.text_area("교육 내용", value=personal_info.get(f'education_{i}_{j}', ''), key=f"education_{i}_{j}", height=100)
+                        with cols[1]:
+                            st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
+                            if st.button("삭제", key=f"delete_edu_{i}_{j}", use_container_width=True):
+                                st.session_state.edu_counts[i] -= 1
+                                st.rerun()
 
-            # 교육 섹션 (6:1:1)
-            if i not in st.session_state.edu_counts:
-                st.session_state.edu_counts[i] = 1
+            # 교육 추가 버튼
+            cols = st.columns([8])
+            with cols[0]:
+                if st.button("+ 교육 추가", use_container_width=True):
+                    # 첫 번째 기술이 없다면 자동으로 추가
+                    if not st.session_state.skill_data:
+                        st.session_state.skill_data.append(0)
+                        st.session_state.cert_counts[0] = 0
+                        st.session_state.edu_counts[0] = 0
+                    
+                    # 첫 번째 기술에 교육 추가
+                    first_skill = st.session_state.skill_data[0]
+                    if first_skill not in st.session_state.edu_counts:
+                        st.session_state.edu_counts[first_skill] = 0
+                    st.session_state.edu_counts[first_skill] += 1
+                    st.rerun()
 
-            for j in range(st.session_state.edu_counts[i]):
-                if j > 0:
-                    st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
-                
-                cols = st.columns([6, 1, 1])
-                with cols[0]:
-                    st.text_input("교육: 훈련, 연수, 유학 등", value=personal_info.get(f'education_{i}_{j}', ''), key=f"education_{i}_{j}")
-                with cols[1]:
-                    st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
-                    if st.session_state.edu_counts[i] > 1:
-                        if st.button("교육 삭제", key=f"delete_edu_{i}_{j}", use_container_width=True):
-                            st.session_state.edu_counts[i] -= 1
-                            st.rerun()
-                with cols[2]:
-                    st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
-                    if st.button("교육 추가", key=f"add_edu_{i}_{j}", use_container_width=True):
-                        st.session_state.edu_counts[i] += 1
-                        st.rerun()
+            st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
 
         # 역량 추가 버튼 (1:7)
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
@@ -1521,7 +1548,7 @@ def show_resume_page():
                         certifications_data[i]['certifications'].append({
                             'id': st.session_state.get(f'cert_id_{i}_{j}'),
                             'cert_name': st.session_state[f'cert_name_{i}_{j}'],
-                            'acquisition_date': st.session_state[f'cert_date_{i}_{j}'],
+                            'issue_date': st.session_state[f'cert_date_{i}_{j}'],
                             'issuing_org': st.session_state[f'cert_org_{i}_{j}']
                         })
                     
@@ -1533,7 +1560,7 @@ def show_resume_page():
                     for j in range(st.session_state.edu_counts[i]):
                         training_data[i]['training'].append({
                             'id': st.session_state.get(f'edu_id_{i}_{j}'),
-                            'training_desc': st.session_state[f'education_{i}_{j}']
+                            'description': st.session_state[f'education_{i}_{j}']
                         })
                 
                 # 각 데이터 저장
