@@ -1974,6 +1974,11 @@ def show_resume_page():
                             st.session_state[f'description_{idx}_{pos_idx}'] = position['description']
                     else:
                         st.session_state.position_counts[idx] = 1
+                        # 빈 직위 정보 초기화
+                        st.session_state[f'position_{idx}_0'] = ''
+                        st.session_state[f'promotion_date_{idx}_0'] = None
+                        st.session_state[f'retirement_date_{idx}_0'] = None
+                        st.session_state[f'description_{idx}_0'] = ''
                 
                 st.session_state.career_count = len(careers)
             else:
@@ -1981,6 +1986,15 @@ def show_resume_page():
                 st.session_state.career_count = 1
                 st.session_state.career_data = [0]
                 st.session_state.position_counts = {0: 1}
+                # 빈 데이터 초기화
+                st.session_state['company_0'] = ''
+                st.session_state['join_date_0'] = None
+                st.session_state['leave_date_0'] = None
+                st.session_state['leave_reason_0'] = ''
+                st.session_state['position_0_0'] = ''
+                st.session_state['promotion_date_0_0'] = None
+                st.session_state['retirement_date_0_0'] = None
+                st.session_state['description_0_0'] = ''
             
             st.session_state.career_loaded = True
         
@@ -2004,13 +2018,13 @@ def show_resume_page():
             # 회사명/입사년월/퇴사년월/퇴사사유/경력삭제 (2:1:1:3:1)
             cols = st.columns([2, 1, 1, 3, 1])
             with cols[0]:
-                st.text_input("회사명", key=f"company_{i}", value=st.session_state.get(f'company_{i}', ''))
+                st.text_input("회사명", key=f"company_{i}")
             with cols[1]:
-                st.date_input("입사년월", key=f"join_date_{i}", value=st.session_state.get(f'join_date_{i}'))
+                st.date_input("입사년월", key=f"join_date_{i}")
             with cols[2]:
-                st.date_input("퇴사년월", key=f"leave_date_{i}", value=st.session_state.get(f'leave_date_{i}'))
+                st.date_input("퇴사년월", key=f"leave_date_{i}")
             with cols[3]:
-                st.text_input("퇴사사유", key=f"leave_reason_{i}", value=st.session_state.get(f'leave_reason_{i}', ''))
+                st.text_input("퇴사사유", key=f"leave_reason_{i}")
             with cols[4]:
                 st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
                 if len(st.session_state.career_data) > 1:
@@ -2032,16 +2046,87 @@ def show_resume_page():
             
             st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
             
-            # 직위/취임일/퇴임일/업무내용 (2:1:1:4)
-            cols = st.columns([2, 1, 1, 4])
-            with cols[0]:
-                st.text_input("직위/직책", key=f"position_{i}", value=st.session_state.get(f'position_{i}', ''))
-            with cols[1]:
-                st.date_input("취임일", key=f"promotion_date_{i}", value=st.session_state.get(f'promotion_date_{i}'))
-            with cols[2]:
-                st.date_input("퇴임일", key=f"retirement_date_{i}", value=st.session_state.get(f'retirement_date_{i}'))
-            with cols[3]:
-                st.text_area("업무내용", key=f"description_{i}", value=st.session_state.get(f'description_{i}', ''), height=100)
+            # 직위 정보 섹션
+            if i not in st.session_state.position_counts:
+                st.session_state.position_counts[i] = 1
+
+            for pos_idx in range(st.session_state.position_counts[i]):
+                if pos_idx > 0:
+                    st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
+                
+                # 직위/취임일/퇴임일/삭제/추가 (2:1:1:1:1)
+                cols = st.columns([2, 1, 1, 1, 1])
+                with cols[0]:
+                    st.text_input("직위/직책", key=f"position_{i}_{pos_idx}")
+                with cols[1]:
+                    st.date_input("취임일", key=f"promotion_date_{i}_{pos_idx}")
+                with cols[2]:
+                    st.date_input("퇴임일", key=f"retirement_date_{i}_{pos_idx}")
+                with cols[3]:
+                    st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
+                    if st.session_state.position_counts[i] > 1:
+                        if st.button("직위 삭제", key=f"delete_position_{i}_{pos_idx}", use_container_width=True):
+                            position_id = st.session_state.get(f'position_id_{i}_{pos_idx}')
+                            career_id = st.session_state.get(f'career_id_{i}')
+                            
+                            if position_id and career_id:  # 기존 데이터인 경우
+                                if delete_position(position_id, career_id):
+                                    # 세션에서 해당 직위 정보 제거
+                                    for key in [f'position_id_{i}_{pos_idx}', 
+                                              f'position_{i}_{pos_idx}',
+                                              f'promotion_date_{i}_{pos_idx}',
+                                              f'retirement_date_{i}_{pos_idx}',
+                                              f'description_{i}_{pos_idx}']:
+                                        if key in st.session_state:
+                                            del st.session_state[key]
+                                    
+                                    # 남은 직위 정보 재정렬
+                                    for j in range(pos_idx + 1, st.session_state.position_counts[i]):
+                                        for key_suffix in ['position_id', 'position', 'promotion_date', 'retirement_date', 'description']:
+                                            old_key = f'{key_suffix}_{i}_{j}'
+                                            new_key = f'{key_suffix}_{i}_{j-1}'
+                                            if old_key in st.session_state:
+                                                st.session_state[new_key] = st.session_state[old_key]
+                                                del st.session_state[old_key]
+                                    
+                                    st.session_state.position_counts[i] -= 1
+                                    st.rerun()
+                            else:  # 새로 추가했다가 삭제하는 경우
+                                # 세션에서 해당 직위 정보 제거
+                                for key in [f'position_{i}_{pos_idx}',
+                                          f'promotion_date_{i}_{pos_idx}',
+                                          f'retirement_date_{i}_{pos_idx}',
+                                          f'description_{i}_{pos_idx}']:
+                                    if key in st.session_state:
+                                        del st.session_state[key]
+                                
+                                # 남은 직위 정보 재정렬
+                                for j in range(pos_idx + 1, st.session_state.position_counts[i]):
+                                    for key_suffix in ['position', 'promotion_date', 'retirement_date', 'description']:
+                                        old_key = f'{key_suffix}_{i}_{j}'
+                                        new_key = f'{key_suffix}_{i}_{j-1}'
+                                        if old_key in st.session_state:
+                                            st.session_state[new_key] = st.session_state[old_key]
+                                            del st.session_state[old_key]
+                                
+                                st.session_state.position_counts[i] -= 1
+                                st.rerun()
+                with cols[4]:
+                    st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
+                    if st.button("직위 추가", key=f"add_position_{i}_{pos_idx}", use_container_width=True):
+                        st.session_state.position_counts[i] += 1
+                        # 새 직위 필드 초기화
+                        new_idx = st.session_state.position_counts[i] - 1
+                        st.session_state[f'position_{i}_{new_idx}'] = ''
+                        st.session_state[f'promotion_date_{i}_{new_idx}'] = None
+                        st.session_state[f'retirement_date_{i}_{new_idx}'] = None
+                        st.session_state[f'description_{i}_{new_idx}'] = ''
+                        st.rerun()
+                
+                # 업무내용 (8)
+                cols = st.columns([8])
+                with cols[0]:
+                    st.text_area("업무내용", key=f"description_{i}_{pos_idx}", height=100)
 
         # 경력 추가 버튼 (1:7)
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
