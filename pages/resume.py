@@ -994,6 +994,221 @@ def delete_position(position_id, experience_id):
     except Exception as e:
         return False
 
+def save_award_info(login_email, data):
+    """
+    수상 정보를 저장/수정/삭제하는 함수
+    Args:
+        login_email (str): 사용자 이메일
+        data (dict): 수상 정보 데이터
+    Returns:
+        bool: 성공 여부
+    """
+    if not login_email or not isinstance(data, dict):
+        print("Invalid input parameters in save_award_info")
+        return False
+
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return False
+        
+        cursor = conn.cursor()
+        try:
+            # 현재 사용자의 모든 수상 정보 조회
+            cursor.execute("""
+                SELECT id FROM tb_resume_awards 
+                WHERE login_email = %s
+            """, (login_email,))
+            existing_award_ids = {row['id'] for row in cursor.fetchall()}
+            
+            # 현재 폼에 있는 수상 ID 수집
+            current_award_ids = set()
+            
+            # 수상 정보 저장/수정
+            for idx, award_info in data.items():
+                # 필수 필드 검증
+                required_fields = ['award_name', 'award_date', 'award_org']
+                if not all(field in award_info for field in required_fields):
+                    print(f"Missing required fields in award data: {idx}")
+                    continue
+
+                award_id = award_info.get('id')
+                award_note = award_info.get('award_note', '')
+                
+                if award_id:  # 기존 데이터 수정
+                    if award_id not in existing_award_ids:
+                        print(f"Invalid award_id: {award_id}")
+                        continue
+                        
+                    cursor.execute("""
+                        UPDATE tb_resume_awards 
+                        SET award_name = %s,
+                            award_date = %s,
+                            award_org = %s,
+                            note = %s
+                        WHERE id = %s AND login_email = %s
+                    """, (
+                        award_info['award_name'],
+                        award_info['award_date'],
+                        award_info['award_org'],
+                        award_note,
+                        award_id,
+                        login_email
+                    ))
+                    current_award_ids.add(award_id)
+                else:  # 새 데이터 추가
+                    cursor.execute("""
+                        INSERT INTO tb_resume_awards 
+                        (login_email, award_name, award_date, award_org, note)
+                        VALUES (%s, %s, %s, %s, %s)
+                    """, (
+                        login_email,
+                        award_info['award_name'],
+                        award_info['award_date'],
+                        award_info['award_org'],
+                        award_note
+                    ))
+            
+            # 삭제된 수상 정보 처리
+            awards_to_delete = existing_award_ids - current_award_ids
+            if awards_to_delete:
+                if len(awards_to_delete) == 1:
+                    cursor.execute("""
+                        DELETE FROM tb_resume_awards 
+                        WHERE id = %s AND login_email = %s
+                    """, (next(iter(awards_to_delete)), login_email))
+                else:
+                    cursor.execute("""
+                        DELETE FROM tb_resume_awards 
+                        WHERE id IN %s AND login_email = %s
+                    """, (tuple(awards_to_delete), login_email))
+            
+            conn.commit()
+            return True
+            
+        except Exception as e:
+            conn.rollback()
+            print(f"Error in save_award_info: {str(e)}")
+            return False
+            
+        finally:
+            cursor.close()
+            
+    except Exception as e:
+        print(f"Database connection error in save_award_info: {str(e)}")
+        return False
+        
+    finally:
+        if 'conn' in locals() and conn is not None:
+            conn.close()
+
+def load_award_info(login_email):
+    """
+    사용자의 수상 정보를 조회하는 함수
+    Args:
+        login_email (str): 사용자 이메일
+    Returns:
+        tuple: (awards_list, error_message)
+    """
+    if not login_email:
+        return None, "유효하지 않은 사용자 정보입니다."
+
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return None, "데이터베이스 연결 실패"
+        
+        cursor = conn.cursor()
+        try:
+            cursor.execute("""
+                SELECT id, award_name, award_date, award_org, note
+                FROM tb_resume_awards 
+                WHERE login_email = %s
+                ORDER BY award_date DESC
+            """, (login_email,))
+            
+            awards = []
+            for row in cursor.fetchall():
+                awards.append({
+                    'id': row['id'],
+                    'award_name': row['award_name'],
+                    'award_date': row['award_date'],
+                    'award_org': row['award_org'],
+                    'award_note': row['note'] if row['note'] is not None else ''
+                })
+            
+            return awards, None
+            
+        except Exception as e:
+            print(f"Error in load_award_info: {str(e)}")
+            return None, f"수상 정보 조회 중 오류가 발생했습니다: {str(e)}"
+            
+        finally:
+            cursor.close()
+            
+    except Exception as e:
+        print(f"Database connection error in load_award_info: {str(e)}")
+        return None, f"데이터베이스 연결 중 오류가 발생했습니다: {str(e)}"
+        
+    finally:
+        if 'conn' in locals() and conn is not None:
+            conn.close()
+
+def delete_award(award_id, login_email):
+    """
+    특정 수상 정보를 삭제하는 함수
+    Args:
+        award_id (int): 삭제할 수상 정보 ID
+        login_email (str): 사용자 이메일
+    Returns:
+        bool: 성공 여부
+    """
+    if not award_id or not login_email:
+        print("Invalid input parameters in delete_award")
+        return False
+
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return False
+        
+        cursor = conn.cursor()
+        try:
+            # 해당 수상 정보가 존재하는지 확인
+            cursor.execute("""
+                SELECT id FROM tb_resume_awards 
+                WHERE id = %s AND login_email = %s
+            """, (award_id, login_email))
+            
+            if not cursor.fetchone():
+                print(f"Award not found: {award_id}")
+                return False
+            
+            # 수상 정보 삭제
+            cursor.execute("""
+                DELETE FROM tb_resume_awards 
+                WHERE id = %s AND login_email = %s
+            """, (award_id, login_email))
+            
+            conn.commit()
+            return True
+            
+        except Exception as e:
+            conn.rollback()
+            print(f"Error in delete_award: {str(e)}")
+            return False
+            
+        finally:
+            cursor.close()
+            
+    except Exception as e:
+        print(f"Database connection error in delete_award: {str(e)}")
+        return False
+        
+    finally:
+        if 'conn' in locals() and conn is not None:
+            conn.close()
+
 def show_success_message():
     st.markdown("""
         <div style="padding: 1rem; border-radius: 0.5rem; background-color: #d8e6fd;">
@@ -2559,137 +2774,3 @@ def show_resume_page():
                         show_success_message()
                         st.rerun()
 
-def save_award_info(login_email, data):
-    try:
-        conn = connect_to_db()
-        if conn is None:
-            return False
-        
-        cursor = conn.cursor()
-        try:
-            # 현재 사용자의 모든 수상 정보 조회
-            cursor.execute("""
-                SELECT id FROM tb_resume_awards 
-                WHERE login_email = %s
-            """, (login_email,))
-            existing_award_ids = {row['id'] for row in cursor.fetchall()}
-            
-            # 현재 폼에 있는 수상 ID 수집
-            current_award_ids = set()
-            
-            # 데이터 처리
-            for idx in data:
-                award_data = data[idx]
-                
-                # 기존 수상 정보가 있는지 확인
-                if award_data.get('id'):  # 기존 데이터 업데이트
-                    current_award_ids.add(award_data['id'])
-                    update_query = """
-                        UPDATE tb_resume_awards SET
-                        award_name = %s,
-                        award_date = %s,
-                        issuing_agency = %s,
-                        note = %s
-                        WHERE id = %s AND login_email = %s
-                    """
-                    cursor.execute(update_query, (
-                        award_data['award_name'],
-                        award_data['award_date'],
-                        award_data['award_org'],
-                        award_data.get('award_note', ''),
-                        award_data['id'],
-                        login_email
-                    ))
-                else:  # 새 수상 정보 삽입
-                    insert_query = """
-                        INSERT INTO tb_resume_awards 
-                        (login_email, award_name, award_date, issuing_agency, note)
-                        VALUES (%s, %s, %s, %s, %s)
-                    """
-                    cursor.execute(insert_query, (
-                        login_email,
-                        award_data['award_name'],
-                        award_data['award_date'],
-                        award_data['award_org'],
-                        award_data.get('award_note', '')
-                    ))
-                    award_id = cursor.lastrowid
-                    current_award_ids.add(award_id)
-            
-            # 삭제된 수상 정보 처리
-            deleted_award_ids = existing_award_ids - current_award_ids
-            if deleted_award_ids:
-                delete_query = """
-                    DELETE FROM tb_resume_awards 
-                    WHERE id IN ({})
-                """.format(','.join(['%s'] * len(deleted_award_ids)))
-                cursor.execute(delete_query, tuple(deleted_award_ids))
-
-            conn.commit()
-            return True
-        except Exception as e:
-            conn.rollback()
-            return False
-        finally:
-            cursor.close()
-            conn.close()
-    except Exception as e:
-        return False
-
-def load_award_info(login_email):
-    try:
-        conn = connect_to_db()
-        if conn is None:
-            return None, "데이터베이스 연결 실패"
-        
-        cursor = conn.cursor()
-        try:
-            # 수상 정보 조회
-            cursor.execute("""
-                SELECT id, award_name, award_date, issuing_agency as award_org, note as award_note
-                FROM tb_resume_awards 
-                WHERE login_email = %s
-                ORDER BY award_date DESC
-            """, (login_email,))
-            awards = cursor.fetchall()
-            
-            if awards is None:
-                awards = []
-            
-            return awards, None
-        except Exception as e:
-            return None, f"데이터 조회 중 오류: {str(e)}"
-        finally:
-            cursor.close()
-            conn.close()
-    except Exception as e:
-        return None, f"데이터베이스 연결 중 오류: {str(e)}"
-
-def delete_award(award_id, login_email):
-    try:
-        conn = connect_to_db()
-        if conn is None:
-            return False
-        
-        cursor = conn.cursor()
-        try:
-            # 해당 수상이 현재 로그인한 사용자의 것인지 확인
-            cursor.execute("""
-                SELECT id FROM tb_resume_awards 
-                WHERE id = %s AND login_email = %s
-            """, (award_id, login_email))
-            
-            if not cursor.fetchone():
-                return False
-            
-            cursor.execute("DELETE FROM tb_resume_awards WHERE id = %s", (award_id,))
-            conn.commit()
-            return True
-        except Exception as e:
-            conn.rollback()
-            return False
-        finally:
-            cursor.close()
-            conn.close()
-    except Exception as e:
-        return False
