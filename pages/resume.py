@@ -1017,17 +1017,9 @@ def save_award_info(login_email, data):
             # 현재 사용자의 모든 수상 정보 조회
             cursor.execute("""
                 SELECT id FROM tb_resume_awards 
-                WHERE resume_id = (SELECT id FROM tb_resume WHERE login_email = %s)
+                WHERE login_email = %s
             """, (login_email,))
             existing_award_ids = {row['id'] for row in cursor.fetchall()}
-            
-            # resume_id 가져오기
-            cursor.execute("SELECT id FROM tb_resume WHERE login_email = %s", (login_email,))
-            resume_row = cursor.fetchone()
-            if not resume_row:
-                print("Resume not found for user")
-                return False
-            resume_id = resume_row['id']
             
             # 현재 폼에 있는 수상 ID 수집
             current_award_ids = set()
@@ -1054,42 +1046,41 @@ def save_award_info(login_email, data):
                             award_date = %s,
                             awarding_body = %s,
                             note = %s
-                        WHERE id = %s AND resume_id = %s
+                        WHERE id = %s AND login_email = %s
                     """, (
                         award_info['award_name'],
                         award_info['award_date'],
                         award_info['award_org'],
                         award_note,
                         award_id,
-                        resume_id
+                        login_email
                     ))
-                    current_award_ids.add(award_id)
+                    if cursor.rowcount > 0:
+                        current_award_ids.add(award_id)
                 else:  # 새 데이터 추가
                     cursor.execute("""
                         INSERT INTO tb_resume_awards 
-                        (resume_id, award_name, award_date, awarding_body, note)
+                        (login_email, award_name, award_date, awarding_body, note)
                         VALUES (%s, %s, %s, %s, %s)
                     """, (
-                        resume_id,
+                        login_email,
                         award_info['award_name'],
                         award_info['award_date'],
                         award_info['award_org'],
                         award_note
                     ))
+                    if cursor.rowcount > 0:
+                        new_award_id = cursor.lastrowid
+                        current_award_ids.add(new_award_id)
             
             # 삭제된 수상 정보 처리
             awards_to_delete = existing_award_ids - current_award_ids
             if awards_to_delete:
-                if len(awards_to_delete) == 1:
-                    cursor.execute("""
-                        DELETE FROM tb_resume_awards 
-                        WHERE id = %s AND resume_id = %s
-                    """, (next(iter(awards_to_delete)), resume_id))
-                else:
-                    cursor.execute("""
-                        DELETE FROM tb_resume_awards 
-                        WHERE id IN %s AND resume_id = %s
-                    """, (tuple(awards_to_delete), resume_id))
+                placeholders = ', '.join(['%s'] * len(awards_to_delete))
+                cursor.execute(f"""
+                    DELETE FROM tb_resume_awards 
+                    WHERE id IN ({placeholders}) AND login_email = %s
+                """, (*awards_to_delete, login_email))
             
             conn.commit()
             return True
@@ -1129,11 +1120,10 @@ def load_award_info(login_email):
         cursor = conn.cursor()
         try:
             cursor.execute("""
-                SELECT a.id, a.award_name, a.award_date, a.awarding_body, a.note
-                FROM tb_resume_awards a
-                JOIN tb_resume r ON a.resume_id = r.id
-                WHERE r.login_email = %s
-                ORDER BY a.award_date DESC
+                SELECT id, award_name, award_date, awarding_body, note
+                FROM tb_resume_awards 
+                WHERE login_email = %s
+                ORDER BY award_date DESC, id DESC
             """, (login_email,))
             
             awards = []
@@ -1185,10 +1175,8 @@ def delete_award(award_id, login_email):
         try:
             # 해당 수상 정보가 존재하는지 확인
             cursor.execute("""
-                SELECT a.id 
-                FROM tb_resume_awards a
-                JOIN tb_resume r ON a.resume_id = r.id
-                WHERE a.id = %s AND r.login_email = %s
+                SELECT id FROM tb_resume_awards 
+                WHERE id = %s AND login_email = %s
             """, (award_id, login_email))
             
             if not cursor.fetchone():
@@ -1197,13 +1185,14 @@ def delete_award(award_id, login_email):
             
             # 수상 정보 삭제
             cursor.execute("""
-                DELETE a FROM tb_resume_awards a
-                JOIN tb_resume r ON a.resume_id = r.id
-                WHERE a.id = %s AND r.login_email = %s
+                DELETE FROM tb_resume_awards 
+                WHERE id = %s AND login_email = %s
             """, (award_id, login_email))
             
-            conn.commit()
-            return True
+            if cursor.rowcount > 0:
+                conn.commit()
+                return True
+            return False
             
         except Exception as e:
             conn.rollback()
