@@ -713,7 +713,7 @@ def save_career_info(login_email, data):
     try:
         conn = connect_to_db()
         if conn is None:
-            return False
+            return None, "데이터베이스 연결 실패"
         
         cursor = conn.cursor()
         try:
@@ -726,6 +726,7 @@ def save_career_info(login_email, data):
             
             # 현재 폼에 있는 경력 ID 수집
             current_career_ids = set()
+            saved_career_ids = {}  # 각 인덱스에 대한 career_id를 저장
             
             # 데이터 구조 변경에 맞게 처리
             for idx in data:
@@ -739,11 +740,7 @@ def save_career_info(login_email, data):
                         company_name = %s,
                         join_date = %s,
                         leave_date = %s,
-                        leave_reason = %s,
-                        position = %s,
-                        promotion_date = %s,
-                        retirement_date = %s,
-                        description = %s
+                        leave_reason = %s
                         WHERE id = %s AND login_email = %s
                     """
                     cursor.execute(update_query, (
@@ -751,33 +748,26 @@ def save_career_info(login_email, data):
                         career_data['join_date'],
                         career_data['leave_date'],
                         career_data['leave_reason'],
-                        career_data['position'],
-                        career_data.get('promotion_date'),
-                        career_data.get('retirement_date'),
-                        career_data.get('description', ''),
                         career_data['id'],
                         login_email
                     ))
+                    saved_career_ids[idx] = career_data['id']
                 else:  # 새 경력 정보 삽입
                     insert_query = """
                         INSERT INTO tb_resume_experiences 
-                        (login_email, company_name, join_date, leave_date, leave_reason, 
-                         position, promotion_date, retirement_date, description)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        (login_email, company_name, join_date, leave_date, leave_reason)
+                        VALUES (%s, %s, %s, %s, %s)
                     """
                     cursor.execute(insert_query, (
                         login_email,
                         career_data['company'],
                         career_data['join_date'],
                         career_data['leave_date'],
-                        career_data['leave_reason'],
-                        career_data['position'],
-                        career_data.get('promotion_date'),
-                        career_data.get('retirement_date'),
-                        career_data.get('description', '')
+                        career_data['leave_reason']
                     ))
                     career_id = cursor.lastrowid
                     current_career_ids.add(career_id)
+                    saved_career_ids[idx] = career_id
             
             # 삭제된 경력 정보 처리
             deleted_career_ids = existing_career_ids - current_career_ids
@@ -789,17 +779,17 @@ def save_career_info(login_email, data):
                 cursor.execute(delete_query, tuple(deleted_career_ids))
 
             conn.commit()
-            return True
+            return saved_career_ids, None
         except Exception as e:
             st.error(f"쿼리 실행 중 오류: {str(e)}")
             conn.rollback()
-            return False
+            return None, str(e)
         finally:
             cursor.close()
             conn.close()
     except Exception as e:
         st.error(f"데이터베이스 연결 중 오류: {str(e)}")
-        return False
+        return None, str(e)
 
 def load_career_info(login_email):
     try:
@@ -2081,10 +2071,11 @@ def show_resume_page():
                 
                 success = True
                 # 먼저 경력 정보 저장
-                if save_career_info(st.session_state.user_email, career_data):
+                saved_career_ids, error = save_career_info(st.session_state.user_email, career_data)
+                if saved_career_ids:
                     # 각 경력에 대한 직위 정보 저장
                     for i in st.session_state.career_data:
-                        career_id = st.session_state.get(f'career_id_{i}')
+                        career_id = saved_career_ids.get(i)
                         if career_id:
                             position_data = {}
                             for j in range(st.session_state.position_counts[i]):
@@ -2106,7 +2097,7 @@ def show_resume_page():
                         st.session_state.career_loaded = False
                         st.rerun()
                 else:
-                    st.error("경력 정보 저장 중 오류가 발생했습니다.")
+                    st.error(f"경력 정보 저장 중 오류가 발생했습니다: {error}")
 
     # 수상 탭
     with tabs[4]:
