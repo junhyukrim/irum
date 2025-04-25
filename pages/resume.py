@@ -747,7 +747,7 @@ def save_career_info(login_email, data):
                         career_data['company'],
                         career_data['join_date'],
                         career_data['leave_date'],
-                        career_data['leave_reason'],
+                        career_data.get('leave_reason', ''),
                         career_data['id'],
                         login_email
                     ))
@@ -763,7 +763,7 @@ def save_career_info(login_email, data):
                         career_data['company'],
                         career_data['join_date'],
                         career_data['leave_date'],
-                        career_data['leave_reason']
+                        career_data.get('leave_reason', '')
                     ))
                     career_id = cursor.lastrowid
                     current_career_ids.add(career_id)
@@ -772,23 +772,29 @@ def save_career_info(login_email, data):
             # 삭제된 경력 정보 처리
             deleted_career_ids = existing_career_ids - current_career_ids
             if deleted_career_ids:
-                delete_query = """
+                # 먼저 관련된 position 정보 삭제
+                position_delete_query = """
+                    DELETE FROM tb_resume_positions 
+                    WHERE experience_id IN ({})
+                """.format(','.join(['%s'] * len(deleted_career_ids)))
+                cursor.execute(position_delete_query, tuple(deleted_career_ids))
+                
+                # 그 다음 career 정보 삭제
+                career_delete_query = """
                     DELETE FROM tb_resume_experiences 
                     WHERE id IN ({})
                 """.format(','.join(['%s'] * len(deleted_career_ids)))
-                cursor.execute(delete_query, tuple(deleted_career_ids))
+                cursor.execute(career_delete_query, tuple(deleted_career_ids))
 
             conn.commit()
             return saved_career_ids, None
         except Exception as e:
-            st.error(f"쿼리 실행 중 오류: {str(e)}")
             conn.rollback()
             return None, str(e)
         finally:
             cursor.close()
             conn.close()
     except Exception as e:
-        st.error(f"데이터베이스 연결 중 오류: {str(e)}")
         return None, str(e)
 
 def load_career_info(login_email):
@@ -801,13 +807,15 @@ def load_career_info(login_email):
         try:
             # 경력 정보 조회
             cursor.execute("""
-                SELECT id, company_name, join_date, leave_date, leave_reason,
-                       position, promotion_date, retirement_date, description
+                SELECT id, company_name, join_date, leave_date, leave_reason
                 FROM tb_resume_experiences 
                 WHERE login_email = %s
                 ORDER BY join_date DESC
             """, (login_email,))
             careers = cursor.fetchall()
+            
+            if careers is None:
+                careers = []
             
             return careers, None
         except Exception as e:
@@ -835,18 +843,21 @@ def delete_career(career_id, login_email):
             if not cursor.fetchone():
                 return False
             
+            # 먼저 관련된 position 정보 삭제
+            cursor.execute("DELETE FROM tb_resume_positions WHERE experience_id = %s", (career_id,))
+            
+            # 그 다음 career 정보 삭제
             cursor.execute("DELETE FROM tb_resume_experiences WHERE id = %s", (career_id,))
+            
             conn.commit()
             return True
         except Exception as e:
-            st.error(f"삭제 중 오류: {str(e)}")
             conn.rollback()
             return False
         finally:
             cursor.close()
             conn.close()
     except Exception as e:
-        st.error(f"데이터베이스 연결 중 오류: {str(e)}")
         return False
 
 def save_position_info(experience_id, data):
@@ -917,14 +928,12 @@ def save_position_info(experience_id, data):
             conn.commit()
             return True
         except Exception as e:
-            st.error(f"쿼리 실행 중 오류: {str(e)}")
             conn.rollback()
             return False
         finally:
             cursor.close()
             conn.close()
     except Exception as e:
-        st.error(f"데이터베이스 연결 중 오류: {str(e)}")
         return False
 
 def load_position_info(experience_id):
@@ -977,14 +986,12 @@ def delete_position(position_id, experience_id):
             conn.commit()
             return True
         except Exception as e:
-            st.error(f"삭제 중 오류: {str(e)}")
             conn.rollback()
             return False
         finally:
             cursor.close()
             conn.close()
     except Exception as e:
-        st.error(f"데이터베이스 연결 중 오류: {str(e)}")
         return False
 
 def show_resume_page():
