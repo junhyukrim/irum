@@ -2787,68 +2787,162 @@ def show_resume_page():
     with tabs[5]:
         st.markdown('<h5 class="main-header">기타활동</h5>', unsafe_allow_html=True)
         
+        # 로그인 확인
+        if 'user_email' not in st.session_state:
+            st.error("로그인이 필요합니다.")
+            return
+        
+        # 기타활동 데이터 로드
+        if 'activities_loaded' not in st.session_state:
+            activities, error = load_activities_info(st.session_state.user_email)
+            if error:
+                st.error(error)
+            elif activities:
+                # 기존 데이터로 session_state 초기화
+                st.session_state.activities_data = []
+                
+                for idx, activity in enumerate(activities):
+                    st.session_state.activities_data.append(idx)
+                    st.session_state[f'activity_id_{idx}'] = activity['id']
+                    st.session_state[f'activity_name_{idx}'] = activity['activity_name']
+                    st.session_state[f'organization_{idx}'] = activity['organization']
+                    st.session_state[f'start_date_{idx}'] = activity['start_date']
+                    st.session_state[f'end_date_{idx}'] = activity['end_date']
+                    st.session_state[f'role_{idx}'] = activity['role']
+                    st.session_state[f'link_{idx}'] = activity['link']
+                    st.session_state[f'details_{idx}'] = activity['details']
+                
+                st.session_state.activities_count = len(activities)
+            else:
+                # 초기 상태 설정
+                st.session_state.activities_count = 1
+                st.session_state.activities_data = [0]
+                # 빈 데이터 초기화
+                st.session_state['activity_name_0'] = ''
+                st.session_state['organization_0'] = ''
+                st.session_state['start_date_0'] = None
+                st.session_state['end_date_0'] = None
+                st.session_state['role_0'] = ''
+                st.session_state['link_0'] = ''
+                st.session_state['details_0'] = ''
+            
+            st.session_state.activities_loaded = True
+        
         # 활동 카운터 초기화
-        if 'activity_count' not in st.session_state:
-            st.session_state.activity_count = 1
+        if 'activities_count' not in st.session_state:
+            st.session_state.activities_count = 1
         
         # 활동 데이터 초기화
-        if 'activity_data' not in st.session_state:
-            st.session_state.activity_data = list(range(st.session_state.activity_count))
+        if 'activities_data' not in st.session_state:
+            st.session_state.activities_data = list(range(st.session_state.activities_count))
 
         # 각 활동 정보 입력 폼
-        for idx, i in enumerate(st.session_state.activity_data):
+        for idx, i in enumerate(st.session_state.activities_data):
             if idx > 0:
                 st.markdown("<hr>", unsafe_allow_html=True)
             
-            # 활동명/소속/시작년월/종료년월/직책/역할/삭제 버튼 (2:2:1:1:1:1)
-            cols = st.columns([2, 2, 1, 1, 1, 1])
-            with cols[0]:
-                st.text_input("활동명", value=personal_info.get(f'activity_name_{i}', ''), key=f"activity_name_{i}")
-            with cols[1]:
-                st.text_input("소속", value=personal_info.get(f'activity_org_{i}', ''), key=f"activity_org_{i}")
-            with cols[2]:
-                st.date_input("시작년월", value=personal_info.get(f'activity_start_{i}', None), key=f"activity_start_{i}")
-            with cols[3]:
-                st.date_input("종료년월", value=personal_info.get(f'activity_end_{i}', None), key=f"activity_end_{i}")
-            with cols[4]:
-                st.text_input("직책/역할", value=personal_info.get(f'activity_role_{i}', ''), key=f"activity_role_{i}")
-            with cols[5]:
-                st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
-                if len(st.session_state.activity_data) > 1:
+            # 활동명/소속/시작일/종료일/직책/링크/상세내용/삭제 버튼
+            cols1 = st.columns([2, 2])
+            with cols1[0]:
+                st.text_input("활동명", key=f"activity_name_{i}")
+            with cols1[1]:
+                st.text_input("소속", key=f"organization_{i}")
+            
+            cols2 = st.columns([1, 1, 1, 1])
+            with cols2[0]:
+                st.date_input("시작년월", key=f"start_date_{i}")
+            with cols2[1]:
+                st.date_input("종료년월", key=f"end_date_{i}")
+            with cols2[2]:
+                st.text_input("직책/역할", key=f"role_{i}")
+            with cols2[3]:
+                if len(st.session_state.activities_data) > 1:
+                    st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
                     if st.button("활동 삭제", key=f"delete_activity_{i}", use_container_width=True):
-                        st.session_state.activity_data.remove(i)
-                        if len(st.session_state.activity_data) == 0:
-                            st.session_state.activity_count = 1
-                            st.session_state.activity_data = [0]
-                        st.rerun()
+                        if st.session_state.get(f'activity_id_{i}'):  # 기존 데이터인 경우
+                            if delete_activity(st.session_state[f'activity_id_{i}'], st.session_state.user_email):
+                                st.session_state.activities_data.remove(i)
+                                if len(st.session_state.activities_data) == 0:
+                                    st.session_state.activities_count = 1
+                                    st.session_state.activities_data = [0]
+                                st.session_state.activities_loaded = False
+                                st.rerun()
+                        else:  # 새로 추가했다가 삭제하는 경우
+                            st.session_state.activities_data.remove(i)
+                            if len(st.session_state.activities_data) == 0:
+                                st.session_state.activities_count = 1
+                                st.session_state.activities_data = [0]
+                            st.rerun()
             
-            st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
-            
-            # 링크와 활동 세부내역 (4:4)
-            cols = st.columns([4, 4])
-            with cols[0]:
-                st.text_input("링크", value=personal_info.get(f'activity_link_{i}', ''), key=f"activity_link_{i}", placeholder="관련 웹사이트나 문서 링크를 입력하세요")
-            with cols[1]:
-                st.text_input("활동세부내역", value=personal_info.get(f'activity_detail_{i}', ''), key=f"activity_detail_{i}")
+            st.text_input("링크", key=f"link_{i}")
+            st.text_area("활동 세부내역", key=f"details_{i}", height=100)
 
-        # 활동 추가 버튼 (1:7)
-        st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-        cols = st.columns(8)
+        # 활동 추가 버튼
+        st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
+        cols = st.columns([1, 7])
         with cols[0]:
             if st.button("활동 추가", use_container_width=True):
-                new_idx = max(st.session_state.activity_data) + 1 if st.session_state.activity_data else 0
-                st.session_state.activity_data.append(new_idx)
-                st.session_state.activity_count += 1
+                new_idx = max(st.session_state.activities_data) + 1 if st.session_state.activities_data else 0
+                st.session_state.activities_data.append(new_idx)
+                st.session_state.activities_count += 1
+                # 새 활동 필드 초기화
+                st.session_state[f'activity_name_{new_idx}'] = ''
+                st.session_state[f'organization_{new_idx}'] = ''
+                st.session_state[f'start_date_{new_idx}'] = None
+                st.session_state[f'end_date_{new_idx}'] = None
+                st.session_state[f'role_{new_idx}'] = ''
+                st.session_state[f'link_{new_idx}'] = ''
+                st.session_state[f'details_{new_idx}'] = ''
                 st.rerun()
 
-        # 저장 버튼 (7:1)
-        st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
-        cols = st.columns(8)
+        # 저장 버튼
+        st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
+        cols = st.columns([7, 1])
         for i in range(7):  # 처음 7개 컬럼은 빈 공간
-            cols[i].empty()
-        with cols[7]:  # 마지막 컬럼에 버튼 배치
-            if st.button("저장", key="save_activity_tab", use_container_width=True):
-                show_success_message()
+            cols[0].empty()
+        with cols[1]:  # 마지막 컬럼에 버튼 배치
+            if st.button("저장", key="save_activities_tab", use_container_width=True):
+                if 'user_email' not in st.session_state:
+                    st.error("로그인이 필요합니다.")
+                    return
+                
+                # 현재 입력된 모든 활동 데이터 수집
+                activities_data = {}
+                for i in st.session_state.activities_data:
+                    activity_name = st.session_state.get(f'activity_name_{i}', '').strip()
+                    organization = st.session_state.get(f'organization_{i}', '').strip()
+                    start_date = st.session_state.get(f'start_date_{i}')
+                    
+                    if activity_name or organization or start_date:  # 하나라도 입력된 경우
+                        if not activity_name:
+                            st.warning(f"{i+1}번째 활동의 활동명이 비어 있습니다.")
+                            continue
+                        
+                        if not organization:
+                            st.warning(f"{i+1}번째 활동의 소속이 비어 있습니다.")
+                            continue
+                        
+                        if not start_date:
+                            st.warning(f"{i+1}번째 활동의 시작년월이 비어 있습니다.")
+                            continue
+                        
+                        activities_data[i] = {
+                            'id': st.session_state.get(f'activity_id_{i}'),
+                            'activity_name': activity_name,
+                            'organization': organization,
+                            'start_date': start_date,
+                            'end_date': st.session_state.get(f'end_date_{i}'),
+                            'role': st.session_state.get(f'role_{i}', ''),
+                            'link': st.session_state.get(f'link_{i}', ''),
+                            'details': st.session_state.get(f'details_{i}', '')
+                        }
+                
+                if save_activities_info(st.session_state.user_email, activities_data):
+                    show_success_message()
+                    st.session_state.activities_loaded = False
+                    st.rerun()
+                else:
+                    st.error("저장 중 오류가 발생했습니다.")
 
     # 자기소개 탭
     with tabs[6]:
