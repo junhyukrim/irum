@@ -954,6 +954,9 @@ def load_position_info(experience_id):
             """, (experience_id,))
             positions = cursor.fetchall()
             
+            if positions is None:
+                positions = []
+            
             return positions, None
         except Exception as e:
             return None, f"데이터 조회 중 오류: {str(e)}"
