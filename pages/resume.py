@@ -994,6 +994,13 @@ def delete_position(position_id, experience_id):
     except Exception as e:
         return False
 
+def show_success_message():
+    st.markdown("""
+        <div style="padding: 1rem; border-radius: 0.5rem; background-color: #d8e6fd;">
+            성공적으로 저장되었습니다!
+        </div>
+    """, unsafe_allow_html=True)
+
 def show_resume_page():
     # 세션 상태 초기화
     if 'skills_loaded' not in st.session_state:
@@ -1351,7 +1358,7 @@ def show_resume_page():
                 }
                 
                 if save_personal_info(login_email, data):
-                    st.success("저장되었습니다!")
+                    show_success_message()
                 else:
                     st.error("저장 중 오류가 발생했습니다.")
 
@@ -1654,7 +1661,7 @@ def show_resume_page():
                 st.write("저장할 데이터:", education_data)
                 
                 if save_education_info(st.session_state.user_email, education_data):
-                    st.success("저장되었습니다!")
+                    show_success_message()
                     # 저장 성공 시 데이터 다시 로드하도록 설정
                     st.session_state.education_loaded = False
                     st.rerun()
@@ -1914,7 +1921,7 @@ def show_resume_page():
                         success = False
                     
                     if success:
-                        st.success("저장되었습니다!")
+                        show_success_message()
                         st.rerun()
 
     # 경력 탭
@@ -2184,7 +2191,7 @@ def show_resume_page():
                                 success = False
                     
                     if success:
-                        st.success("저장되었습니다!")
+                        show_success_message()
                         # 저장 성공 시 데이터 다시 로드하도록 설정
                         st.session_state.career_loaded = False
                         st.rerun()
@@ -2194,6 +2201,41 @@ def show_resume_page():
     # 수상 탭
     with tabs[4]:
         st.markdown('<h5 class="main-header">수상</h5>', unsafe_allow_html=True)
+        
+        # 로그인 확인
+        if 'user_email' not in st.session_state:
+            st.error("로그인이 필요합니다.")
+            return
+        
+        # 수상 데이터 로드
+        if 'award_loaded' not in st.session_state:
+            awards, error = load_award_info(st.session_state.user_email)
+            if error:
+                st.error(error)
+            elif awards:
+                # 기존 데이터로 session_state 초기화
+                st.session_state.award_data = []
+                
+                for idx, award in enumerate(awards):
+                    st.session_state.award_data.append(idx)
+                    st.session_state[f'award_id_{idx}'] = award['id']
+                    st.session_state[f'award_name_{idx}'] = award['award_name']
+                    st.session_state[f'award_date_{idx}'] = award['award_date']
+                    st.session_state[f'award_org_{idx}'] = award['award_org']
+                    st.session_state[f'award_note_{idx}'] = award['award_note']
+                
+                st.session_state.award_count = len(awards)
+            else:
+                # 초기 상태 설정
+                st.session_state.award_count = 1
+                st.session_state.award_data = [0]
+                # 빈 데이터 초기화
+                st.session_state['award_name_0'] = ''
+                st.session_state['award_date_0'] = None
+                st.session_state['award_org_0'] = ''
+                st.session_state['award_note_0'] = ''
+            
+            st.session_state.award_loaded = True
         
         # 수상 카운터 초기화
         if 'award_count' not in st.session_state:
@@ -2208,25 +2250,34 @@ def show_resume_page():
             if idx > 0:
                 st.markdown("<hr>", unsafe_allow_html=True)
             
-            # 상명/수상일/수여기관/비고/삭제 버튼 (1:1:1:4:1)
+            # 상명/수상일/수여기관/비고/삭제 버튼 (2:1:1:3:1)
             cols = st.columns([2, 1, 1, 3, 1])
             with cols[0]:
-                st.text_input("상명", value=personal_info.get(f'award_name_{i}', ''), key=f"award_name_{i}")
+                st.text_input("상명", key=f"award_name_{i}")
             with cols[1]:
-                st.date_input("수상년월", value=personal_info.get(f'award_date_{i}', None), key=f"award_date_{i}")
+                st.date_input("수상년월", key=f"award_date_{i}")
             with cols[2]:
-                st.text_input("수여기관", value=personal_info.get(f'award_org_{i}', ''), key=f"award_org_{i}")
+                st.text_input("수여기관", key=f"award_org_{i}")
             with cols[3]:
-                st.text_input("비고", value=personal_info.get(f'award_note_{i}', ''), key=f"award_note_{i}")
+                st.text_input("비고", key=f"award_note_{i}")
             with cols[4]:
                 st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
                 if len(st.session_state.award_data) > 1:
                     if st.button("수상내역 삭제", key=f"delete_award_{i}", use_container_width=True):
-                        st.session_state.award_data.remove(i)
-                        if len(st.session_state.award_data) == 0:
-                            st.session_state.award_count = 1
-                            st.session_state.award_data = [0]
-                        st.rerun()
+                        if st.session_state.get(f'award_id_{i}'):  # 기존 데이터인 경우
+                            if delete_award(st.session_state[f'award_id_{i}'], st.session_state.user_email):
+                                st.session_state.award_data.remove(i)
+                                if len(st.session_state.award_data) == 0:
+                                    st.session_state.award_count = 1
+                                    st.session_state.award_data = [0]
+                                st.session_state.award_loaded = False
+                                st.rerun()
+                        else:  # 새로 추가했다가 삭제하는 경우
+                            st.session_state.award_data.remove(i)
+                            if len(st.session_state.award_data) == 0:
+                                st.session_state.award_count = 1
+                                st.session_state.award_data = [0]
+                            st.rerun()
 
         # 수상내역 추가 버튼 (1:7)
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
@@ -2236,6 +2287,11 @@ def show_resume_page():
                 new_idx = max(st.session_state.award_data) + 1 if st.session_state.award_data else 0
                 st.session_state.award_data.append(new_idx)
                 st.session_state.award_count += 1
+                # 새 수상 필드 초기화
+                st.session_state[f'award_name_{new_idx}'] = ''
+                st.session_state[f'award_date_{new_idx}'] = None
+                st.session_state[f'award_org_{new_idx}'] = ''
+                st.session_state[f'award_note_{new_idx}'] = ''
                 st.rerun()
 
         # 저장 버튼 (7:1)
@@ -2245,7 +2301,44 @@ def show_resume_page():
             cols[i].empty()
         with cols[7]:  # 마지막 컬럼에 버튼 배치
             if st.button("저장", key="save_award_tab", use_container_width=True):
-                st.success("저장되었습니다!")
+                if 'user_email' not in st.session_state:
+                    st.error("로그인이 필요합니다.")
+                    return
+                
+                # 현재 입력된 모든 수상 데이터 수집
+                award_data = {}
+                for i in st.session_state.award_data:
+                    award_name = st.session_state.get(f'award_name_{i}', '').strip()
+                    award_date = st.session_state.get(f'award_date_{i}')
+                    award_org = st.session_state.get(f'award_org_{i}', '').strip()
+                    
+                    if award_name or award_date or award_org:  # 하나라도 입력된 경우
+                        if not award_name:
+                            st.warning(f"{i+1}번째 수상의 상명이 비어 있습니다.")
+                            continue
+                        
+                        if not award_date:
+                            st.warning(f"{i+1}번째 수상의 수상년월이 비어 있습니다.")
+                            continue
+                        
+                        if not award_org:
+                            st.warning(f"{i+1}번째 수상의 수여기관이 비어 있습니다.")
+                            continue
+                        
+                        award_data[i] = {
+                            'id': st.session_state.get(f'award_id_{i}'),
+                            'award_name': award_name,
+                            'award_date': award_date,
+                            'award_org': award_org,
+                            'award_note': st.session_state.get(f'award_note_{i}', '')
+                        }
+                
+                if save_award_info(st.session_state.user_email, award_data):
+                    show_success_message()
+                    st.session_state.award_loaded = False
+                    st.rerun()
+                else:
+                    st.error("저장 중 오류가 발생했습니다.")
 
     # 기타활동 탭
     with tabs[5]:
@@ -2312,7 +2405,7 @@ def show_resume_page():
             cols[i].empty()
         with cols[7]:  # 마지막 컬럼에 버튼 배치
             if st.button("저장", key="save_activity_tab", use_container_width=True):
-                st.success("저장되었습니다!")
+                show_success_message()
 
     # 자기소개 탭
     with tabs[6]:
@@ -2463,5 +2556,140 @@ def show_resume_page():
                         success = False
                     
                     if success:
-                        st.success("저장되었습니다!")
+                        show_success_message()
                         st.rerun()
+
+def save_award_info(login_email, data):
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return False
+        
+        cursor = conn.cursor()
+        try:
+            # 현재 사용자의 모든 수상 정보 조회
+            cursor.execute("""
+                SELECT id FROM tb_resume_awards 
+                WHERE login_email = %s
+            """, (login_email,))
+            existing_award_ids = {row['id'] for row in cursor.fetchall()}
+            
+            # 현재 폼에 있는 수상 ID 수집
+            current_award_ids = set()
+            
+            # 데이터 처리
+            for idx in data:
+                award_data = data[idx]
+                
+                # 기존 수상 정보가 있는지 확인
+                if award_data.get('id'):  # 기존 데이터 업데이트
+                    current_award_ids.add(award_data['id'])
+                    update_query = """
+                        UPDATE tb_resume_awards SET
+                        award_name = %s,
+                        award_date = %s,
+                        issuing_agency = %s,
+                        note = %s
+                        WHERE id = %s AND login_email = %s
+                    """
+                    cursor.execute(update_query, (
+                        award_data['award_name'],
+                        award_data['award_date'],
+                        award_data['award_org'],
+                        award_data.get('award_note', ''),
+                        award_data['id'],
+                        login_email
+                    ))
+                else:  # 새 수상 정보 삽입
+                    insert_query = """
+                        INSERT INTO tb_resume_awards 
+                        (login_email, award_name, award_date, issuing_agency, note)
+                        VALUES (%s, %s, %s, %s, %s)
+                    """
+                    cursor.execute(insert_query, (
+                        login_email,
+                        award_data['award_name'],
+                        award_data['award_date'],
+                        award_data['award_org'],
+                        award_data.get('award_note', '')
+                    ))
+                    award_id = cursor.lastrowid
+                    current_award_ids.add(award_id)
+            
+            # 삭제된 수상 정보 처리
+            deleted_award_ids = existing_award_ids - current_award_ids
+            if deleted_award_ids:
+                delete_query = """
+                    DELETE FROM tb_resume_awards 
+                    WHERE id IN ({})
+                """.format(','.join(['%s'] * len(deleted_award_ids)))
+                cursor.execute(delete_query, tuple(deleted_award_ids))
+
+            conn.commit()
+            return True
+        except Exception as e:
+            conn.rollback()
+            return False
+        finally:
+            cursor.close()
+            conn.close()
+    except Exception as e:
+        return False
+
+def load_award_info(login_email):
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return None, "데이터베이스 연결 실패"
+        
+        cursor = conn.cursor()
+        try:
+            # 수상 정보 조회
+            cursor.execute("""
+                SELECT id, award_name, award_date, issuing_agency as award_org, note as award_note
+                FROM tb_resume_awards 
+                WHERE login_email = %s
+                ORDER BY award_date DESC
+            """, (login_email,))
+            awards = cursor.fetchall()
+            
+            if awards is None:
+                awards = []
+            
+            return awards, None
+        except Exception as e:
+            return None, f"데이터 조회 중 오류: {str(e)}"
+        finally:
+            cursor.close()
+            conn.close()
+    except Exception as e:
+        return None, f"데이터베이스 연결 중 오류: {str(e)}"
+
+def delete_award(award_id, login_email):
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return False
+        
+        cursor = conn.cursor()
+        try:
+            # 해당 수상이 현재 로그인한 사용자의 것인지 확인
+            cursor.execute("""
+                SELECT id FROM tb_resume_awards 
+                WHERE id = %s AND login_email = %s
+            """, (award_id, login_email))
+            
+            if not cursor.fetchone():
+                return False
+            
+            cursor.execute("DELETE FROM tb_resume_awards WHERE id = %s", (award_id,))
+            conn.commit()
+            return True
+        except Exception as e:
+            conn.rollback()
+            return False
+        finally:
+            cursor.close()
+            conn.close()
+    except Exception as e:
+        return False
