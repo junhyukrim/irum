@@ -859,6 +859,141 @@ def delete_career(career_id, login_email):
         st.error(f"데이터베이스 연결 중 오류: {str(e)}")
         return False
 
+def save_position_info(experience_id, data):
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return False
+        
+        cursor = conn.cursor()
+        try:
+            # 현재 경력의 모든 직위 정보 조회
+            cursor.execute("""
+                SELECT id FROM tb_resume_positions 
+                WHERE experience_id = %s
+            """, (experience_id,))
+            existing_position_ids = {row['id'] for row in cursor.fetchall()}
+            
+            # 현재 폼에 있는 직위 ID 수집
+            current_position_ids = set()
+            
+            # 데이터 구조 변경에 맞게 처리
+            for idx in data:
+                position_data = data[idx]
+                # 기존 직위 정보가 있는지 확인
+                if position_data.get('id'):  # 기존 데이터 업데이트
+                    current_position_ids.add(position_data['id'])
+                    update_query = """
+                        UPDATE tb_resume_positions SET
+                        position = %s,
+                        promotion_date = %s,
+                        retirement_date = %s,
+                        description = %s
+                        WHERE id = %s AND experience_id = %s
+                    """
+                    cursor.execute(update_query, (
+                        position_data['position'],
+                        position_data['promotion_date'],
+                        position_data['retirement_date'],
+                        position_data.get('description', ''),
+                        position_data['id'],
+                        experience_id
+                    ))
+                else:  # 새 직위 정보 삽입
+                    insert_query = """
+                        INSERT INTO tb_resume_positions 
+                        (experience_id, position, promotion_date, retirement_date, description)
+                        VALUES (%s, %s, %s, %s, %s)
+                    """
+                    cursor.execute(insert_query, (
+                        experience_id,
+                        position_data['position'],
+                        position_data['promotion_date'],
+                        position_data['retirement_date'],
+                        position_data.get('description', '')
+                    ))
+                    position_id = cursor.lastrowid
+                    current_position_ids.add(position_id)
+            
+            # 삭제된 직위 정보 처리
+            deleted_position_ids = existing_position_ids - current_position_ids
+            if deleted_position_ids:
+                delete_query = """
+                    DELETE FROM tb_resume_positions 
+                    WHERE id IN ({})
+                """.format(','.join(['%s'] * len(deleted_position_ids)))
+                cursor.execute(delete_query, tuple(deleted_position_ids))
+
+            conn.commit()
+            return True
+        except Exception as e:
+            st.error(f"쿼리 실행 중 오류: {str(e)}")
+            conn.rollback()
+            return False
+        finally:
+            cursor.close()
+            conn.close()
+    except Exception as e:
+        st.error(f"데이터베이스 연결 중 오류: {str(e)}")
+        return False
+
+def load_position_info(experience_id):
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return None, "데이터베이스 연결 실패"
+        
+        cursor = conn.cursor()
+        try:
+            # 직위 정보 조회
+            cursor.execute("""
+                SELECT id, position, promotion_date, retirement_date, description
+                FROM tb_resume_positions 
+                WHERE experience_id = %s
+                ORDER BY promotion_date ASC
+            """, (experience_id,))
+            positions = cursor.fetchall()
+            
+            return positions, None
+        except Exception as e:
+            return None, f"데이터 조회 중 오류: {str(e)}"
+        finally:
+            cursor.close()
+            conn.close()
+    except Exception as e:
+        return None, f"데이터베이스 연결 중 오류: {str(e)}"
+
+def delete_position(position_id, experience_id):
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return False
+        
+        cursor = conn.cursor()
+        try:
+            # 해당 직위가 현재 경력의 것인지 확인
+            cursor.execute("""
+                SELECT id FROM tb_resume_positions 
+                WHERE id = %s AND experience_id = %s
+            """, (position_id, experience_id))
+            
+            if not cursor.fetchone():
+                return False
+            
+            cursor.execute("DELETE FROM tb_resume_positions WHERE id = %s", (position_id,))
+            conn.commit()
+            return True
+        except Exception as e:
+            st.error(f"삭제 중 오류: {str(e)}")
+            conn.rollback()
+            return False
+        finally:
+            cursor.close()
+            conn.close()
+    except Exception as e:
+        st.error(f"데이터베이스 연결 중 오류: {str(e)}")
+        return False
+
 def show_resume_page():
     # 세션 상태 초기화
     if 'skills_loaded' not in st.session_state:
@@ -1817,6 +1952,7 @@ def show_resume_page():
             elif careers:
                 # 기존 데이터로 session_state 초기화
                 st.session_state.career_data = []
+                st.session_state.position_counts = {}
                 
                 for idx, career in enumerate(careers):
                     st.session_state.career_data.append(idx)
@@ -1825,22 +1961,36 @@ def show_resume_page():
                     st.session_state[f'join_date_{idx}'] = career['join_date']
                     st.session_state[f'leave_date_{idx}'] = career['leave_date']
                     st.session_state[f'leave_reason_{idx}'] = career['leave_reason']
-                    st.session_state[f'position_{idx}'] = career['position']
-                    st.session_state[f'promotion_date_{idx}'] = career['promotion_date']
-                    st.session_state[f'retirement_date_{idx}'] = career['retirement_date']
-                    st.session_state[f'description_{idx}'] = career['description']
+                    
+                    # 직위 정보 로드
+                    positions, pos_error = load_position_info(career['id'])
+                    if not pos_error and positions:
+                        st.session_state.position_counts[idx] = len(positions)
+                        for pos_idx, position in enumerate(positions):
+                            st.session_state[f'position_id_{idx}_{pos_idx}'] = position['id']
+                            st.session_state[f'position_{idx}_{pos_idx}'] = position['position']
+                            st.session_state[f'promotion_date_{idx}_{pos_idx}'] = position['promotion_date']
+                            st.session_state[f'retirement_date_{idx}_{pos_idx}'] = position['retirement_date']
+                            st.session_state[f'description_{idx}_{pos_idx}'] = position['description']
+                    else:
+                        st.session_state.position_counts[idx] = 1
                 
                 st.session_state.career_count = len(careers)
             else:
                 # 초기 상태 설정
                 st.session_state.career_count = 1
                 st.session_state.career_data = [0]
+                st.session_state.position_counts = {0: 1}
             
             st.session_state.career_loaded = True
         
         # 경력 카운터 초기화
         if 'career_count' not in st.session_state:
             st.session_state.career_count = 1
+        
+        # 직위 카운터 초기화
+        if 'position_counts' not in st.session_state:
+            st.session_state.position_counts = {0: 1}
         
         # 경력 데이터 초기화
         if 'career_data' not in st.session_state:
@@ -1868,13 +2018,16 @@ def show_resume_page():
                         if st.session_state.get(f'career_id_{i}'):  # 기존 데이터인 경우
                             if delete_career(st.session_state[f'career_id_{i}'], st.session_state.user_email):
                                 st.session_state.career_data.remove(i)
-                                st.session_state.career_loaded = False  # 다시 로드하도록 설정
+                                if i in st.session_state.position_counts:
+                                    del st.session_state.position_counts[i]
+                                st.session_state.career_loaded = False
                                 st.rerun()
                         else:  # 새로 추가했다가 삭제하는 경우
                             st.session_state.career_data.remove(i)
                             if len(st.session_state.career_data) == 0:
                                 st.session_state.career_count = 1
                                 st.session_state.career_data = [0]
+                                st.session_state.position_counts = {0: 1}
                             st.rerun()
             
             st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
@@ -1897,6 +2050,7 @@ def show_resume_page():
             if st.button("경력 추가", use_container_width=True):
                 new_idx = max(st.session_state.career_data) + 1 if st.session_state.career_data else 0
                 st.session_state.career_data.append(new_idx)
+                st.session_state.position_counts[new_idx] = 1
                 st.session_state.career_count += 1
                 st.rerun()
 
@@ -1919,20 +2073,37 @@ def show_resume_page():
                         'company': st.session_state[f'company_{i}'],
                         'join_date': st.session_state[f'join_date_{i}'],
                         'leave_date': st.session_state[f'leave_date_{i}'],
-                        'leave_reason': st.session_state[f'leave_reason_{i}'],
-                        'position': st.session_state[f'position_{i}'],
-                        'promotion_date': st.session_state[f'promotion_date_{i}'],
-                        'retirement_date': st.session_state[f'retirement_date_{i}'],
-                        'description': st.session_state[f'description_{i}']
+                        'leave_reason': st.session_state[f'leave_reason_{i}']
                     }
                 
+                success = True
+                # 먼저 경력 정보 저장
                 if save_career_info(st.session_state.user_email, career_data):
-                    st.success("저장되었습니다!")
-                    # 저장 성공 시 데이터 다시 로드하도록 설정
-                    st.session_state.career_loaded = False
-                    st.rerun()
+                    # 각 경력에 대한 직위 정보 저장
+                    for i in st.session_state.career_data:
+                        career_id = st.session_state.get(f'career_id_{i}')
+                        if career_id:
+                            position_data = {}
+                            for j in range(st.session_state.position_counts[i]):
+                                position_data[j] = {
+                                    'id': st.session_state.get(f'position_id_{i}_{j}'),
+                                    'position': st.session_state[f'position_{i}_{j}'],
+                                    'promotion_date': st.session_state[f'promotion_date_{i}_{j}'],
+                                    'retirement_date': st.session_state[f'retirement_date_{i}_{j}'],
+                                    'description': st.session_state[f'description_{i}_{j}']
+                                }
+                            
+                            if not save_position_info(career_id, position_data):
+                                st.error(f"{st.session_state[f'company_{i}']} 회사의 직위 정보 저장 중 오류가 발생했습니다.")
+                                success = False
+                    
+                    if success:
+                        st.success("저장되었습니다!")
+                        # 저장 성공 시 데이터 다시 로드하도록 설정
+                        st.session_state.career_loaded = False
+                        st.rerun()
                 else:
-                    st.error("저장 중 오류가 발생했습니다.")
+                    st.error("경력 정보 저장 중 오류가 발생했습니다.")
 
     # 수상 탭
     with tabs[4]:
