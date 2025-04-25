@@ -1210,6 +1210,233 @@ def delete_award(award_id, login_email):
         if 'conn' in locals() and conn is not None:
             conn.close()
 
+def save_activities_info(login_email, data):
+    """
+    기타활동 정보를 저장/수정/삭제하는 함수
+    Args:
+        login_email (str): 사용자 이메일
+        data (dict): 기타활동 정보 데이터
+    Returns:
+        bool: 성공 여부
+    """
+    if not login_email or not isinstance(data, dict):
+        print("Invalid input parameters in save_activities_info")
+        return False
+
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return False
+        
+        cursor = conn.cursor()
+        try:
+            # 현재 사용자의 모든 기타활동 정보 조회
+            cursor.execute("""
+                SELECT id FROM tb_resume_activities 
+                WHERE login_email = %s
+            """, (login_email,))
+            existing_activity_ids = {row['id'] for row in cursor.fetchall()}
+            
+            # 현재 폼에 있는 활동 ID 수집
+            current_activity_ids = set()
+            
+            # 기타활동 정보 저장/수정
+            for idx, activity_info in data.items():
+                # 필수 필드 검증
+                required_fields = ['activity_name', 'organization', 'start_date']
+                if not all(field in activity_info and activity_info[field] for field in required_fields):
+                    print(f"Missing required fields in activity data: {idx}")
+                    continue
+
+                activity_id = activity_info.get('id')
+                
+                if activity_id:  # 기존 데이터 수정
+                    if activity_id not in existing_activity_ids:
+                        print(f"Invalid activity_id: {activity_id}")
+                        continue
+                        
+                    cursor.execute("""
+                        UPDATE tb_resume_activities 
+                        SET activity_name = %s,
+                            organization = %s,
+                            start_date = %s,
+                            end_date = %s,
+                            role = %s,
+                            link = %s,
+                            details = %s
+                        WHERE id = %s AND login_email = %s
+                    """, (
+                        activity_info['activity_name'],
+                        activity_info['organization'],
+                        activity_info['start_date'],
+                        activity_info.get('end_date'),
+                        activity_info.get('role', ''),
+                        activity_info.get('link', ''),
+                        activity_info.get('details', ''),
+                        activity_id,
+                        login_email
+                    ))
+                    if cursor.rowcount > 0:
+                        current_activity_ids.add(activity_id)
+                else:  # 새 데이터 추가
+                    cursor.execute("""
+                        INSERT INTO tb_resume_activities 
+                        (login_email, activity_name, organization, start_date, end_date, role, link, details)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                    """, (
+                        login_email,
+                        activity_info['activity_name'],
+                        activity_info['organization'],
+                        activity_info['start_date'],
+                        activity_info.get('end_date'),
+                        activity_info.get('role', ''),
+                        activity_info.get('link', ''),
+                        activity_info.get('details', '')
+                    ))
+                    if cursor.rowcount > 0:
+                        new_activity_id = cursor.lastrowid
+                        current_activity_ids.add(new_activity_id)
+            
+            # 삭제된 기타활동 정보 처리
+            activities_to_delete = existing_activity_ids - current_activity_ids
+            if activities_to_delete:
+                placeholders = ', '.join(['%s'] * len(activities_to_delete))
+                cursor.execute(f"""
+                    DELETE FROM tb_resume_activities 
+                    WHERE id IN ({placeholders}) AND login_email = %s
+                """, (*activities_to_delete, login_email))
+            
+            conn.commit()
+            return True
+            
+        except Exception as e:
+            conn.rollback()
+            print(f"Error in save_activities_info: {str(e)}")
+            return False
+            
+        finally:
+            cursor.close()
+            
+    except Exception as e:
+        print(f"Database connection error in save_activities_info: {str(e)}")
+        return False
+        
+    finally:
+        if 'conn' in locals() and conn is not None:
+            conn.close()
+
+def load_activities_info(login_email):
+    """
+    사용자의 기타활동 정보를 조회하는 함수
+    Args:
+        login_email (str): 사용자 이메일
+    Returns:
+        tuple: (activities_list, error_message)
+    """
+    if not login_email:
+        return None, "유효하지 않은 사용자 정보입니다."
+
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return None, "데이터베이스 연결 실패"
+        
+        cursor = conn.cursor()
+        try:
+            cursor.execute("""
+                SELECT id, activity_name, organization, start_date, end_date, role, link, details
+                FROM tb_resume_activities 
+                WHERE login_email = %s
+                ORDER BY start_date DESC, id DESC
+            """, (login_email,))
+            
+            activities = []
+            for row in cursor.fetchall():
+                activities.append({
+                    'id': row['id'],
+                    'activity_name': row['activity_name'],
+                    'organization': row['organization'],
+                    'start_date': row['start_date'],
+                    'end_date': row['end_date'],
+                    'role': row['role'] if row['role'] is not None else '',
+                    'link': row['link'] if row['link'] is not None else '',
+                    'details': row['details'] if row['details'] is not None else ''
+                })
+            
+            return activities, None
+            
+        except Exception as e:
+            print(f"Error in load_activities_info: {str(e)}")
+            return None, f"기타활동 정보 조회 중 오류가 발생했습니다: {str(e)}"
+            
+        finally:
+            cursor.close()
+            
+    except Exception as e:
+        print(f"Database connection error in load_activities_info: {str(e)}")
+        return None, f"데이터베이스 연결 중 오류가 발생했습니다: {str(e)}"
+        
+    finally:
+        if 'conn' in locals() and conn is not None:
+            conn.close()
+
+def delete_activity(activity_id, login_email):
+    """
+    특정 기타활동 정보를 삭제하는 함수
+    Args:
+        activity_id (int): 삭제할 기타활동 정보 ID
+        login_email (str): 사용자 이메일
+    Returns:
+        bool: 성공 여부
+    """
+    if not activity_id or not login_email:
+        print("Invalid input parameters in delete_activity")
+        return False
+
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return False
+        
+        cursor = conn.cursor()
+        try:
+            # 해당 기타활동 정보가 존재하는지 확인
+            cursor.execute("""
+                SELECT id FROM tb_resume_activities 
+                WHERE id = %s AND login_email = %s
+            """, (activity_id, login_email))
+            
+            if not cursor.fetchone():
+                print(f"Activity not found: {activity_id}")
+                return False
+            
+            # 기타활동 정보 삭제
+            cursor.execute("""
+                DELETE FROM tb_resume_activities 
+                WHERE id = %s AND login_email = %s
+            """, (activity_id, login_email))
+            
+            if cursor.rowcount > 0:
+                conn.commit()
+                return True
+            return False
+            
+        except Exception as e:
+            conn.rollback()
+            print(f"Error in delete_activity: {str(e)}")
+            return False
+            
+        finally:
+            cursor.close()
+            
+    except Exception as e:
+        print(f"Database connection error in delete_activity: {str(e)}")
+        return False
+        
+    finally:
+        if 'conn' in locals() and conn is not None:
+            conn.close()
+
 def show_success_message():
     st.markdown("""
         <div style="padding: 1rem; border-radius: 0.5rem; background-color: #d8e6fd;">
