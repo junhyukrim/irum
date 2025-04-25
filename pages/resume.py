@@ -1044,7 +1044,7 @@ def save_award_info(login_email, data):
                         UPDATE tb_resume_awards 
                         SET award_name = %s,
                             award_date = %s,
-                            award_org = %s,
+                            issuing_agency = %s,
                             note = %s
                         WHERE id = %s AND login_email = %s
                     """, (
@@ -1059,7 +1059,7 @@ def save_award_info(login_email, data):
                 else:  # 새 데이터 추가
                     cursor.execute("""
                         INSERT INTO tb_resume_awards 
-                        (login_email, award_name, award_date, award_org, note)
+                        (login_email, award_name, award_date, issuing_agency, note)
                         VALUES (%s, %s, %s, %s, %s)
                     """, (
                         login_email,
@@ -1121,7 +1121,7 @@ def load_award_info(login_email):
         cursor = conn.cursor()
         try:
             cursor.execute("""
-                SELECT id, award_name, award_date, award_org, note
+                SELECT id, award_name, award_date, issuing_agency, note
                 FROM tb_resume_awards 
                 WHERE login_email = %s
                 ORDER BY award_date DESC
@@ -1133,7 +1133,7 @@ def load_award_info(login_email):
                     'id': row['id'],
                     'award_name': row['award_name'],
                     'award_date': row['award_date'],
-                    'award_org': row['award_org'],
+                    'award_org': row['issuing_agency'],
                     'award_note': row['note'] if row['note'] is not None else ''
                 })
             
