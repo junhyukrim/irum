@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pymysql
 from datetime import datetime
@@ -640,40 +639,60 @@ def save_training_info(login_email, data):
         return False
 
 def load_certifications_info(login_email):
+    """
+    사용자의 자격증 정보를 조회하는 함수
+    Args:
+        login_email (str): 사용자 이메일
+    Returns:
+        tuple: (certifications_list, error_message)
+    """
+    if not login_email:
+        return None, "유효하지 않은 사용자 정보입니다."
+
     try:
         conn = connect_to_db()
         if conn is None:
-            return None
+            return None, "데이터베이스 연결 실패"
         
         cursor = conn.cursor()
         try:
-            # 자격증 정보 조회
             cursor.execute("""
-                SELECT id, certification_name, issue_date, issuing_agency 
+                SELECT id, certification_name, issuing_agency, acquisition_date, 
+                       expiration_date, certification_number, score, note
                 FROM tb_resume_certifications 
                 WHERE login_email = %s
-                ORDER BY issue_date DESC
+                ORDER BY acquisition_date DESC, id DESC
             """, (login_email,))
-            certifications = cursor.fetchall()
             
-            # 자격증 데이터를 스킬별로 그룹화
-            result = {}
-            for cert in certifications:
-                skill_idx = 0  # 기본값으로 첫 번째 스킬에 할당
-                if skill_idx not in result:
-                    result[skill_idx] = {
-                        'cert_count': 0,
-                        'certifications': []
-                    }
-                result[skill_idx]['certifications'].append(cert)
-                result[skill_idx]['cert_count'] += 1
+            certifications = []
+            for row in cursor.fetchall():
+                certifications.append({
+                    'id': row['id'],
+                    'certification_name': row['certification_name'],
+                    'issuing_agency': row['issuing_agency'],
+                    'acquisition_date': row['acquisition_date'],
+                    'expiration_date': row['expiration_date'],
+                    'certification_number': row['certification_number'] if row['certification_number'] is not None else '',
+                    'score': row['score'] if row['score'] is not None else '',
+                    'note': row['note'] if row['note'] is not None else ''
+                })
             
-            return result
+            return certifications, None
+            
+        except Exception as e:
+            print(f"Error in load_certifications_info: {str(e)}")
+            return None, f"자격증 정보 조회 중 오류가 발생했습니다: {str(e)}"
+            
         finally:
             cursor.close()
-            conn.close()
+            
     except Exception as e:
-        return None
+        print(f"Database connection error in load_certifications_info: {str(e)}")
+        return None, f"데이터베이스 연결 중 오류가 발생했습니다: {str(e)}"
+        
+    finally:
+        if 'conn' in locals() and conn is not None:
+            conn.close()
 
 def load_training_info(login_email):
     try:
