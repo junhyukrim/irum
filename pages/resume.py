@@ -1055,7 +1055,7 @@ def save_award_info(login_email, data):
                     continue
 
                 award_id = award_info.get('id')
-                award_note = award_info.get('award_note', '')
+                award_note = award_info.get('award_note', '')  # Changed from 'note' to 'award_note'
                 
                 if award_id:  # 기존 데이터 수정
                     if award_id not in existing_award_ids:
@@ -2828,7 +2828,7 @@ def show_resume_page():
                     st.session_state[f'award_name_{idx}'] = award['award_name']
                     st.session_state[f'award_date_{idx}'] = award['award_date']
                     st.session_state[f'awarding_body_{idx}'] = award['awarding_body']
-                    st.session_state[f'award_note_{idx}'] = award['note']
+                    st.session_state[f'award_note_{idx}'] = award['award_note']
                 
                 st.session_state.award_count = len(awards)
             else:
