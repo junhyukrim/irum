@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pymysql
 from datetime import datetime
@@ -1437,6 +1438,147 @@ def delete_activity(activity_id, login_email):
         if 'conn' in locals() and conn is not None:
             conn.close()
 
+def save_intro_info(login_email, data):
+    """자기소개 정보를 저장하는 함수"""
+    try:
+        conn = connect_to_db()
+        cursor = conn.cursor(dictionary=True)
+        
+        try:
+            # 현재 사용자의 기존 자기소개 ID 목록 조회
+            cursor.execute(
+                "SELECT id FROM tb_resume_self_introductions WHERE login_email = %s",
+                (login_email,)
+            )
+            existing_ids = {row['id'] for row in cursor.fetchall()}
+            saved_ids = set()
+            
+            # 데이터 저장/수정
+            for idx, intro in data.items():
+                intro_id = intro.get('id')
+                
+                if intro_id:  # 기존 데이터 수정
+                    cursor.execute("""
+                        UPDATE tb_resume_self_introductions 
+                        SET topic_category = %s, topic_title = %s, content = %s
+                        WHERE id = %s AND login_email = %s
+                    """, (
+                        intro['category'],
+                        intro['topic'],
+                        intro['content'],
+                        intro_id,
+                        login_email
+                    ))
+                    saved_ids.add(intro_id)
+                else:  # 새 데이터 추가
+                    cursor.execute("""
+                        INSERT INTO tb_resume_self_introductions 
+                        (login_email, topic_category, topic_title, content)
+                        VALUES (%s, %s, %s, %s)
+                    """, (
+                        login_email,
+                        intro['category'],
+                        intro['topic'],
+                        intro['content']
+                    ))
+                    if cursor.lastrowid:
+                        saved_ids.add(cursor.lastrowid)
+            
+            # 삭제된 항목 처리
+            ids_to_delete = existing_ids - saved_ids
+            if ids_to_delete:
+                cursor.execute(
+                    "DELETE FROM tb_resume_self_introductions WHERE id IN (%s) AND login_email = %s" % 
+                    (','.join(['%s'] * len(ids_to_delete)), login_email),
+                    tuple(list(ids_to_delete) + [login_email])
+                )
+            
+            conn.commit()
+            return True
+            
+        except Exception as e:
+            conn.rollback()
+            print(f"Error in save_intro_info: {str(e)}")
+            return False
+            
+        finally:
+            cursor.close()
+            
+    except Exception as e:
+        print(f"Database connection error in save_intro_info: {str(e)}")
+        return False
+        
+    finally:
+        if 'conn' in locals() and conn is not None:
+            conn.close()
+
+def load_intro_info(login_email):
+    """자기소개 정보를 불러오는 함수"""
+    try:
+        conn = connect_to_db()
+        cursor = conn.cursor(dictionary=True)
+        
+        try:
+            cursor.execute("""
+                SELECT id, topic_category, topic_title, content
+                FROM tb_resume_self_introductions
+                WHERE login_email = %s
+                ORDER BY id
+            """, (login_email,))
+            
+            results = cursor.fetchall()
+            return results, None
+            
+        except Exception as e:
+            error_msg = f"Error in load_intro_info: {str(e)}"
+            print(error_msg)
+            return None, error_msg
+            
+        finally:
+            cursor.close()
+            
+    except Exception as e:
+        error_msg = f"Database connection error in load_intro_info: {str(e)}"
+        print(error_msg)
+        return None, error_msg
+        
+    finally:
+        if 'conn' in locals() and conn is not None:
+            conn.close()
+
+def delete_intro(intro_id, login_email):
+    """특정 자기소개를 삭제하는 함수"""
+    try:
+        conn = connect_to_db()
+        cursor = conn.cursor()
+        
+        try:
+            cursor.execute("""
+                DELETE FROM tb_resume_self_introductions 
+                WHERE id = %s AND login_email = %s
+            """, (intro_id, login_email))
+            
+            if cursor.rowcount > 0:
+                conn.commit()
+                return True
+            return False
+            
+        except Exception as e:
+            conn.rollback()
+            print(f"Error in delete_intro: {str(e)}")
+            return False
+            
+        finally:
+            cursor.close()
+            
+    except Exception as e:
+        print(f"Database connection error in delete_intro: {str(e)}")
+        return False
+        
+    finally:
+        if 'conn' in locals() and conn is not None:
+            conn.close()
+
 def show_success_message():
     st.markdown("""
         <div style="padding: 1rem; border-radius: 0.5rem; background-color: #d8e6fd;">
@@ -2664,8 +2806,8 @@ def show_resume_page():
                     st.session_state[f'award_id_{idx}'] = award['id']
                     st.session_state[f'award_name_{idx}'] = award['award_name']
                     st.session_state[f'award_date_{idx}'] = award['award_date']
-                    st.session_state[f'award_org_{idx}'] = award['award_org']
-                    st.session_state[f'award_note_{idx}'] = award['award_note']
+                    st.session_state[f'award_org_{idx}'] = award['issuing_agency']
+                    st.session_state[f'award_note_{idx}'] = award['note']
                 
                 st.session_state.award_count = len(awards)
             else:
@@ -2687,56 +2829,58 @@ def show_resume_page():
         # 수상 데이터 초기화
         if 'award_data' not in st.session_state:
             st.session_state.award_data = list(range(st.session_state.award_count))
-
+        
         # 각 수상 정보 입력 폼
         for idx, i in enumerate(st.session_state.award_data):
             if idx > 0:
                 st.markdown("<hr>", unsafe_allow_html=True)
             
-            # 상명/수상일/수여기관/비고/삭제 버튼 (2:1:1:3:1)
-            cols = st.columns([2, 1, 1, 3, 1])
+            # 수상명/수상일/수여기관/삭제 버튼 (3:2:2:1 = 8)
+            cols = st.columns([3, 2, 2, 1])
             with cols[0]:
-                st.text_input("상명", key=f"award_name_{i}")
+                st.text_input("수상명", key=f"award_name_{i}")
             with cols[1]:
-                st.date_input("수상년월", key=f"award_date_{i}")
+                st.date_input("수상일", key=f"award_date_{i}")
             with cols[2]:
                 st.text_input("수여기관", key=f"award_org_{i}")
             with cols[3]:
-                st.text_input("비고", key=f"award_note_{i}")
-            with cols[4]:
                 st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
                 if len(st.session_state.award_data) > 1:
-                    if st.button("수상내역 삭제", key=f"delete_award_{i}", use_container_width=True):
-                        if st.session_state.get(f'award_id_{i}'):  # 기존 데이터인 경우
-                            if delete_award(st.session_state[f'award_id_{i}'], st.session_state.user_email):
+                    if st.button("삭제", key=f"delete_award_{i}", use_container_width=True):
+                        # 기존 수상 정보인 경우 DB에서도 삭제
+                        award_id = st.session_state.get(f'award_id_{i}')
+                        if award_id:
+                            if delete_award(award_id, st.session_state.user_email):
                                 st.session_state.award_data.remove(i)
-                                if len(st.session_state.award_data) == 0:
-                                    st.session_state.award_count = 1
-                                    st.session_state.award_data = [0]
+                                st.session_state.award_count -= 1
                                 st.session_state.award_loaded = False
                                 st.rerun()
-                        else:  # 새로 추가했다가 삭제하는 경우
+                            else:
+                                st.error("수상 정보 삭제 중 오류가 발생했습니다.")
+                        else:
+                            # 새로 추가된 수상 정보인 경우 세션에서만 삭제
                             st.session_state.award_data.remove(i)
-                            if len(st.session_state.award_data) == 0:
-                                st.session_state.award_count = 1
-                                st.session_state.award_data = [0]
+                            st.session_state.award_count -= 1
                             st.rerun()
-
-        # 수상내역 추가 버튼 (1:7)
+            
+            # 비고 (8)
+            st.text_area("비고", key=f"award_note_{i}", height=100)
+        
+        # 수상 추가/저장 버튼 (1:7)
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
         cols = st.columns(8)
         with cols[0]:
-            if st.button("수상내역 추가", use_container_width=True):
+            if st.button("수상 추가", use_container_width=True):
                 new_idx = max(st.session_state.award_data) + 1 if st.session_state.award_data else 0
                 st.session_state.award_data.append(new_idx)
                 st.session_state.award_count += 1
-                # 새 수상 필드 초기화
+                # 새 수상 정보 필드 초기화
                 st.session_state[f'award_name_{new_idx}'] = ''
                 st.session_state[f'award_date_{new_idx}'] = None
                 st.session_state[f'award_org_{new_idx}'] = ''
                 st.session_state[f'award_note_{new_idx}'] = ''
                 st.rerun()
-
+        
         # 저장 버튼 (7:1)
         st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
         cols = st.columns(8)
@@ -2755,25 +2899,13 @@ def show_resume_page():
                     award_date = st.session_state.get(f'award_date_{i}')
                     award_org = st.session_state.get(f'award_org_{i}', '').strip()
                     
-                    if award_name or award_date or award_org:  # 하나라도 입력된 경우
-                        if not award_name:
-                            st.warning(f"{i+1}번째 수상의 상명이 비어 있습니다.")
-                            continue
-                        
-                        if not award_date:
-                            st.warning(f"{i+1}번째 수상의 수상년월이 비어 있습니다.")
-                            continue
-                        
-                        if not award_org:
-                            st.warning(f"{i+1}번째 수상의 수여기관이 비어 있습니다.")
-                            continue
-                        
+                    if award_name or award_date or award_org:
                         award_data[i] = {
                             'id': st.session_state.get(f'award_id_{i}'),
                             'award_name': award_name,
                             'award_date': award_date,
-                            'award_org': award_org,
-                            'award_note': st.session_state.get(f'award_note_{i}', '')
+                            'issuing_agency': award_org,
+                            'note': st.session_state.get(f'award_note_{i}', '').strip()
                         }
                 
                 if save_award_info(st.session_state.user_email, award_data):
@@ -3212,4 +3344,3 @@ def show_resume_page():
                     if success:
                         show_success_message()
                         st.rerun()
-
