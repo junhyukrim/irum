@@ -644,51 +644,53 @@ def load_certifications_info(login_email):
     Args:
         login_email (str): 사용자 이메일
     Returns:
-        tuple: (certifications_list, error_message)
+        dict: 자격증 정보를 담은 딕셔너리
     """
     if not login_email:
-        return None, "유효하지 않은 사용자 정보입니다."
+        return {}
 
     try:
         conn = connect_to_db()
         if conn is None:
-            return None, "데이터베이스 연결 실패"
+            return {}
         
         cursor = conn.cursor()
         try:
             cursor.execute("""
-                SELECT id, certification_name, issuing_agency, acquisition_date, 
-                       expiration_date, certification_number, score, note
+                SELECT id, certification_name, issuing_agency, issue_date
                 FROM tb_resume_certifications 
                 WHERE login_email = %s
-                ORDER BY acquisition_date DESC, id DESC
+                ORDER BY issue_date DESC, id DESC
             """, (login_email,))
             
-            certifications = []
+            certifications = {}
             for row in cursor.fetchall():
-                certifications.append({
+                skill_idx = 0  # 기본값으로 첫 번째 스킬에 할당
+                if skill_idx not in certifications:
+                    certifications[skill_idx] = {
+                        'cert_count': 0,
+                        'certifications': []
+                    }
+                certifications[skill_idx]['certifications'].append({
                     'id': row['id'],
                     'certification_name': row['certification_name'],
                     'issuing_agency': row['issuing_agency'],
-                    'acquisition_date': row['acquisition_date'],
-                    'expiration_date': row['expiration_date'],
-                    'certification_number': row['certification_number'] if row['certification_number'] is not None else '',
-                    'score': row['score'] if row['score'] is not None else '',
-                    'note': row['note'] if row['note'] is not None else ''
+                    'issue_date': row['issue_date']
                 })
+                certifications[skill_idx]['cert_count'] += 1
             
-            return certifications, None
+            return certifications
             
         except Exception as e:
             print(f"Error in load_certifications_info: {str(e)}")
-            return None, f"자격증 정보 조회 중 오류가 발생했습니다: {str(e)}"
+            return {}
             
         finally:
             cursor.close()
             
     except Exception as e:
         print(f"Database connection error in load_certifications_info: {str(e)}")
-        return None, f"데이터베이스 연결 중 오류가 발생했습니다: {str(e)}"
+        return {}
         
     finally:
         if 'conn' in locals() and conn is not None:
@@ -1047,7 +1049,7 @@ def save_award_info(login_email, data):
             # 수상 정보 저장/수정
             for idx, award_info in data.items():
                 # 필수 필드 검증
-                required_fields = ['award_name', 'award_date', 'award_org']
+                required_fields = ['award_name', 'award_date', 'awarding_body']
                 if not all(field in award_info for field in required_fields):
                     print(f"Missing required fields in award data: {idx}")
                     continue
@@ -1070,7 +1072,7 @@ def save_award_info(login_email, data):
                     """, (
                         award_info['award_name'],
                         award_info['award_date'],
-                        award_info['award_org'],
+                        award_info['awarding_body'],
                         award_note,
                         award_id,
                         login_email
@@ -1086,7 +1088,7 @@ def save_award_info(login_email, data):
                         login_email,
                         award_info['award_name'],
                         award_info['award_date'],
-                        award_info['award_org'],
+                        award_info['awarding_body'],
                         award_note
                     ))
                     if cursor.rowcount > 0:
@@ -1152,7 +1154,7 @@ def load_award_info(login_email):
                     'id': row['id'],
                     'award_name': row['award_name'],
                     'award_date': row['award_date'],
-                    'award_org': row['awarding_body'],
+                    'awarding_body': row['awarding_body'],
                     'award_note': row['note'] if row['note'] is not None else ''
                 })
             
@@ -2825,7 +2827,7 @@ def show_resume_page():
                     st.session_state[f'award_id_{idx}'] = award['id']
                     st.session_state[f'award_name_{idx}'] = award['award_name']
                     st.session_state[f'award_date_{idx}'] = award['award_date']
-                    st.session_state[f'award_org_{idx}'] = award['issuing_agency']
+                    st.session_state[f'awarding_body_{idx}'] = award['awarding_body']
                     st.session_state[f'award_note_{idx}'] = award['note']
                 
                 st.session_state.award_count = len(awards)
@@ -2836,7 +2838,7 @@ def show_resume_page():
                 # 빈 데이터 초기화
                 st.session_state['award_name_0'] = ''
                 st.session_state['award_date_0'] = None
-                st.session_state['award_org_0'] = ''
+                st.session_state['awarding_body_0'] = ''
                 st.session_state['award_note_0'] = ''
             
             st.session_state.award_loaded = True
@@ -2861,7 +2863,7 @@ def show_resume_page():
             with cols[1]:
                 st.date_input("수상일", key=f"award_date_{i}")
             with cols[2]:
-                st.text_input("수여기관", key=f"award_org_{i}")
+                st.text_input("수여기관", key=f"awarding_body_{i}")
             with cols[3]:
                 st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
                 if len(st.session_state.award_data) > 1:
@@ -2896,7 +2898,7 @@ def show_resume_page():
                 # 새 수상 정보 필드 초기화
                 st.session_state[f'award_name_{new_idx}'] = ''
                 st.session_state[f'award_date_{new_idx}'] = None
-                st.session_state[f'award_org_{new_idx}'] = ''
+                st.session_state[f'awarding_body_{new_idx}'] = ''
                 st.session_state[f'award_note_{new_idx}'] = ''
                 st.rerun()
         
@@ -2916,14 +2918,14 @@ def show_resume_page():
                 for i in st.session_state.award_data:
                     award_name = st.session_state.get(f'award_name_{i}', '').strip()
                     award_date = st.session_state.get(f'award_date_{i}')
-                    award_org = st.session_state.get(f'award_org_{i}', '').strip()
+                    awarding_body = st.session_state.get(f'awarding_body_{i}', '').strip()
                     
-                    if award_name or award_date or award_org:
+                    if award_name or award_date or awarding_body:
                         award_data[i] = {
                             'id': st.session_state.get(f'award_id_{i}'),
                             'award_name': award_name,
                             'award_date': award_date,
-                            'issuing_agency': award_org,
+                            'awarding_body': awarding_body,
                             'note': st.session_state.get(f'award_note_{i}', '').strip()
                         }
                 
