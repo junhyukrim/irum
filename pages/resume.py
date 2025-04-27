@@ -692,7 +692,6 @@ def load_training_info(login_email):
     if not login_email:
         return {}
     
-    cursor = conn.cursor()    
     try:
         conn = connect_to_db()
         if conn is None:
@@ -714,6 +713,7 @@ def load_training_info(login_email):
                 }
             
             return trainings
+        
         except Exception as e:
             print(f"Error in load_training_info: {str(e)}")
             return {}
