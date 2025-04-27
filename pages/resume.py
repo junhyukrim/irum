@@ -3233,6 +3233,23 @@ def show_resume_page():
                 "경력 중 가장 자랑스러웠던 순간은?"
             ]
         }
+
+        # 자기소개 데이터 로딩
+        if 'intro_data_loaded' not in st.session_state:
+            results, error = load_intro_info(st.session_state.user_email)
+            if results:
+                st.session_state.intro_data = []
+                for idx, row in enumerate(results):
+                    st.session_state.intro_data.append(idx)
+                    st.session_state[f'intro_category_{idx}'] = row['topic_category']
+                    st.session_state[f'intro_topic_{idx}'] = row['topic_title']
+                    st.session_state[f'intro_answer_{idx}'] = row['content']
+                st.session_state.intro_count = len(results)
+            else:
+                st.session_state.intro_count = 1
+                st.session_state.intro_data = [0]
+
+            st.session_state.intro_data_loaded = True
         
         # 자기소개 카운터 초기화
         if 'intro_count' not in st.session_state:
