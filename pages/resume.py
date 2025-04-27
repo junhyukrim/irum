@@ -671,6 +671,8 @@ def load_certifications_info(login_email):
                     'issue_date': row['issue_date']
                 }
 
+            st.write("=== 디버깅: certifications ===")
+            st.json(certifications)
             return certifications
             
         except Exception as e:
@@ -2370,7 +2372,6 @@ def show_resume_page():
         # 자격증 필드 초기화
         if 'cert_fields' not in st.session_state:
             certifications = load_certifications_info(st.session_state.user_email)  # DB에서 불러오기
-            print(certifications)
             if certifications:
                 st.session_state.cert_fields = list(certifications.keys())
                 for cert_idx, cert in certifications.items():
