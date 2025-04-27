@@ -664,21 +664,13 @@ def load_certifications_info(login_email):
             """, (login_email,))
             
             certifications = {}
-            for row in cursor.fetchall():
-                skill_idx = 0  # 기본값으로 첫 번째 스킬에 할당
-                if skill_idx not in certifications:
-                    certifications[skill_idx] = {
-                        'cert_count': 0,
-                        'certifications': []
-                    }
-                certifications[skill_idx]['certifications'].append({
-                    'id': row['id'],
+            for row in enumerate(cursor.fetchall()):
+                certifications[idx] = {
                     'certification_name': row['certification_name'],
                     'issuing_agency': row['issuing_agency'],
                     'issue_date': row['issue_date']
-                })
-                certifications[skill_idx]['cert_count'] += 1
-            
+                }
+                            
             return certifications
             
         except Exception as e:
