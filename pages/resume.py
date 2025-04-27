@@ -665,14 +665,20 @@ def load_certifications_info(login_email):
             
             certifications = {}
             for idx, row in enumerate(cursor.fetchall()):
+                cert_date = row['issue_date']
+                if isinstance(cert_date, str):
+                    if "datetime.date" in cert_date:
+                        cert_date = cert_date.replace("datetime.date(", "").replace(")", "")
+                        year, month, day = map(int, cert_date.split(","))
+                        cert_date = datetime.date(year, month, day)
+                    else:
+                        cert_date = datetime.datetime.strptime(cert_date, "%Y-%m-%d").date()
                 certifications[idx] = {
                     'certification_name': row['certification_name'],
                     'issuing_agency': row['issuing_agency'],
-                    'issue_date': row['issue_date']
+                    'issue_date': cert_date
                 }
 
-            st.write("=== 디버깅: certifications ===")
-            st.json(certifications)
             return certifications
             
         except Exception as e:
