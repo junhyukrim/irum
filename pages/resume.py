@@ -664,7 +664,7 @@ def load_certifications_info(login_email):
             """, (login_email,))
             
             certifications = {}
-            for row in enumerate(cursor.fetchall()):
+            for idx, row in enumerate(cursor.fetchall()):
                 certifications[idx] = {
                     'certification_name': row['certification_name'],
                     'issuing_agency': row['issuing_agency'],
