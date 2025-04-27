@@ -1544,7 +1544,7 @@ def load_intro_info(login_email):
     """자기소개 정보를 불러오는 함수"""
     try:
         conn = connect_to_db()
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor()
         
         try:
             cursor.execute("""
