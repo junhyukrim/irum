@@ -1463,8 +1463,10 @@ def save_intro_info(login_email, data):
     """자기소개 정보를 저장하는 함수"""
     try:
         conn = connect_to_db()
-        cursor = conn.cursor(dictionary=True)
+        if conn is None:
+            return False
         
+        cursor = conn.cursor()
         try:
             # 현재 사용자의 기존 자기소개 ID 목록 조회
             cursor.execute(
@@ -1508,10 +1510,10 @@ def save_intro_info(login_email, data):
             # 삭제된 항목 처리
             ids_to_delete = existing_ids - saved_ids
             if ids_to_delete:
+                placeholders = ','.join(['%s'] * len(ids_to_delete))
                 cursor.execute(
-                    "DELETE FROM tb_resume_self_introductions WHERE id IN (%s) AND login_email = %s" % 
-                    (','.join(['%s'] * len(ids_to_delete)), login_email),
-                    tuple(list(ids_to_delete) + [login_email])
+                    f"DELETE FROM tb_resume_self_introductions WHERE id IN ({placeholders}) AND login_email = %s",
+                    (*ids_to_delete, login_email)
                 )
             
             conn.commit()
