@@ -588,19 +588,19 @@ def save_training_info(login_email, data):
             
             # 데이터 구조 변경에 맞게 처리
             for idx in data:
-                edu_data = data[idx]
+                train_data = data[idx]
                 
                 # 기존 교육 정보가 있는지 확인
-                if edu_data.get('id'):  # 기존 데이터 업데이트
-                    current_training_ids.add(edu_data['id'])
+                if train_data.get('id'):  # 기존 데이터 업데이트
+                    current_training_ids.add(train_data['id'])
                     update_query = """
                         UPDATE tb_resume_training SET
                         description = %s
                         WHERE id = %s AND login_email = %s
                     """
                     cursor.execute(update_query, (
-                        edu_data['description'],
-                        edu_data['id'],
+                        train_data['description'],
+                        train_data['id'],
                         login_email
                     ))
                 else:  # 새 교육 정보 삽입
@@ -611,7 +611,7 @@ def save_training_info(login_email, data):
                     """
                     cursor.execute(insert_query, (
                         login_email,
-                        edu_data['description']
+                        train_data['description']
                     ))
                     training_id = cursor.lastrowid
                     current_training_ids.add(training_id)
@@ -714,15 +714,15 @@ def load_training_info(login_email):
             
             # 교육 데이터를 스킬별로 그룹화
             result = {}
-            for edu in training:
+            for train in training:
                 skill_idx = 0  # 기본값으로 첫 번째 스킬에 할당
                 if skill_idx not in result:
                     result[skill_idx] = {
-                        'edu_count': 0,
+                        'train_count': 0,
                         'training': []
                     }
-                result[skill_idx]['training'].append(edu)
-                result[skill_idx]['edu_count'] += 1
+                result[skill_idx]['training'].append(train)
+                result[skill_idx]['train_count'] += 1
             
             return result
         finally:
@@ -1621,9 +1621,9 @@ def show_resume_page():
         st.session_state.cert_counts = defaultdict(int)
         st.session_state.cert_counts[0] = 1
     
-    if 'edu_counts' not in st.session_state or not st.session_state.edu_counts:
-        st.session_state.edu_counts = defaultdict(int)
-        st.session_state.edu_counts[0] = 1
+    if 'train_counts' not in st.session_state or not st.session_state.train_counts:
+        st.session_state.train_counts = defaultdict(int)
+        st.session_state.train_counts[0] = 1
     
     # 사용자가 로그인한 경우에만 데이터 로드
     if 'user_email' in st.session_state and not st.session_state.skills_loaded:
@@ -1654,12 +1654,12 @@ def show_resume_page():
         # 교육 데이터 로드
         training_info = load_training_info(st.session_state.user_email)
         if training_info:
-            for skill_idx, edu_data in training_info.items():
+            for skill_idx, train_data in training_info.items():
                 skill_idx = int(skill_idx)
-                st.session_state.edu_counts[skill_idx] = edu_data.get('edu_count', 0)
-                for j, edu in enumerate(edu_data.get('training', [])):
-                    st.session_state[f'edu_id_{skill_idx}_{j}'] = edu.get('id')
-                    st.session_state[f'education_{skill_idx}_{j}'] = edu.get('description', '')
+                st.session_state.train_counts[skill_idx] = train_data.get('train_count', 0)
+                for j, train in enumerate(train_data.get('training', [])):
+                    st.session_state[f'train_id_{skill_idx}_{j}'] = train.get('id')
+                    st.session_state[f'traincation_{skill_idx}_{j}'] = train.get('description', '')
         
         st.session_state.skills_loaded = True
     
@@ -2372,7 +2372,15 @@ def show_resume_page():
         
         # 자격증 필드 초기화
         if 'cert_fields' not in st.session_state:
-            st.session_state.cert_fields = [0]
+            certifications = load_certifications_info(st.session_state.user_email)  # DB에서 불러오기
+            if certifications:
+                st.session_state.cert_fields = list(certifications.keys())
+                for cert_idx, cert in certifications.items():
+                    st.session_state[f'certification_name_{cert_idx}'] = cert['certification_name']
+                    st.session_state[f'cert_date_{cert_idx}'] = cert['issue_date']
+                    st.session_state[f'cert_org_{cert_idx}'] = cert['issuing_agency']
+            else:
+                st.session_state.cert_fields = [0]
         
         # 자격증 입력 필드들
         for cert_idx in st.session_state.cert_fields:
@@ -2410,33 +2418,39 @@ def show_resume_page():
         st.markdown('<div class="section-header">교육: 훈련, 연수, 유학 등</div>', unsafe_allow_html=True)
         
         # 교육 필드 초기화
-        if 'edu_fields' not in st.session_state:
-            st.session_state.edu_fields = [0]
+        if 'train_fields' not in st.session_state:
+            trainings = load_training_info(st.session_state.user_email)  # DB에서 불러오기
+            if trainings:
+                st.session_state.train_fields = list(trainings.keys())
+                for train_idx, train in trainings.items():
+                    st.session_state[f'traincation_{train_idx}'] = train['description']
+            else:
+                st.session_state.train_fields = [0]
         
         # 교육 입력 필드들
-        for edu_idx in st.session_state.edu_fields:
-            if edu_idx > 0:
+        for train_idx in st.session_state.train_fields:
+            if train_idx > 0:
                 st.markdown("<div style='margin: 1rem 0;'></div>", unsafe_allow_html=True)
             
             # 교육 (6:1:1)
             cols = st.columns([6, 1, 1])
             with cols[0]:
-                st.text_area("교육 내용", key=f"education_{edu_idx}", 
+                st.text_area("교육 내용", key=f"traincation_{train_idx}", 
                            height=100,
                            placeholder="교육명:\n교육기관:\n교육기간:\n교육내용:")
             with cols[1]:
                 st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
-                if len(st.session_state.edu_fields) > 1:
-                    if st.button("교육 삭제", key=f"delete_edu_{edu_idx}", use_container_width=True):
-                        st.session_state.edu_fields.remove(edu_idx)
+                if len(st.session_state.train_fields) > 1:
+                    if st.button("교육 삭제", key=f"delete_train_{train_idx}", use_container_width=True):
+                        st.session_state.train_fields.remove(train_idx)
                         st.rerun()
                 else:
                     st.empty()
             with cols[2]:
                 st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
-                if st.button("교육 추가", key=f"add_edu_{edu_idx}", use_container_width=True):
-                    new_idx = max(st.session_state.edu_fields) + 1 if st.session_state.edu_fields else 0
-                    st.session_state.edu_fields.append(new_idx)
+                if st.button("교육 추가", key=f"add_train_{train_idx}", use_container_width=True):
+                    new_idx = max(st.session_state.train_fields) + 1 if st.session_state.train_fields else 0
+                    st.session_state.train_fields.append(new_idx)
                     st.rerun()
 
         st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
@@ -2507,12 +2521,12 @@ def show_resume_page():
                 
                 # 교육 데이터 수집
                 training_data = {}
-                for idx in st.session_state.edu_fields:
-                    edu_desc = st.session_state.get(f'education_{idx}', '').strip()
+                for idx in st.session_state.train_fields:
+                    train_desc = st.session_state.get(f'traincation_{idx}', '').strip()
                     
-                    if edu_desc:  # 입력된 경우만 저장
+                    if train_desc:  # 입력된 경우만 저장
                         training_data[idx] = {
-                            'description': edu_desc
+                            'description': train_desc
                         }
                 
                 if success:
