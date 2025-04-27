@@ -670,7 +670,7 @@ def load_certifications_info(login_email):
                     'issuing_agency': row['issuing_agency'],
                     'issue_date': row['issue_date']
                 }
-                            
+
             return certifications
             
         except Exception as e:
@@ -689,6 +689,10 @@ def load_certifications_info(login_email):
             conn.close()
 
 def load_training_info(login_email):
+    if not login_email:
+        return {}
+    
+    cursor = conn.cursor()    
     try:
         conn = connect_to_db()
         if conn is None:
@@ -702,26 +706,27 @@ def load_training_info(login_email):
                 FROM tb_resume_training 
                 WHERE login_email = %s
             """, (login_email,))
-            training = cursor.fetchall()
+
+            trainings = {}
+            for idx, row in enumerate(cursor.fetchall()):
+                trainings[idx] = {
+                    'description': row['description']
+                }
             
-            # 교육 데이터를 스킬별로 그룹화
-            result = {}
-            for train in training:
-                skill_idx = 0  # 기본값으로 첫 번째 스킬에 할당
-                if skill_idx not in result:
-                    result[skill_idx] = {
-                        'train_count': 0,
-                        'training': []
-                    }
-                result[skill_idx]['training'].append(train)
-                result[skill_idx]['train_count'] += 1
+            return trainings
+        except Exception as e:
+            print(f"Error in load_training_info: {str(e)}")
+            return {}
             
-            return result
         finally:
             cursor.close()
-            conn.close()
+
     except Exception as e:
-        return None
+            print(f"Error in load_training_info: {str(e)}")
+            return {}
+            
+    finally:
+        cursor.close()
 
 def save_career_info(login_email, data):
     try:
@@ -1651,7 +1656,7 @@ def show_resume_page():
                 st.session_state.train_counts[skill_idx] = train_data.get('train_count', 0)
                 for j, train in enumerate(train_data.get('training', [])):
                     st.session_state[f'train_id_{skill_idx}_{j}'] = train.get('id')
-                    st.session_state[f'traincation_{skill_idx}_{j}'] = train.get('description', '')
+                    st.session_state[f'train_{skill_idx}_{j}'] = train.get('description', '')
         
         st.session_state.skills_loaded = True
     
@@ -2365,6 +2370,7 @@ def show_resume_page():
         # 자격증 필드 초기화
         if 'cert_fields' not in st.session_state:
             certifications = load_certifications_info(st.session_state.user_email)  # DB에서 불러오기
+            print(certifications)
             if certifications:
                 st.session_state.cert_fields = list(certifications.keys())
                 for cert_idx, cert in certifications.items():
