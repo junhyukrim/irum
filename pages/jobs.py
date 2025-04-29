@@ -88,5 +88,5 @@ def show_jobs_page():
     # 저장 버튼
     col6, col7 = st.columns([7, 1])
     with col7:
-        if st.button("저장", type="primary", use_container_width=True):
+        if st.button("저장", use_container_width=True):
             st.success("저장되었습니다!") 
