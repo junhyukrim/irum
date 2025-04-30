@@ -1,4 +1,122 @@
 import streamlit as st
+import pymysql
+
+def connect_to_db():
+    try:
+        connection = pymysql.connect(
+            host=st.secrets["mysql"]["host"],
+            port=int(st.secrets["mysql"]["port"]),
+            user=st.secrets["mysql"]["user"],
+            password=st.secrets["mysql"]["password"],
+            database=st.secrets["mysql"]["database"],
+            cursorclass=pymysql.cursors.DictCursor
+        )
+        
+        return connection
+    except Exception as e:
+        
+        return None
+
+def show_success_message():
+    st.markdown("""
+        <div style="padding: 1rem; border-radius: 0.5rem; background-color: #d8e6fd;">
+            성공적으로 저장되었습니다!
+        </div>
+    """, unsafe_allow_html=True)
+
+def save_jobs_info(login_email, data):
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return False
+
+        cursor = conn.cursor()
+        try:
+            # 현재 사용자의 기존 공고 ID 목록 조회
+            cursor.execute(
+                "SELECT id FROM tb_jobs WHERE login_email = %s",
+                (login_email,)
+            )
+            existing_ids = {row['id'] for row in cursor.fetchall()}
+            saved_ids = set()
+
+            # 데이터 저장/수정
+            for idx, job in data.items():
+                if idx in existing_ids:
+                    # 기존 공고 업데이트
+                    update_query = """
+                        UPDATE tb_jobs
+                        SET
+                            company_name = %s,
+                            position_name = %s,
+                            position_count = %s,
+                            requirements = %s,
+                            main_tasks = %s,
+                            submission = %s,
+                            contact = %s,
+                            website = %s,
+                            company_intro = %s,
+                            talent = %s,
+                            preferences = %s,
+                            work_environment = %s,  
+                            faq = %s,
+                            additional_info = %s
+                        WHERE id = %s
+                    """
+                    cursor.execute(update_query, (
+                        job['company_name'], job['position_name'], job['position_count'], job['requirements'],  
+                        job['main_tasks'], job['submission'], job['contact'], job['website'], job['company_intro'],
+                        job['talent'], job['preferences'], job['work_environment'], job['faq'], job['additional_info'],
+                        idx
+                    ))
+                    saved_ids.add(idx)
+                else:
+                    # 새로운 공고 저장
+                    insert_query = """
+                        INSERT INTO tb_jobs (
+                            login_email, company_name, position_name, position_count, requirements, main_tasks, submission,
+                            contact, website, company_intro, talent, preferences, work_environment, faq, additional_info
+                        )
+                    """
+                    cursor.execute(insert_query, (
+                        login_email, job['company_name'], job['position_name'], job['position_count'], job['requirements'],
+                        job['main_tasks'], job['submission'], job['contact'], job['website'], job['company_intro'],
+                        job['talent'], job['preferences'], job['work_environment'], job['faq'], job['additional_info']
+                    ))
+                    saved_ids.add(idx)
+                    
+            conn.commit()
+            return True
+        except Exception as e:
+            st.error(f"쿼리 실행 중 오류: {str(e)}")
+            conn.rollback()
+            return False
+        finally:
+            cursor.close()
+            conn.close()
+    except Exception as e:
+        st.error(f"데이터베이스 연결 중 오류: {str(e)}")
+        return False        
+
+def load_jobs_info():
+    # 데이터베이스에서 불러오기
+    return []
+
+def delete_jobs_info(job_id):
+    # 데이터베이스에서 삭제
+    return True
+
+def update_jobs_info(job_id, jobs_data):
+    # 데이터베이스에서 업데이트
+    return True
+
+def show_jobs_list():
+    # 저장된 공고 목록 표시
+    st.markdown("""
+        <div style="padding: 1rem; border-radius: 0.5rem; background-color: #d8e6fd;">
+            저장된 공고 목록
+        </div>
+    """, unsafe_allow_html=True)
 
 def show_jobs_page():
     st.markdown(
@@ -9,6 +127,32 @@ def show_jobs_page():
             padding-left: 1rem !important;
             padding-right: 1rem !important;
             margin: 0 auto !important;
+        }
+        div.stButton > button {
+        width: 100% !important;
+        height: 42px !important;
+        margin: 0 !important;
+        padding: 0.5rem !important;
+        background-color: white !important;
+        color: #4285F4 !important;
+        font-size: 14px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border-radius: 8px !important;
+        transition: all 0.2s ease !important;
+        border: 2px solid #f39a9a !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        div.stButton > button:hover {
+            background-color: #f8f8f8 !important;
+            border-color: #e07a7a !important;
+        }
+
+        div.stButton > button:active {
+            background-color: #f0f0f0 !important;
+            border-color: #d65555 !important;
         }
         </style>
         """,
@@ -86,7 +230,36 @@ def show_jobs_page():
     st.markdown("<br>", unsafe_allow_html=True)
     
     # 저장 버튼
-    col6, col7 = st.columns([7, 1])
-    with col7:
-        if st.button("저장", use_container_width=True):
-            st.success("저장되었습니다!") 
+    st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
+    cols = st.columns(8)
+    for i in range(7):  # 처음 7개 컬럼은 빈 공간
+        cols[i].empty()
+    with cols[7]:  # 마지막 컬럼에 버튼 배치
+        if st.button("저장", key="save_jobs_button", use_container_width=True):
+            if 'user_email' not in st.session_state:
+                    st.error("로그인이 필요합니다.")
+                    return
+            
+            # 현재 입력된 모든 공고 데이터 수집
+            jobs_data = {
+                'company_name': company_name,
+                'position_name': position_name,
+                'position_count': position_count,
+                'requirements': requirements,
+                'main_tasks': main_tasks,
+                'submission': submission,
+                'contact': contact,
+                'website': website,
+                'company_intro': company_intro,
+                'talent': talent,
+                'preferences': preferences,
+                'work_environment': work_environment,
+                'faq': faq,
+                'additional_info': additional_info
+            }
+            
+            if save_jobs_info(st.session_state.user_email, jobs_data):
+                show_success_message()
+                st.rerun()
+            else:
+                st.error("저장 중 오류가 발생했습니다.")
