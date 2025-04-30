@@ -128,32 +128,6 @@ def show_jobs_page():
             padding-right: 1rem !important;
             margin: 0 auto !important;
         }
-        div.stButton > button {
-        width: 100% !important;
-        height: 42px !important;
-        margin: 0 !important;
-        padding: 0.5rem !important;
-        background-color: white !important;
-        color: #4285F4 !important;
-        font-size: 14px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        border-radius: 8px !important;
-        transition: all 0.2s ease !important;
-        border: 2px solid #f39a9a !important;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-        }
-
-        div.stButton > button:hover {
-            background-color: #f8f8f8 !important;
-            border-color: #e07a7a !important;
-        }
-
-        div.stButton > button:active {
-            background-color: #f0f0f0 !important;
-            border-color: #d65555 !important;
-        }
         </style>
         """,
         unsafe_allow_html=True
@@ -230,7 +204,36 @@ def show_jobs_page():
     st.markdown("<br>", unsafe_allow_html=True)
     
     # 저장 버튼
-    st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
+    st.markdown("""
+    <style>
+    div.stButton > button {
+        width: 100% !important;
+        height: 42px !important;
+        margin: 0 !important;
+        padding: 0.5rem !important;
+        background-color: white !important;
+        color: #4285F4 !important;
+        font-size: 14px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border-radius: 8px !important;
+        transition: all 0.2s ease !important;
+        border: 2px solid #f39a9a !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    div.stButton > button:hover {
+        background-color: #f8f8f8 !important;
+        border-color: #e07a7a !important;
+    }
+
+    div.stButton > button:active {
+        background-color: #f0f0f0 !important;
+        border-color: #d65555 !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
     cols = st.columns(8)
     for i in range(7):  # 처음 7개 컬럼은 빈 공간
         cols[i].empty()
