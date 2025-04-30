@@ -131,18 +131,17 @@ def show_jobs_page():
         div.stButton > button {
         width: 100% !important;
         height: 42px !important;
-        background-color: #f8f9fa !important;  /* 사이드탭과 동일한 회색톤 */
-        color: #1a73e8 !important;
-        font-size: 16px !important;
-        font-weight: 500 !important;
-        border: 1.5px solid #1a73e8 !important;
-        border-radius: 8px !important;
+        margin: 0 !important;
+        padding: 0.5rem !important;
+        background-color: #4285F4 !important;
+        color: white !important;
+        font-size: 14px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        line-height: normal !important;
-        padding: 0 !important;
-        transition: all 0.2s ease;
+        border-radius: 4px !important;
+        transition: all 0.2s ease !important;
+        border: 1px solid #4285F4 !important;
     }
 
         div.stButton > button:hover {
