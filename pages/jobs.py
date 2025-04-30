@@ -133,7 +133,7 @@ def show_jobs_page():
         height: 42px !important;
         margin: 0 !important;
         padding: 0.5rem !important;
-        background-color: #4285F4 !important;
+        background-color: white !important;
         color: white !important;
         font-size: 14px !important;
         display: flex !important;
@@ -145,13 +145,13 @@ def show_jobs_page():
     }
 
         div.stButton > button:hover {
-            background-color: #1967D2 !important;
-            border-color: #1967D2 !important;
+            background-color: white !important;
+            border-color: #4285F4 !important;
         }
 
         div.stButton > button:active {
-            background-color: #1557B0 !important;
-            border-color: #1557B0 !important;
+            background-color: white !important;
+            border-color: #4285F4 !important;
         }
         </style>
     """, unsafe_allow_html=True)
