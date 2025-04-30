@@ -210,27 +210,25 @@ def show_jobs_page():
         width: 100% !important;
         height: 42px !important;
         margin: 0 !important;
-        padding: 0.5rem !important;
+        padding: 0.5rem 1rem !important;
         background-color: white !important;
-        color: #4285F4 !important;
-        font-size: 14px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
+        color: #1a73e8 !important;
+        font-size: 16px !important;
+        font-weight: 500 !important;
+        border: 1.5px solid #1a73e8 !important;
         border-radius: 8px !important;
-        transition: all 0.2s ease !important;
-        border: 2px solid #f39a9a !important;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        cursor: pointer !important;
+        transition: background-color 0.2s ease, border-color 0.2s ease;
     }
 
     div.stButton > button:hover {
-        background-color: #f8f8f8 !important;
-        border-color: #e07a7a !important;
+        background-color: #f0f8ff !important;
+        border-color: #1669c1 !important;
     }
 
     div.stButton > button:active {
-        background-color: #f0f0f0 !important;
-        border-color: #d65555 !important;
+        background-color: #e8f0fe !important;
+        border-color: #145dbf !important;
     }
     </style>
     """, unsafe_allow_html=True)
