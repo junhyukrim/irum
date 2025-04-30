@@ -145,13 +145,13 @@ def show_jobs_page():
     }
 
         div.stButton > button:hover {
-            background-color: #eef4ff !important;
-            border-color: #1669c1 !important;
+            background-color: #1967D2 !important;
+            border-color: #1967D2 !important;
         }
 
         div.stButton > button:active {
-            background-color: #e3efff !important;
-            border-color: #145dbf !important;
+            background-color: #1557B0 !important;
+            border-color: #1557B0 !important;
         }
         </style>
     """, unsafe_allow_html=True)
