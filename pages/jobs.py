@@ -95,7 +95,7 @@ def delete_job(job_id):
         st.error(f"삭제 오류: {str(e)}")
         return False
 
-def show_jobs_page():
+def show_jobs_page(): 
     st.markdown(
         """
         <style>
@@ -225,28 +225,6 @@ def show_jobs_page():
                 font-size: 2rem !important;
                 font-weight: bold !important;
             }
-            
-            /* 공고관리 저장 버튼만 스타일링 (key 기반 선택) */
-            button[aria-label="save_jobs_button"] {
-                width: 100% !important;
-                height: 42px !important;
-                margin: 0 !important;
-                padding: 0.5rem !important;
-                background-color: white !important;
-                color: #4285F4 !important;
-                font-size: 14px !important;
-                font-weight: bold !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                border-radius: 4px !important;
-                border: 2px solid #4285F4 !important;
-                transition: all 0.2s ease !important;
-            }
-
-            button[aria-label="save_jobs_button"]:hover {
-                background-color: #e8f0fe !important;
-            }
 
             /* 모바일 화면 대응 */
             @media (max-width: 768px) {
@@ -366,18 +344,55 @@ def show_jobs_page():
     st.markdown("<br>", unsafe_allow_html=True)
     
     # 저장 버튼
-    st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
-    cols = st.columns(8)
-    for i in range(7):  # 처음 7개 컬럼은 빈 공간
-        cols[i].empty()
-    with cols[7]:  # 마지막 컬럼에 버튼 배치
-        if st.button("저장", key="save_jobs_button", use_container_width=True):
-            if save_job(login_email, job_data, job_id):
-                show_success_message()
-                st.rerun()
+    # st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
+    # cols = st.columns(8)
+    # for i in range(7):  # 처음 7개 컬럼은 빈 공간
+    #     cols[i].empty()
+    # with cols[7]:  # 마지막 컬럼에 버튼 배치
+    #     if st.button("저장", key="save_jobs_button", use_container_width=True):
+    #         if save_job(login_email, job_data, job_id):
+    #             show_success_message()
+    #             st.rerun()
             
+    # if job_id:
+    #     if st.button("공고 삭제", key="delete_jobs_button"):
+    #         if delete_job(job_id):
+    #             st.success("공고가 삭제되었습니다.")
+    #             st.rerun()
+    st.markdown("""
+        <div style='display: flex; justify-content: flex-end; padding-top: 1rem;'>
+            <form action="?save_custom=true" method="get">
+                <button type="submit" style="
+                    width: 100px;
+                    height: 42px;
+                    background-color: white;
+                    color: #4285F4;
+                    border: 2px solid #4285F4;
+                    border-radius: 4px;
+                    font-size: 14px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    transition: background-color 0.2s ease;
+                " 
+                onmouseover="this.style.backgroundColor='#e8f0fe'"
+                onmouseout="this.style.backgroundColor='white'">
+                    저장
+                </button>
+            </form>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # 쿼리 파라미터로 저장 요청 감지
+    query_params = st.experimental_get_query_params()
+    if query_params.get("save_custom") == ["true"]:
+        if save_job(login_email, job_data, job_id):
+            show_success_message()
+            st.experimental_set_query_params()
+            st.rerun()
+
     if job_id:
         if st.button("공고 삭제", key="delete_jobs_button"):
             if delete_job(job_id):
                 st.success("공고가 삭제되었습니다.")
                 st.rerun()
+
