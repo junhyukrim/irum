@@ -1,5 +1,6 @@
 import streamlit as st
 import pymysql
+from datetime import datetime
 
 def connect_to_db():
     try:
@@ -58,9 +59,9 @@ def save_job(login_email, job_data, job_id=None):
             if job_id:
                 update_query = """
                     UPDATE tb_job_postings SET
-                        company_name = %s, position_name = %s, position_count = %s, requirements = %s,
-                        main_tasks = %s, submission = %s, contact = %s, website = %s, company_intro = %s,
-                        talent = %s, preferences = %s, work_environment = %s, faq = %s, additional_info = %s,
+                        company_name = %s, position = %s, openings = %s, requirements = %s,
+                        main_duties = %s, submission = %s, contact = %s, company_website = %s, company_intro = %s,
+                        talent = %s, preferences = %s, company_culture = %s, faq = %s, additional_info = %s,
                         motivation = %s
                     WHERE id = %s
                 """
@@ -68,12 +69,13 @@ def save_job(login_email, job_data, job_id=None):
             else:
                 insert_query = """
                     INSERT INTO tb_job_postings (
-                        login_email, company_name, position_name, position_count, requirements, main_tasks,
-                        submission, contact, website, company_intro, talent, preferences, work_environment,
-                        faq, additional_info, motivation
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        login_email, company_name, position, openings, requirements, main_duties,
+                        submission, contact, company_website, company_intro, talent, preferences, company_culture,
+                        faq, additional_info, motivation, created_at
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
-                cursor.execute(insert_query, (login_email, *job_data.values()))
+                now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                cursor.execute(insert_query, (login_email, *job_data.values(), now))
             conn.commit()
             return True
     except Exception as e:
@@ -270,8 +272,8 @@ def show_jobs_page():
 
     selected_job = st.selectbox("저장된 공고 선택", ["새 공고 추가"] + job_titles)
     job_data = {key: "" for key in [
-        'company_name', 'position_name', 'position_count', 'requirements', 'main_tasks', 'submission',
-        'contact', 'website', 'company_intro', 'talent', 'preferences', 'work_environment', 'faq',
+        'company_name', 'position', 'openings', 'requirements', 'main_duties', 'submission',
+        'contact', 'company_website', 'company_intro', 'talent', 'preferences', 'company_culture', 'faq',
         'additional_info', 'motivation']}
     job_id = None
 
@@ -288,20 +290,21 @@ def show_jobs_page():
     with col1:
         company_name = st.text_input("기업명")
     with col2:
-        position_name = st.text_input("직무명")
+        position = st.text_input("직무명")
     with col3:
-        position_count = st.number_input("채용인원", min_value=1, value=1)
+        openings = st.number_input("채용인원", min_value=1, value=1)
     
     # 자격요건 (여러 줄 입력 가능)
     requirements = st.text_area("자격요건", height=150,
                               help="• 항목별로 새로운 줄에 입력해주세요.")
     
     # 주요업무 (여러 줄 입력 가능)
-    main_tasks = st.text_area("주요업무", height=150,
+    main_duties = st.text_area("주요업무", height=150,
                              help="• 항목별로 새로운 줄에 입력해주세요.")
     
     # 지원동기 (여러 줄 입력 가능)
-    job_data['motivation'] = st.text_area("지원동기", height=150, value=job_data['motivation'])
+    motivation = st.text_area("지원동기", height=150, value=job_data['motivation'],
+                                          help="• 회사에 지원하는 동기를 기재해주세요.")
 
     # 제출서류 & 지원방법 (여러 줄 입력 가능)
     submission = st.text_area("제출서류 & 지원방법", height=150,
@@ -310,9 +313,9 @@ def show_jobs_page():
     # 문의처와 홈페이지
     col4, col5 = st.columns(2)
     with col4:
-        contact = st.text_input("문의처(이메일/연락처)")
+        contact = st.text_input("문의처(이메일/연락처)", value=job_data["contact"])
     with col5:
-        website = st.text_input("홈페이지 주소")
+        company_website = st.text_input("홈페이지 주소", value=job_data["company_website"])
     
     st.markdown("<hr>", unsafe_allow_html=True)
     
@@ -332,7 +335,7 @@ def show_jobs_page():
                              help="• 우대하는 자격요건이나 경험을 기재해주세요.")
     
     # 근무환경 (여러 줄 입력 가능)
-    work_environment = st.text_area("근무환경", height=100,
+    company_culture = st.text_area("근무환경", height=100,
                                   help="• 근무지, 근무시간, 복리후생 등을 상세히 기재해주세요.")
     
     # FAQ (여러 줄 입력 가능)
@@ -342,6 +345,23 @@ def show_jobs_page():
     # 기타 안내사항 (여러 줄 입력 가능)
     additional_info = st.text_area("기타 안내사항", height=100,
                                  help="• 추가로 안내할 사항이 있다면 기재해주세요.")
+    
+    # 입력값을 job_data에 다시 저장
+    job_data["company_name"] = company_name
+    job_data["position"] = position
+    job_data["openings"] = openings
+    job_data["requirements"] = requirements
+    job_data["main_duties"] = main_duties
+    job_data["motivation"] = motivation
+    job_data["submission"] = submission
+    job_data["contact"] = contact
+    job_data["company_website"] = company_website
+    job_data["company_intro"] = company_intro
+    job_data["talent"] = talent
+    job_data["preferences"] = preferences
+    job_data["company_culture"] = company_culture
+    job_data["faq"] = faq
+    job_data["additional_info"] = additional_info
     
     st.markdown("<br>", unsafe_allow_html=True)
     
