@@ -31,7 +31,7 @@ def load_jobs_info(login_email):
         if conn is None:
             return []
         with conn.cursor() as cursor:
-            cursor.execute("SELECT id, company_name FROM tb_jobs WHERE login_email = %s", (login_email,))
+            cursor.execute("SELECT id, company_name FROM tb_job_postings WHERE login_email = %s", (login_email,))
             return cursor.fetchall()
     except Exception as e:
         st.error(f"불러오기 오류: {str(e)}")
@@ -43,7 +43,7 @@ def load_single_job(job_id):
         if conn is None:
             return None
         with conn.cursor() as cursor:
-            cursor.execute("SELECT * FROM tb_jobs WHERE id = %s", (job_id,))
+            cursor.execute("SELECT * FROM tb_job_postings WHERE id = %s", (job_id,))
             return cursor.fetchone()
     except Exception as e:
         st.error(f"불러오기 오류: {str(e)}")
@@ -57,7 +57,7 @@ def save_job(login_email, job_data, job_id=None):
         with conn.cursor() as cursor:
             if job_id:
                 update_query = """
-                    UPDATE tb_jobs SET
+                    UPDATE tb_job_postings SET
                         company_name = %s, position_name = %s, position_count = %s, requirements = %s,
                         main_tasks = %s, submission = %s, contact = %s, website = %s, company_intro = %s,
                         talent = %s, preferences = %s, work_environment = %s, faq = %s, additional_info = %s,
@@ -67,7 +67,7 @@ def save_job(login_email, job_data, job_id=None):
                 cursor.execute(update_query, (*job_data.values(), job_id))
             else:
                 insert_query = """
-                    INSERT INTO tb_jobs (
+                    INSERT INTO tb_job_postings (
                         login_email, company_name, position_name, position_count, requirements, main_tasks,
                         submission, contact, website, company_intro, talent, preferences, work_environment,
                         faq, additional_info, motivation
@@ -86,7 +86,7 @@ def delete_job(job_id):
         if conn is None:
             return False
         with conn.cursor() as cursor:
-            cursor.execute("DELETE FROM tb_jobs WHERE id = %s", (job_id,))
+            cursor.execute("DELETE FROM tb_job_postings WHERE id = %s", (job_id,))
             conn.commit()
             return True
     except Exception as e:
@@ -223,6 +223,28 @@ def show_jobs_page():
                 font-size: 2rem !important;
                 font-weight: bold !important;
             }
+            
+            /* 공고관리 저장 버튼만 스타일링 (key 기반 선택) */
+            button[aria-label="save_jobs_button"] {
+                width: 100% !important;
+                height: 42px !important;
+                margin: 0 !important;
+                padding: 0.5rem !important;
+                background-color: white !important;
+                color: #4285F4 !important;
+                font-size: 14px !important;
+                font-weight: bold !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                border-radius: 4px !important;
+                border: 2px solid #4285F4 !important;
+                transition: all 0.2s ease !important;
+            }
+
+            button[aria-label="save_jobs_button"]:hover {
+                background-color: #e8f0fe !important;
+            }
 
             /* 모바일 화면 대응 */
             @media (max-width: 768px) {
@@ -329,7 +351,7 @@ def show_jobs_page():
     for i in range(7):  # 처음 7개 컬럼은 빈 공간
         cols[i].empty()
     with cols[7]:  # 마지막 컬럼에 버튼 배치
-        if st.button("공고 저장", key="save_jobs_button", use_container_width=True):
+        if st.button("저장", key="save_jobs_button", use_container_width=True):
             if save_job(login_email, job_data, job_id):
                 show_success_message()
                 st.rerun()
