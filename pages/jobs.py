@@ -11,6 +11,7 @@ def connect_to_db():
             password=st.secrets["mysql"]["password"],
             database=st.secrets["mysql"]["database"],
             cursorclass=pymysql.cursors.DictCursor
+            charset="utf8mb4"
         )
         
         return connection
@@ -123,6 +124,7 @@ def save_job(login_email, job_data, job_id=None):
                         submission, contact, company_website, company_intro, talent, preferences, company_culture,
                         faq, additional_info, motivation, created_at
                     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    COLLATE utf8mb4_general_ci
                 """
                 now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 cursor.execute(insert_query, (
@@ -156,13 +158,14 @@ def delete_job(job_id, login_email):
             cursor.execute("""
                 SELECT id FROM tb_job_postings 
                 WHERE id = %s AND login_email = %s
+                COLLATE utf8mb4_general_ci
             """, (job_id, login_email))
 
             if not cursor.fetchone():
                 st.warning("해당 공고를 찾을 수 없거나 삭제 권한이 없습니다.")
                 return False
             
-            cursor.execute("DELETE FROM tb_job_postings WHERE id = %s", (job_id,))
+            cursor.execute("DELETE FROM tb_job_postings WHERE id = %s COLLATE utf8mb4_general_ci", (job_id,))
             conn.commit()
             st.success("공고가 성공적으로 삭제되었습니다.")
             return True
@@ -331,6 +334,7 @@ def show_jobs_page():
     st.markdown("<br>", unsafe_allow_html=True)
     
     st.markdown("""
+    <style>
         div[data-testid="stHorizontalBlock"] div.stButton > button:not([kind="primary"]) {
         background-color: white !important;
         color: #4285F4 !important;
