@@ -19,13 +19,6 @@ def connect_to_db():
         
         return None
 
-def initialize_intro_state(idx):
-    if f'selected_category_{idx}' not in st.session_state:
-        st.session_state[f'selected_category_{idx}'] = list(intro_topic_map.keys())[0]
-    if f'intro_topic_{idx}' not in st.session_state:
-        first_topic = intro_topic_map[st.session_state[f'selected_category_{idx}']][0]
-        st.session_state[f'intro_topic_{idx}'] = first_topic
-
 def save_personal_info(login_email, data):
     try:
         conn = connect_to_db()
@@ -3270,6 +3263,13 @@ def show_resume_page():
         # 자기소개 데이터 초기화
         if 'intro_data' not in st.session_state:
             st.session_state.intro_data = list(range(st.session_state.intro_count))
+
+        def initialize_intro_state(idx):
+            if f'selected_category_{idx}' not in st.session_state:
+                st.session_state[f'selected_category_{idx}'] = list(intro_topic_map.keys())[0]
+            if f'intro_topic_{idx}' not in st.session_state:
+                first_topic = intro_topic_map[st.session_state[f'selected_category_{idx}']][0]
+                st.session_state[f'intro_topic_{idx}'] = first_topic
 
         # 각 자기소개 정보 입력 폼
         for idx, i in enumerate(st.session_state.intro_data):
