@@ -3240,6 +3240,7 @@ def show_resume_page():
             st.session_state['custom_topic'] = ""
         
         # 주제 선택
+        topics = intro_topic_map.get(selected_category, [])
         selected_topic = st.selectbox("주제", topics, key=f"intro_topic_{i}")
 
         # 사용자 정의 주제를 선택한 경우 텍스트 입력 필드 추가
