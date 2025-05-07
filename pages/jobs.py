@@ -49,7 +49,7 @@ def load_jobs_info(login_email):
         
         cursor = conn.cursor()
         try:
-            cursor.execute("SELECT id, company_name FROM tb_job_postings WHERE login_email = %s", (login_email,))
+            cursor.execute("SELECT id, company_name FROM tb_job_postings WHERE login_email = %s COLLATE utf8mb4_general_ci", (login_email,))
             result = cursor.fetchall()
 
             if result:
@@ -70,7 +70,7 @@ def load_single_job(job_id):
             return None,  "데이터베이스에 접근할 수 없습니다. 관리자에게 문의해주세요."
         cursor = conn.cursor()
         try:
-            cursor.execute("SELECT * FROM tb_job_postings WHERE id = %s", (job_id,))
+            cursor.execute("SELECT * FROM tb_job_postings WHERE id = %s COLLATE utf8mb4_general_ci", (job_id,))
             result = cursor.fetchone()
             
             if result:
@@ -93,10 +93,10 @@ def save_job(login_email, job_data, job_id=None):
         cursor = conn.cursor()
         try:
             if job_id:
-                cursor.execute("SELECT * FROM tb_job_postings WHERE id = %s", (job_id,))
+                cursor.execute("SELECT * FROM tb_job_postings WHERE id = %s COLLATE utf8mb4_general_ci", (job_id,))
                 result = cursor.fetchone()
             else:
-                cursor.execute("SELECT * FROM tb_job_postings WHERE login_email = %s AND company_name = %s", 
+                cursor.execute("SELECT * FROM tb_job_postings WHERE login_email = %s AND company_name = %s COLLATE utf8mb4_general_ci", 
                             (login_email, job_data['company_name']))
                 result = cursor.fetchone()
             
