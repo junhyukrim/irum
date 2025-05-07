@@ -98,7 +98,7 @@ def delete_job(job_id):
 def format_bullet_text(raw_text):
     lines = raw_text.strip().splitlines()
     return "\n".join(
-        line if line.strip().startswith("•") else f"• {line.strip()}"
+        line if line.strip().startswith("-") else f"- {line.strip()}"
         for line in lines if line.strip()
     )
 
@@ -155,7 +155,7 @@ def show_jobs_page():
     
     # 자격요건 (여러 줄 입력 가능)
     requirements = st.text_area("자격요건", height=150,
-                              help="• 항목별로 새로운 줄에 입력해주세요.")
+                              help="• 각 항목을 줄바꿈하여 입력하세요. 자동으로 '-' 기호가 붙습니다.")
     
     # 주요업무 (여러 줄 입력 가능)
     main_duties = st.text_area("주요업무", height=150,
