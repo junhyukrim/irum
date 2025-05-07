@@ -59,7 +59,7 @@ def save_job(login_email, job_data, job_id=None):
             if job_id:
                 update_query = """
                     UPDATE tb_job_postings SET
-                        company_name = %s, position = %s, openings = %s, requirements = %s,
+                        company_name = %s, position = %s, openings = %s, deadline = %, requirements = %s,
                         main_duties = %s, submission = %s, contact = %s, company_website = %s, company_intro = %s,
                         talent = %s, preferences = %s, company_culture = %s, faq = %s, additional_info = %s,
                         motivation = %s
@@ -69,10 +69,10 @@ def save_job(login_email, job_data, job_id=None):
             else:
                 insert_query = """
                     INSERT INTO tb_job_postings (
-                        login_email, company_name, position, openings, requirements, main_duties,
+                        login_email, company_name, position, openings, deadline, requirements, main_duties,
                         submission, contact, company_website, company_intro, talent, preferences, company_culture,
                         faq, additional_info, motivation, created_at
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
                 now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 cursor.execute(insert_query, (login_email, *job_data.values(), now))
@@ -98,7 +98,7 @@ def delete_job(job_id):
 def format_bullet_text(raw_text):
     lines = raw_text.strip().splitlines()
     return "\n".join(
-        line if line.strip().startswith("-") else f"- {line.strip()}"
+        f"- {line.strip()}" if not line.strip().startswith("-") else line.strip()
         for line in lines if line.strip()
     )
 
@@ -152,14 +152,25 @@ def show_jobs_page():
         position = st.text_input("직무명")
     with col3:
         openings = st.number_input("채용인원", min_value=1, value=1)
-    
+
+    # 제출기한
+    deadline = st.date_input("제출기한", value=datetime.now().date())
+
     # 자격요건 (여러 줄 입력 가능)
     requirements = st.text_area("자격요건", height=150,
                               help="• 각 항목을 줄바꿈하여 입력하세요. 자동으로 '-' 기호가 붙습니다.")
     
+    if requirements:
+        formatted_requirements = format_bullet_text(requirements)
+        st.markdown(f"#### 가공된 자격요건\n{formatted_requirements}")
+
     # 주요업무 (여러 줄 입력 가능)
     main_duties = st.text_area("주요업무", height=150,
-                             help="• 항목별로 새로운 줄에 입력해주세요.")
+                             help="• 각 항목을 줄바꿈하여 입력하세요. 자동으로 '-' 기호가 붙습니다.")
+    
+    if main_duties:
+        formatted_main_duties = format_bullet_text(main_duties)
+        st.markdown(f"#### 가공된 주요업무\n{formatted_main_duties}")
     
     # 지원동기 (여러 줄 입력 가능)
     motivation = st.text_area("지원동기", height=150, value=job_data['motivation'],
@@ -209,6 +220,7 @@ def show_jobs_page():
     job_data["company_name"] = company_name
     job_data["position"] = position
     job_data["openings"] = openings
+    job_data["deadline"] = str(deadline)
     job_data["requirements"] = format_bullet_text(requirements)
     job_data["main_duties"] = format_bullet_text(main_duties)
     job_data["motivation"] = motivation
@@ -217,7 +229,7 @@ def show_jobs_page():
     job_data["company_website"] = company_website
     job_data["company_intro"] = company_intro
     job_data["talent"] = talent
-    job_data["preferences"] = format_bullet_text(preferences)
+    job_data["preferences"] = preferences
     job_data["company_culture"] = company_culture
     job_data["faq"] = faq
     job_data["additional_info"] = additional_info
