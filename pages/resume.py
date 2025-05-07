@@ -3295,7 +3295,10 @@ def show_resume_page():
                 # '기타(개성, 좌우명 등)' 선택 시 '사용자 정의 주제 추가' 옵션 추가
                 if selected_category == "기타(개성, 좌우명 등)":
                     topics.append("사용자 정의 주제 추가")
-                st.selectbox(
+
+                # 주제 선택
+                selected_topic = ""    
+                selected_topic = st.selectbox(
                     "주제",
                     topics,
                     key=f"intro_topic_{i}"
