@@ -212,7 +212,10 @@ def show_jobs_page():
     
     # 사용자 이메일로 저장된 공고 목록 불러오기
     login_email = st.session_state.user_email
-    jobs = load_jobs_info(login_email)
+
+    jobs, message = load_jobs_info(login_email)
+    if not jobs:
+        st.warning(message)
     job_titles = [job['company_name'] for job in jobs]
     job_ids = {job['company_name']: job['id'] for job in jobs}
 
@@ -227,9 +230,11 @@ def show_jobs_page():
 
     # 기존 공고 선택 시 데이터 불러오기
     if selected_job != "새 공고 추가" and job_id:
-        db_data = load_single_job(job_id)
+        db_data, msg = load_single_job(job_id)
         if db_data:
             job_data.update(db_data)
+        else:
+            st.warning(msg)
 
     # 필수 채용공고 양식
     st.markdown('<h5 class="section-header">필수 채용공고 양식</h5>', unsafe_allow_html=True)
@@ -349,23 +354,32 @@ def show_jobs_page():
     """, unsafe_allow_html=True)
 
     if st.button("저장"):
+        job_data.update({
+            "company_name": company_name,
+            "position": position,
+            "openings": openings,
+            "deadline": str(deadline),
+            "requirements": requirements
+        })
         if save_job(login_email, job_data, job_id):
             st.session_state.save_success = True
-            show_success_message("성공적으로 저장되었습니다!", "success")
+            st.success("성공적으로 저장되었습니다!")
         else:
-            show_success_message("저장에 실패했습니다.", "error")
+            st.error("저장에 실패했습니다.")
 
     if job_id and st.button("삭제"):
-        if delete_job(job_id):
+        if delete_job(job_id, login_email):
             st.session_state.save_success = True
-            show_success_message("성공적으로 삭제되었습니다!", "success")
+            st.success("성공적으로 삭제되었습니다!")
         else:
-            show_success_message("삭제에 실패했습니다.", "error")
+            st.error("삭제에 실패했습니다.")
 
     if st.session_state.save_success:
-        show_success_message("작업이 완료되었습니다!")
+        st.success("작업이 완료되었습니다!")
+        st.session_state.save_success = False
 
 show_jobs_page()
+
     
 
 
