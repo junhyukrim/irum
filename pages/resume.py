@@ -3238,23 +3238,6 @@ def show_resume_page():
         # 사용자 정의 주제 입력 필드 관리
         if 'custom_topic' not in st.session_state:
             st.session_state['custom_topic'] = ""
-        
-    # 주제 선택
-    selected_category = st.session_state.get(f'selected_category_{i}', list(intro_topic_map.keys())[0])
-    topics = intro_topic_map.get(selected_category, [])
-    selected_topic = selected_topic = ""
-    if selected_category == "기타(개성, 좌우명 등)" and "사용자 정의 주제 추가" in topics:
-        selected_topic = st.selectbox("주제", topics, key=f"intro_topic_{i}")
-    if selected_topic == "사용자 정의 주제 추가":
-        st.session_state[f'custom_topic_{i}'] = st.text_input("사용자 정의 주제를 입력하세요.", key=f"custom_topic_{i}")
-        selected_topic = st.session_state[f'custom_topic_{i}'] if st.session_state[f'custom_topic_{i}'] else selected_topic
-    else:
-        selected_topic = st.selectbox("주제", topics, key=f"intro_topic_{i}")
-
-        # 사용자 정의 주제를 선택한 경우 텍스트 입력 필드 추가
-        if selected_topic == "사용자 정의 주제 추가":
-            st.session_state['custom_topic'] = st.text_input("사용자 정의 주제를 입력하세요.", key=f"custom_topic_{i}")
-            selected_topic = st.session_state['custom_topic'] if st.session_state['custom_topic'] else selected_topic
 
         # 자기소개 데이터 로딩
         if 'intro_data_loaded' not in st.session_state:
@@ -3308,11 +3291,21 @@ def show_resume_page():
             with cols[1]:
                 # 선택된 분야에 따른 주제 목록 표시
                 topics = intro_topic_map[selected_category]
+
+                # '기타(개성, 좌우명 등)' 선택 시 '사용자 정의 주제 추가' 옵션 추가
+                if selected_category == "기타(개성, 좌우명 등)":
+                    topics.append("사용자 정의 주제 추가")
                 st.selectbox(
                     "주제",
                     topics,
                     key=f"intro_topic_{i}"
                 )
+
+                # '사용자 정의 주제 추가'가 선택된 경우, 입력 필드 표시
+                if selected_topic == "사용자 정의 주제 추가":
+                    custom_topic = st.text_input("사용자 정의 주제를 입력하세요.", key=f"custom_topic_{i}")
+                    # 세션 상태 업데이트
+                    st.session_state[f'intro_topic_{i}'] = custom_topic if custom_topic else selected_topic
             
             with cols[2]:
                 st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
