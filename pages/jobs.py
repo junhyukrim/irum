@@ -95,7 +95,14 @@ def delete_job(job_id):
         st.error(f"삭제 오류: {str(e)}")
         return False
 
-def show_jobs_page(): 
+def format_bullet_text(raw_text):
+    lines = raw_text.strip().splitlines()
+    return "\n".join(
+        line if line.strip().startswith("•") else f"• {line.strip()}"
+        for line in lines if line.strip()
+    )
+
+def show_jobs_page():
     st.markdown(
         """
         <style>
@@ -105,132 +112,6 @@ def show_jobs_page():
                 padding-left: 1rem !important;
                 padding-right: 1rem !important;
                 margin: 0 auto !important;
-            }
-
-            /* 폼 스타일링 */
-            .stTextInput > label, 
-            .stSelectbox > label, 
-            .stDateInput > label,
-            .stTextArea > label {
-                font-size: 14px !important;
-                font-weight: 500 !important;
-            }
-            
-            /* 입력란 폰트 크기 */
-            .stTextInput > div > div > input,
-            .stSelectbox > div > div > div,
-            .stDateInput > div > div > input,
-            .stTextArea > div > div > textarea,
-            div[data-baseweb="input"] > input,
-            div[data-baseweb="textarea"] > textarea,
-            div[data-baseweb="select"] > div {
-                font-size: 14px !important;
-            }
-            
-            /* 입력란 배경색 조정 */
-            .stTextInput > div > div > input,
-            .stSelectbox > div > div > div,
-            .stDateInput > div > div > input,
-            div[data-baseweb="input"] > input,
-            div[data-baseweb="input"],
-            div[data-baseweb="base-input"] {
-                background-color: #F8F9FA !important;
-            }
-
-            /* 입력란 호버/포커스 시 배경색 */
-            .stTextInput > div > div > input:hover,
-            .stSelectbox > div > div > div:hover,
-            .stDateInput > div > div > input:hover,
-            div[data-baseweb="input"] > input:hover,
-            div[data-baseweb="input"]:hover,
-            div[data-baseweb="base-input"]:hover,
-            .stTextInput > div > div > input:focus,
-            .stSelectbox > div > div > div:focus,
-            .stDateInput > div > div > input:focus,
-            div[data-baseweb="input"] > input:focus,
-            div[data-baseweb="input"]:focus-within,
-            div[data-baseweb="base-input"]:focus-within {
-                background-color: #FFFFFF !important;
-            }
-            
-            /* 버튼 스타일링 */
-            div.stButton > button {
-                width: 100% !important;
-                height: 42px !important;
-                margin: 0 !important;
-                padding: 0.5rem !important;
-                background-color: #4285F4 !important;
-                color: white !important;
-                font-size: 14px !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                border-radius: 4px !important;
-                transition: all 0.2s ease !important;
-                border: 1px solid #4285F4 !important;
-            }
-
-            div.stButton > button:hover {
-                background-color: #1967D2 !important;
-                border-color: #1967D2 !important;
-            }
-
-            div.stButton > button:active {
-                background-color: #1557B0 !important;
-                border-color: #1557B0 !important;
-            }
-
-            /* 사이드바 스타일 */
-            section[data-testid="stSidebar"] {
-                background-color: #4285F4;
-                width: 250px !important;
-            }
-            
-            /* 이미지 컨테이너 스타일 */
-            div.element-container:has(img) {
-                padding: 0 !important;
-                display: flex !important;
-                justify-content: center !important;
-            }
-            
-            img {
-                width: 150px;
-                margin-bottom: 3rem;
-            }
-            
-            /* 사이드바 버튼 스타일 */
-            section[data-testid="stSidebar"] .stButton > button {
-                width: calc(100% + 4rem) !important;
-                margin-left: -2rem !important;
-                background-color: transparent !important;
-                border: none !important;
-                color: white !important;
-                font-size: 1.1rem !important;
-                padding: 0.5rem 2rem !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: flex-start !important;
-                transition: all 0.2s ease !important;
-                border-radius: 0 !important;
-            }
-
-            section[data-testid="stSidebar"] .stButton > button:hover {
-                font-size: 2rem !important;
-                font-weight: bold !important;
-                background-color: rgba(255, 255, 255, 0.1) !important;
-            }
-
-            section[data-testid="stSidebar"] .stButton > button[aria-pressed="true"] {
-                background-color: #0051FF !important;
-                font-size: 2rem !important;
-                font-weight: bold !important;
-            }
-
-            /* 모바일 화면 대응 */
-            @media (max-width: 768px) {
-                div[data-testid="stMainBlockContainer"] {
-                    max-width: 100% !important;
-                }
             }
             </style>
             """,
@@ -328,37 +209,21 @@ def show_jobs_page():
     job_data["company_name"] = company_name
     job_data["position"] = position
     job_data["openings"] = openings
-    job_data["requirements"] = requirements
-    job_data["main_duties"] = main_duties
+    job_data["requirements"] = format_bullet_text(requirements)
+    job_data["main_duties"] = format_bullet_text(main_duties)
     job_data["motivation"] = motivation
     job_data["submission"] = submission
     job_data["contact"] = contact
     job_data["company_website"] = company_website
     job_data["company_intro"] = company_intro
     job_data["talent"] = talent
-    job_data["preferences"] = preferences
+    job_data["preferences"] = format_bullet_text(preferences)
     job_data["company_culture"] = company_culture
     job_data["faq"] = faq
     job_data["additional_info"] = additional_info
     
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # 저장 버튼
-    # st.markdown("<div style='margin: 0.5rem 0;'></div>", unsafe_allow_html=True)
-    # cols = st.columns(8)
-    # for i in range(7):  # 처음 7개 컬럼은 빈 공간
-    #     cols[i].empty()
-    # with cols[7]:  # 마지막 컬럼에 버튼 배치
-    #     if st.button("저장", key="save_jobs_button", use_container_width=True):
-    #         if save_job(login_email, job_data, job_id):
-    #             show_success_message()
-    #             st.rerun()
-            
-    # if job_id:
-    #     if st.button("공고 삭제", key="delete_jobs_button"):
-    #         if delete_job(job_id):
-    #             st.success("공고가 삭제되었습니다.")
-    #             st.rerun()
     st.markdown("""
         <div style='display: flex; justify-content: flex-end; padding-top: 1rem;'>
             <form action="?save_custom=true" method="get">
@@ -367,7 +232,7 @@ def show_jobs_page():
                     height: 42px;
                     background-color: white;
                     color: #4285F4;
-                    border: 2px solid #4285F4;
+                    border: 1px solid #4285F4;
                     border-radius: 4px;
                     font-size: 14px;
                     font-weight: bold;
