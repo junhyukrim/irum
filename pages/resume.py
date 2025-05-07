@@ -19,6 +19,13 @@ def connect_to_db():
         
         return None
 
+def initialize_intro_state(idx):
+    if f'selected_category_{idx}' not in st.session_state:
+        st.session_state[f'selected_category_{idx}'] = list(intro_topic_map.keys())[0]
+    if f'intro_topic_{idx}' not in st.session_state:
+        first_topic = intro_topic_map[st.session_state[f'selected_category_{idx}']][0]
+        st.session_state[f'intro_topic_{idx}'] = first_topic
+
 def save_personal_info(login_email, data):
     try:
         conn = connect_to_db()
@@ -3268,29 +3275,25 @@ def show_resume_page():
         for idx, i in enumerate(st.session_state.intro_data):
             if idx > 0:
                 st.markdown("<hr>", unsafe_allow_html=True)
-            
+
+            # 상태값 초기화
+            initialize_intro_state(i)
+
             # 자기소개분야/주제/삭제 버튼 (2:5:1)
             cols = st.columns([2, 5, 1])
             with cols[0]:
-                # 선택된 분야가 session_state에 없으면 첫 번째 분야를 기본값으로 설정
-                if f'selected_category_{i}' not in st.session_state:
-                    st.session_state[f'selected_category_{i}'] = list(intro_topic_map.keys())[0]
-                
+                # 선택된 분야 표시        
                 selected_category = st.selectbox(
                     "자기소개분야",
                     list(intro_topic_map.keys()),
                     key=f"intro_category_{i}"
                 )
-
-                # 분야가 변경되면 session_state 업데이트
-                if f'selected_category_{i}_prev' not in st.session_state:
-                    st.session_state[f'selected_category_{i}_prev'] = selected_category
-
-                if selected_category != st.session_state[f'selected_category_{i}_prev']:
-                    # 카테고리가 바뀌면 선택 주제 초기화
-                    st.session_state[f'intro_topic_{i}'] = intro_topic_map[selected_category][0]
-                    st.session_state[f'selected_category_{i}_prev'] = selected_category
-                    
+                # 카테고리가 변경되면 주제를 초기화
+                if selected_category != st.session_state[f'selected_category_{i}']:
+                    st.session_state[f'selected_category_{i}'] = selected_category
+                    first_topic = intro_topic_map[selected_category][0]
+                    st.session_state[f'intro_topic_{i}'] = first_topic
+                            
             with cols[1]:
                 # 선택된 분야에 따른 주제 목록 표시
                 topics = intro_topic_map[selected_category]
@@ -3309,8 +3312,6 @@ def show_resume_page():
                     # 세션 상태 업데이트
                     if custom_topic:
                         st.session_state[f'intro_topic_{i}'] = custom_topic
-                    else:
-                        st.session_state[f'intro_topic_{i}'] = "사용자 정의 주제 추가"
             
             with cols[2]:
                 st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
