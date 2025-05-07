@@ -3231,8 +3231,21 @@ def show_resume_page():
                 "좌우명이 업무에 미친 영향은?",
                 "조직에서 차별화된 자신만의 강점은?",
                 "경력 중 가장 자랑스러웠던 순간은?"
+                "사용자 정의 주제 추가"
             ]
         }
+
+        # 사용자 정의 주제 입력 필드 관리
+        if 'custom_topic' not in st.session_state:
+            st.session_state['custom_topic'] = ""
+        
+        # 주제 선택
+        selected_topic = st.selectbox("주제", topics, key=f"intro_topic_{i}")
+
+        # 사용자 정의 주제를 선택한 경우 텍스트 입력 필드 추가
+        if selected_topic == "사용자 정의 주제 추가":
+            st.session_state['custom_topic'] = st.text_input("사용자 정의 주제를 입력하세요.", key=f"custom_topic_{i}")
+            selected_topic = st.session_state['custom_topic'] if st.session_state['custom_topic'] else selected_topic
 
         # 자기소개 데이터 로딩
         if 'intro_data_loaded' not in st.session_state:
