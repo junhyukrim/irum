@@ -15,13 +15,29 @@ def connect_to_db():
         
         return connection
     except Exception as e:
-        
+        st.error(f"DB 연결 오류: {str(e)}")
         return None
 
-def show_success_message():
-    st.markdown("""
-        <div style="padding: 1rem; border-radius: 0.5rem; background-color: #d8e6fd;">
-            성공적으로 저장되었습니다!
+def show_success_message(message, message_type="success"):
+    # 메시지 유형별 스타일 설정
+    styles = {
+        "success": {"color": "#155724", "background": "#d4edda"},
+        "warning": {"color": "#856404", "background": "#fff3cd"},
+        "error": {"color": "#721c24", "background": "#f8d7da"},
+        "info": {"color": "#0c5460", "background": "#d1ecf1"},
+    }
+    
+    # 메시지 유형이 유효하지 않으면 기본값으로 설정
+    if message_type not in styles:
+        message_type = "success"
+
+    # 스타일 가져오기
+    style = styles[message_type]
+
+    # HTML로 메시지 표시
+    st.markdown(f"""
+        <div style="padding: 1rem; border-radius: 0.5rem; background-color: {style['background']}; color: {style['color']};">
+            <span style="font-size: 1.2rem;">{style['icon']}</span> {message}
         </div>
     """, unsafe_allow_html=True)
 
@@ -59,7 +75,7 @@ def save_job(login_email, job_data, job_id=None):
             if job_id:
                 update_query = """
                     UPDATE tb_job_postings SET
-                        company_name = %s, position = %s, openings = %s, deadline = %, requirements = %s,
+                        company_name = %s, position = %s, openings = %s, deadline = %s, requirements = %s,
                         main_duties = %s, submission = %s, contact = %s, company_website = %s, company_intro = %s,
                         talent = %s, preferences = %s, company_culture = %s, faq = %s, additional_info = %s,
                         motivation = %s
@@ -103,6 +119,10 @@ def format_bullet_text(raw_text):
     )
 
 def show_jobs_page():
+    # 세션 상태 초기화
+    if 'save_success' not in st.session_state:
+        st.session_state.save_success = False
+    
     st.markdown(
         """
         <style>
@@ -124,20 +144,23 @@ def show_jobs_page():
         st.warning("로그인이 필요합니다.")
         return
     
+    # 사용자 이메일로 저장된 공고 목록 불러오기
     login_email = st.session_state.user_email
     jobs = load_jobs_info(login_email)
     job_titles = [job['company_name'] for job in jobs]
     job_ids = {job['company_name']: job['id'] for job in jobs}
 
+    # 공고 선택 드롭다운
     selected_job = st.selectbox("저장된 공고 선택", ["새 공고 추가"] + job_titles)
+    job_id = job_ids.get(selected_job, None)
+
     job_data = {key: "" for key in [
-        'company_name', 'position', 'openings', 'requirements', 'main_duties', 'submission',
+        'company_name', 'position', 'openings', 'deadline', 'requirements', 'main_duties', 'submission',
         'contact', 'company_website', 'company_intro', 'talent', 'preferences', 'company_culture', 'faq',
         'additional_info', 'motivation']}
-    job_id = None
 
-    if selected_job != "새 공고 추가":
-        job_id = job_ids[selected_job]
+    # 기존 공고 선택 시 데이터 불러오기
+    if selected_job != "새 공고 추가" and job_id:
         db_data = load_single_job(job_id)
         if db_data:
             job_data.update(db_data)
@@ -189,7 +212,7 @@ def show_jobs_page():
     
     st.markdown("<hr>", unsafe_allow_html=True)
     
-    # 추가적 채용공고 양식
+    # 추가 채용공고 양식
     st.markdown('<h5 class="section-header">추가 채용공고 양식</h5>', unsafe_allow_html=True)
     
     # 기업소개 (여러 줄 입력 가능)
@@ -260,16 +283,37 @@ def show_jobs_page():
     """, unsafe_allow_html=True)
 
     # 쿼리 파라미터로 저장 요청 감지
-    query_params = st.experimental_get_query_params()
-    if query_params.get("save_custom") == ["true"]:
-        if save_job(login_email, job_data, job_id):
-            show_success_message()
-            st.experimental_set_query_params()
-            st.rerun()
+    # query_params = st.experimental_get_query_params()
+    # if query_params.get("save_custom") == ["true"]:
+    #     if save_job(login_email, job_data, job_id):
+    #         show_success_message()
+    #         st.experimental_set_query_params()
+    #         st.rerun()
 
-    if job_id:
-        if st.button("공고 삭제", key="delete_jobs_button"):
-            if delete_job(job_id):
-                st.success("공고가 삭제되었습니다.")
-                st.rerun()
+    # if job_id:
+    #     if st.button("공고 삭제", key="delete_jobs_button"):
+    #         if delete_job(job_id):
+    #             st.success("공고가 삭제되었습니다.")
+    #             st.rerun()
+
+    if st.button("저장"):
+        if save_job(login_email, job_data, job_id):
+            st.session_state.save_success = True
+            show_success_message("성공적으로 저장되었습니다!", "success")
+        else:
+            show_success_message("저장에 실패했습니다.", "error")
+
+    if job_id and st.button("삭제"):
+        if delete_job(job_id):
+            st.session_state.save_success = True
+            show_success_message("성공적으로 삭제되었습니다!", "success")
+        else:
+            show_success_message("삭제에 실패했습니다.", "error")
+
+    if st.session_state.save_success:
+        show_success_message("작업이 완료되었습니다!")
+
+show_jobs_page()
+    
+
 
