@@ -42,37 +42,65 @@ def show_success_message(message, message_type="success"):
     """, unsafe_allow_html=True)
 
 def load_jobs_info(login_email):
-    # 데이터베이스에서 불러오기
     try:
         conn = connect_to_db()
         if conn is None:
-            return []
-        with conn.cursor() as cursor:
+            return [], "데이터베이스에 접근할 수 없습니다. 관리자에게 문의해주세요."
+        
+        cursor = conn.cursor()
+        try:
             cursor.execute("SELECT id, company_name FROM tb_job_postings WHERE login_email = %s", (login_email,))
-            return cursor.fetchall()
+            result = cursor.fetchall()
+
+            if result:
+                return result, f"{login_email}님의 공고 목록을 불러왔습니다."
+            else:
+                return [], "저장된 공고가 없습니다. 새로운 공고를 추가해보세요."
+        
+        finally:
+            cursor.close()
+            conn.close()
     except Exception as e:
-        st.error(f"불러오기 오류: {str(e)}")
-        return []
+        return [], f"데이터베이스 접근 중 오류가 발생했습니다: {str(e)}"
     
 def load_single_job(job_id):
     try:
         conn = connect_to_db()
         if conn is None:
-            return None
-        with conn.cursor() as cursor:
+            return None,  "데이터베이스에 접근할 수 없습니다. 관리자에게 문의해주세요."
+        cursor = conn.cursor()
+        try:
             cursor.execute("SELECT * FROM tb_job_postings WHERE id = %s", (job_id,))
-            return cursor.fetchone()
+            result = cursor.fetchone()
+            
+            if result:
+                return result, f"공고 ID {job_id}의 정보를 불러왔습니다."
+            else:
+                return {}, "해당 공고를 찾을 수 없습니다. 공고 ID를 확인해주세요."
+        
+        finally:
+            cursor.close()
+            conn.close()
     except Exception as e:
-        st.error(f"불러오기 오류: {str(e)}")
-        return None
+        return None, f"데이터베이스 접근 중 오류가 발생했습니다: {str(e)}"
     
 def save_job(login_email, job_data, job_id=None):
     try:
         conn = connect_to_db()
         if conn is None:
             return False
-        with conn.cursor() as cursor:
+        
+        cursor = conn.cursor()
+        try:
             if job_id:
+                cursor.execute("SELECT * FROM tb_job_postings WHERE id = %s", (job_id,))
+                result = cursor.fetchone()
+            else:
+                cursor.execute("SELECT * FROM tb_job_postings WHERE login_email = %s AND company_name = %s", 
+                            (login_email, job_data['company_name']))
+                result = cursor.fetchone()
+            
+            if result:
                 update_query = """
                     UPDATE tb_job_postings SET
                         company_name = %s, position = %s, openings = %s, deadline = %s, requirements = %s,
@@ -81,7 +109,13 @@ def save_job(login_email, job_data, job_id=None):
                         motivation = %s
                     WHERE id = %s
                 """
-                cursor.execute(update_query, (*job_data.values(), job_id))
+                cursor.execute(update_query, (
+                    job_data['company_name'], job_data['position'], job_data['openings'], job_data['deadline'],
+                    job_data['requirements'], job_data['main_duties'], job_data['submission'], job_data['contact'],
+                    job_data['company_website'], job_data['company_intro'], job_data['talent'], job_data['preferences'],
+                    job_data['company_culture'], job_data['faq'], job_data['additional_info'], job_data['motivation'],
+                    job_id
+                ))
             else:
                 insert_query = """
                     INSERT INTO tb_job_postings (
@@ -91,24 +125,56 @@ def save_job(login_email, job_data, job_id=None):
                     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
                 now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                cursor.execute(insert_query, (login_email, *job_data.values(), now))
+                cursor.execute(insert_query, (
+                    login_email, job_data['company_name'], job_data['position'], job_data['openings'], 
+                    job_data['deadline'], job_data['requirements'], job_data['main_duties'], job_data['submission'],
+                    job_data['contact'], job_data['company_website'], job_data['company_intro'], job_data['talent'],
+                    job_data['preferences'], job_data['company_culture'], job_data['faq'], 
+                    job_data['additional_info'], job_data['motivation'], now
+                ))
             conn.commit()
             return True
+        except Exception as e:
+                st.error(f"쿼리 실행 중 오류: {str(e)}")
+                conn.rollback()
+                return False
+        finally:
+            cursor.close()
+            conn.close()
     except Exception as e:
-        st.error(f"저장 오류: {str(e)}")
+        st.error(f"데이터베이스 연결 중 오류: {str(e)}")
         return False
     
-def delete_job(job_id):
+def delete_job(job_id, login_email):
     try:
         conn = connect_to_db()
         if conn is None:
             return False
-        with conn.cursor() as cursor:
+        
+        cursor = conn.cursor()
+        try:
+            cursor.execute("""
+                SELECT id FROM tb_job_postings 
+                WHERE id = %s AND login_email = %s
+            """, (job_id, login_email))
+
+            if not cursor.fetchone():
+                st.warning("해당 공고를 찾을 수 없거나 삭제 권한이 없습니다.")
+                return False
+            
             cursor.execute("DELETE FROM tb_job_postings WHERE id = %s", (job_id,))
             conn.commit()
+            st.success("공고가 성공적으로 삭제되었습니다.")
             return True
+        except Exception as e:
+                st.error(f"삭제 중 오류: {str(e)}")
+                conn.rollback()
+                return False
+        finally:
+            cursor.close()
+            conn.close()
     except Exception as e:
-        st.error(f"삭제 오류: {str(e)}")
+        st.error(f"데이터베이스 연결 중 오류: {str(e)}")
         return False
 
 def format_bullet_text(raw_text):
@@ -121,7 +187,7 @@ def format_bullet_text(raw_text):
 def show_jobs_page():
     # 세션 상태 초기화
     if 'save_success' not in st.session_state:
-        st.session_state.save_success = False
+        st.session_state['save_success'] = False
     
     st.markdown(
         """
@@ -263,7 +329,7 @@ def show_jobs_page():
         <div style='display: flex; justify-content: flex-end; padding-top: 1rem;'>
             <form action="?save_custom=true" method="get">
                 <button type="submit" style="
-                    width: 100px;
+                    width: 150px;
                     height: 42px;
                     background-color: white;
                     color: #4285F4;
@@ -281,20 +347,6 @@ def show_jobs_page():
             </form>
         </div>
     """, unsafe_allow_html=True)
-
-    # 쿼리 파라미터로 저장 요청 감지
-    # query_params = st.experimental_get_query_params()
-    # if query_params.get("save_custom") == ["true"]:
-    #     if save_job(login_email, job_data, job_id):
-    #         show_success_message()
-    #         st.experimental_set_query_params()
-    #         st.rerun()
-
-    # if job_id:
-    #     if st.button("공고 삭제", key="delete_jobs_button"):
-    #         if delete_job(job_id):
-    #             st.success("공고가 삭제되었습니다.")
-    #             st.rerun()
 
     if st.button("저장"):
         if save_job(login_email, job_data, job_id):
