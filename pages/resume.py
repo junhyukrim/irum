@@ -3240,6 +3240,7 @@ def show_resume_page():
             st.session_state['custom_topic'] = ""
         
         # 주제 선택
+        selected_category = st.session_state.get(f'selected_category_{i}', list(intro_topic_map.keys())[0])
         topics = intro_topic_map.get(selected_category, [])
         selected_topic = st.selectbox("주제", topics, key=f"intro_topic_{i}")
 
