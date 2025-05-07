@@ -331,36 +331,35 @@ def show_jobs_page():
     st.markdown("<br>", unsafe_allow_html=True)
     
     st.markdown("""
-        <div style='display: flex; justify-content: flex-end; padding-top: 1rem;'>
-            <form action="?save_custom=true" method="get">
-                <button type="submit" style="
-                    width: 150px;
-                    height: 42px;
-                    background-color: white;
-                    color: #4285F4;
-                    border: 1px solid #4285F4;
-                    border-radius: 4px;
-                    font-size: 14px;
-                    font-weight: bold;
-                    cursor: pointer;
-                    transition: background-color 0.2s ease;
-                " 
-                onmouseover="this.style.backgroundColor='#e8f0fe'"
-                onmouseout="this.style.backgroundColor='white'">
-                    저장
-                </button>
-            </form>
-        </div>
+        div[data-testid="stHorizontalBlock"] div.stButton > button:not([kind="primary"]) {
+        background-color: white !important;
+        color: #4285F4 !important;
+        border: 1px solid #4285F4 !important;
+        border-radius: 4px !important;
+        font-size: 14px !important;
+        font-weight: bold !important;
+        height: 42px !important;
+        width: 150px !important;
+        transition: background-color 0.2s ease !important;
+    }
+    div[data-testid="stHorizontalBlock"] div.stButton > button:not([kind="primary"]):hover {
+        background-color: #e8f0fe !important;
+    }
+    </style>
     """, unsafe_allow_html=True)
 
-    if st.button("저장"):
-        job_data.update({
-            "company_name": company_name,
-            "position": position,
-            "openings": openings,
-            "deadline": str(deadline),
-            "requirements": requirements
-        })
+    cols = st.columns(8)
+    for i in range(7): 
+        cols[i].empty()
+    with cols[7]:
+        if st.button("저장"):
+            job_data.update({
+                "company_name": company_name,
+                "position": position,
+                "openings": openings,
+                "deadline": str(deadline),
+                "requirements": requirements
+            })
         if save_job(login_email, job_data, job_id):
             st.session_state.save_success = True
             st.success("성공적으로 저장되었습니다!")
