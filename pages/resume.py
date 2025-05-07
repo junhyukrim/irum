@@ -3239,9 +3239,15 @@ def show_resume_page():
         if 'custom_topic' not in st.session_state:
             st.session_state['custom_topic'] = ""
         
-        # 주제 선택
-        selected_category = st.session_state.get(f'selected_category_{i}', list(intro_topic_map.keys())[0])
-        topics = intro_topic_map.get(selected_category, [])
+    # 주제 선택
+    selected_category = st.session_state.get(f'selected_category_{i}', list(intro_topic_map.keys())[0])
+    topics = intro_topic_map.get(selected_category, [])
+    if selected_category == "기타(개성, 좌우명 등)" and "사용자 정의 주제 추가" in topics:
+        selected_topic = st.selectbox("주제", topics, key=f"intro_topic_{i}")
+    if selected_topic == "사용자 정의 주제 추가":
+        st.session_state[f'custom_topic_{i}'] = st.text_input("사용자 정의 주제를 입력하세요.", key=f"custom_topic_{i}")
+        selected_topic = st.session_state[f'custom_topic_{i}'] if st.session_state[f'custom_topic_{i}'] else selected_topic
+    else:
         selected_topic = st.selectbox("주제", topics, key=f"intro_topic_{i}")
 
         # 사용자 정의 주제를 선택한 경우 텍스트 입력 필드 추가
