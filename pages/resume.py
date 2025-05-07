@@ -3281,20 +3281,19 @@ def show_resume_page():
                     list(intro_topic_map.keys()),
                     key=f"intro_category_{i}"
                 )
+
                 # 분야가 변경되면 session_state 업데이트
-                if selected_category != st.session_state[f'selected_category_{i}']:
-                    st.session_state[f'selected_category_{i}'] = selected_category
-                    if f'intro_topic_{i}' in st.session_state:
-                        del st.session_state[f'intro_topic_{i}']
-                    st.rerun()
-            
+                if f'selected_category_{i}_prev' not in st.session_state:
+                    st.session_state[f'selected_category_{i}_prev'] = selected_category
+
+                if selected_category != st.session_state[f'selected_category_{i}_prev']:
+                    # 카테고리가 바뀌면 선택 주제 초기화
+                    st.session_state[f'intro_topic_{i}'] = intro_topic_map[selected_category][0]
+                    st.session_state[f'selected_category_{i}_prev'] = selected_category
+                    
             with cols[1]:
                 # 선택된 분야에 따른 주제 목록 표시
                 topics = intro_topic_map[selected_category]
-
-                # '기타(개성, 좌우명 등)' 선택 시 '사용자 정의 주제 추가' 옵션 추가
-                if selected_category == "기타(개성, 좌우명 등)":
-                    topics.append("사용자 정의 주제 추가")
 
                 # 주제 선택
                 selected_topic = ""    
@@ -3308,7 +3307,10 @@ def show_resume_page():
                 if selected_topic == "사용자 정의 주제 추가":
                     custom_topic = st.text_input("사용자 정의 주제를 입력하세요.", key=f"custom_topic_{i}")
                     # 세션 상태 업데이트
-                    st.session_state[f'intro_topic_{i}'] = custom_topic if custom_topic else selected_topic
+                    if custom_topic:
+                        st.session_state[f'intro_topic_{i}'] = custom_topic
+                    else:
+                        st.session_state[f'intro_topic_{i}'] = "사용자 정의 주제 추가"
             
             with cols[2]:
                 st.markdown("<div style='height: 27px;'></div>", unsafe_allow_html=True)
