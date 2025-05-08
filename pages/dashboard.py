@@ -31,7 +31,7 @@ def get_related_ids(cursor, table, id_column, email_col, login_email):
         st.warning(f"{table} 테이블 ID 가져오기 오류: {str(e)}")
         return []
     
-def get_empty_field_count(cursor, table, where_clause, where_values):
+def get_filled_field_count(cursor, table, where_clause, where_values):
     try:
         cursor.execute(f"SHOW COLUMNS FROM {table}")
         columns = [col["Field"] for col in cursor.fetchall()]
@@ -40,22 +40,21 @@ def get_empty_field_count(cursor, table, where_clause, where_values):
         cursor.execute(query, where_values)
         results = cursor.fetchall()
 
-        empty_count = 0
+        filled_count = 0
         total_count = 0
         for row in results:
             for col in columns:
                 total_count += 1
-                if row[col] is None or str(row[col]).strip() == "":
-                    empty_count += 1
-        return empty_count, total_count
+                if row[col] is not None and str(row[col]).strip() != "":
+                    filled_count += 1
+        return filled_count, total_count
     except pymysql.MySQLError as e:
         st.warning(f"테이블 {table} 데이터 가져오기 오류: {str(e)}")
         return 0, 0
 
-def calculate_completion_ratio(empty_count, total_count):
+def calculate_completion_ratio(filled_count, total_count):
     if total_count == 0:
-        return 100.0
-    filled_count = total_count - empty_count
+        return 0.0
     return round((filled_count / total_count) * 100, 2)
 
 def get_tab_progress(login_email):
@@ -96,7 +95,7 @@ def get_tab_progress(login_email):
         tab_progress = []
 
         for tab_name, tables in tab_table_map.items():
-            total_empty = 0
+            total_filled = 0
             total_fields = 0
             for table, id_col in tables:
                 if id_col == "login_email":
@@ -111,11 +110,11 @@ def get_tab_progress(login_email):
                 else:
                     continue
 
-                empty_count, total_count = get_empty_field_count(cursor, table, where_clause, where_values)
-                total_empty += empty_count
+                filled_count, total_count = get_filled_field_count(cursor, table, where_clause, where_values)
+                total_filled += filled_count
                 total_fields += total_count
 
-            progress = calculate_completion_ratio(total_empty, total_fields)
+            progress = calculate_completion_ratio(total_filled, total_fields)
             tab_progress.append({"탭 이름": tab_name, "진행률 (%)": progress})
 
         return tab_progress
@@ -127,11 +126,12 @@ def get_tab_progress(login_email):
             conn.close()
     
 def show_dashboard_page():
-    st.title("대시보드")
     if st.user.name:
         st.write(f"환영합니다, {st.user.name}님!")
     else:
         st.write("환영합니다, 사용자님!")
+    
+    st.title("대시보드")
 
     # 로그인 이메일 가져오기
     login_email = st.user.email
