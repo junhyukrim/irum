@@ -363,16 +363,22 @@ def show_jobs_page():
     
     st.markdown("""
     <style>
-        div[data-testid="stHorizontalBlock"] div.stButton > button:not([kind="primary"]) {
-        background-color: white !important;
-        color: #4285F4 !important;
-        border: 1px solid #4285F4 !important;
-        border-radius: 4px !important;
-        font-size: 14px !important;
-        font-weight: bold !important;
-        height: 42px !important;
-        width: 150px !important;
-        transition: background-color 0.2s ease !important;
+        div[data-testid="stHorizontalBlock"] div.stButton > button {
+            background-color: white !important;
+            color: #4285F4 !important;
+            border: 1px solid #4285F4 !important;
+            border-radius: 4px !important;
+            font-size: 14px !important;
+            font-weight: bold !important;
+            height: 42px !important;
+            width: 150px !important;
+            transition: background-color 0.2s ease !important;
+            display: inline-flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            text-align: center !important;
+            line-height: normal !important;
+            padding: 0 !important;
     }
     div[data-testid="stHorizontalBlock"] div.stButton > button:not([kind="primary"]):hover {
         background-color: #e8f0fe !important;
