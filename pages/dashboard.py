@@ -62,6 +62,15 @@ def map_column_to_field(table, column):
         },
         "tb_resume_self_introductions": {
             "topic_category": "자기소개 유형", "topic_title": "제목", "content": "내용"
+        },
+        "tb_resume_experiences": {
+            "company_name": "회사명", "position": "직위", 
+            "join_date": "입사일", "leave_date": "퇴사일", 
+            "description": "업무 설명"
+        },
+        "tb_resume_positions": {
+            "position": "직위명", "promotion_date": "승진일", 
+            "retirement_date": "퇴직일", "description": "직무 설명"
         }
     }
     return field_mapping.get(table, {}).get(column, column)
@@ -107,7 +116,7 @@ def calculate_completion_ratio(filled_count, total_count):
         return 0.0
     return round((filled_count / total_count) * 100, 2)
 
-def get_tab_progress(login_email):
+def get_resume_progress(login_email):
     try:
         conn = connect_to_db()
         if conn is None:
@@ -175,7 +184,57 @@ def get_tab_progress(login_email):
     finally:
         if conn:
             conn.close()
-    
+
+def get_career_progress(login_email):
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return []
+
+        cursor = conn.cursor()
+
+        # 경력관리 테이블 매핑
+        career_table_map = {
+            "경력": [
+                ("tb_resume_experiences", "login_email"),
+                ("tb_resume_positions", "experience_id")
+            ]
+        }
+
+        career_progress = []
+
+        for tab_name, tables in career_table_map.items():
+            total_filled = 0
+            total_fields = 0
+            all_empty_fields = []
+
+            for table, id_col in tables:
+                if id_col == "login_email":
+                    where_clause = f"WHERE {id_col} = %s"
+                    where_values = (login_email,)
+                elif id_col == "experience_id":
+                    where_clause = f"WHERE {id_col} IN (SELECT id FROM tb_resume_experiences WHERE login_email = %s)"
+                    where_values = (login_email,)
+                else:
+                    continue
+
+                filled_count, total_count, empty_fields = get_filled_field_count(cursor, table, where_clause, where_values)
+                total_filled += filled_count
+                total_fields += total_count
+                all_empty_fields.extend(empty_fields)
+
+            progress = calculate_completion_ratio(total_filled, total_fields)
+            empty_fields_str = ", ".join(all_empty_fields) if all_empty_fields else "없음"
+            career_progress.append({"경력관리 탭": tab_name, "진행률 (%)": progress, "비어있는 필드": empty_fields_str})
+
+        return career_progress
+    except Exception as e:
+        st.error(f"경력관리 진행률 계산 오류: {str(e)}")
+        return []
+    finally:
+        if conn:
+            conn.close()
+
 def show_dashboard_page():
     st.title("대시보드")
     if st.user.name:
@@ -187,7 +246,7 @@ def show_dashboard_page():
     login_email = st.user.email
 
     # 탭별 진행률 가져오기
-    tab_progress = get_tab_progress(login_email)
+    tab_progress = get_resume_progress(login_email)
 
     if tab_progress:
         df = pd.DataFrame(tab_progress)
@@ -195,6 +254,17 @@ def show_dashboard_page():
         st.dataframe(df)
     else:
         st.markdown("### 진행률 데이터를 가져올 수 없습니다.")
+
+
+    # 경력관리 진행률 가져오기
+    career_progress = get_career_progress(login_email)
+
+    if career_progress:
+        df_career = pd.DataFrame(career_progress)
+        st.markdown("### 경력관리 진행률 및 비어있는 필드")
+        st.dataframe(df_career)
+    else:
+        st.markdown("### 경력관리 진행률 데이터를 가져올 수 없습니다.")
 
 # 대시보드 페이지 표시
 if __name__ == "__main__":
