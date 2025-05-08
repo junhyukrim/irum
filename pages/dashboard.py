@@ -23,45 +23,45 @@ def connect_to_db():
     
 def map_column_to_field(table, column):
     field_mapping = {
-        # 개인정보
         "tb_resume_personal_info": {
-            "name": "이름", "birth_date": "생년월일", "phone": "전화번호", "email": "이메일"
+            "ko_lastname": "한글 성", "ko_firstname": "한글 이름", 
+            "en_firstname": "영문 이름", "en_lastname": "영문 성",
+            "nationality": "국적", "gender": "성별", "birth_date": "생년월일", 
+            "address": "주소", "email": "이메일", "contact_number": "연락처", 
+            "photo_url": "사진 링크", "military_status": "병역 여부",
+            "military_type": "병역 유형", "military_rank": "계급", 
+            "veterans_status": "보훈 여부", "service_start": "복무 시작일", 
+            "service_end": "복무 종료일", "discharge_type": "전역 유형"
         },
-        # 학력
         "tb_resume_education": {
-            "school_name": "학교명", "degree": "학위", "major": "전공", "gpa": "학점"
+            "institution": "학교명", "start_date": "입학일", "end_date": "졸업일", "note": "비고"
         },
         "tb_resume_education_major": {
-            "department": "학과", "degree": "학위", "gpa": "학점"
+            "department": "학과", "major": "전공", "degree": "학위", "gpa": "평점"
         },
-        # 역량
         "tb_resume_skills": {
-            "skill_name": "기술명", "proficiency": "숙련도"
+            "skill_name": "기술명", "skill_level": "숙련도", "note": "비고"
         },
         "tb_resume_certifications": {
-            "cert_name": "자격증명", "issue_date": "발급일"
+            "certification_name": "자격증명", "issue_date": "취득일", "issuing_agency": "발급 기관"
         },
-        # 경력
         "tb_resume_experiences": {
-            "company_name": "회사명", "position": "직무", "start_date": "시작일", "end_date": "종료일"
+            "company_name": "회사명", "position": "직위", "join_date": "입사일", "leave_date": "퇴사일"
         },
         "tb_resume_positions": {
-            "position": "직무명", "promotion_date": "승진일", "retirement_date": "퇴직일"
+            "position": "직위명", "promotion_date": "승진일", "retirement_date": "퇴직일", "description": "직무 설명"
         },
-        # 수상
         "tb_resume_awards": {
-            "award_name": "수상명", "award_date": "수상일"
+            "award_name": "수상명", "award_date": "수상일", "awarding_body": "수상 기관", "note": "비고"
         },
-        # 기타활동
         "tb_resume_activities": {
-            "activity_name": "활동명", "activity_date": "활동일"
+            "activity_name": "활동명", "organization": "소속", "start_date": "활동 시작일", "end_date": "활동 종료일"
         },
         "tb_resume_training": {
-            "training_name": "교육명", "training_date": "교육일"
+            "description": "교육 내용"
         },
-        # 자기소개
         "tb_resume_self_introductions": {
-            "intro_text": "자기소개 내용"
+            "topic_category": "자기소개 유형", "topic_title": "제목", "content": "내용"
         }
     }
     return field_mapping.get(table, {}).get(column, column)
@@ -120,7 +120,7 @@ def get_tab_progress(login_email):
             "개인정보": [("tb_resume_personal_info", "login_email")],
             "학력": [
                 ("tb_resume_education", "login_email"),
-                ("tb_resume_education_major", "login_email")
+                ("tb_resume_education_major", "education_id")
             ],
             "역량": [
                 ("tb_resume_skills", "login_email"),
@@ -128,7 +128,7 @@ def get_tab_progress(login_email):
             ],
             "경력": [
                 ("tb_resume_experiences", "login_email"),
-                ("tb_resume_positions", "login_email")
+                ("tb_resume_positions", "experience_id")
             ],
             "수상": [("tb_resume_awards", "login_email")],
             "기타활동": [
@@ -149,12 +149,22 @@ def get_tab_progress(login_email):
                 where_clause = f"WHERE {id_col} = %s"
                 where_values = (login_email,)
 
-                filled_count, total_count, empty_fields = get_filled_field_count(cursor, table, where_clause, where_values)
-                total_filled += filled_count
-                total_fields += total_count
-                all_empty_fields.extend(empty_fields)
+                cursor.execute(f"SHOW COLUMNS FROM {table}")
+                columns = [col["Field"] for col in cursor.fetchall()]
+                
+                query = f"SELECT {', '.join(columns)} FROM {table} {where_clause}"
+                cursor.execute(query, where_values)
+                results = cursor.fetchall()
 
-            progress = calculate_completion_ratio(total_filled, total_fields)
+                for row in results:
+                    for col in columns:
+                        total_fields += 1
+                        if row[col] is not None and str(row[col]).strip() != "":
+                            total_filled += 1
+                        else:
+                            all_empty_fields.append(map_column_to_field(table, col))
+
+            progress = round((total_filled / total_fields) * 100, 2) if total_fields else 0
             empty_fields_str = ", ".join(all_empty_fields) if all_empty_fields else "없음"
             tab_progress.append({"탭 이름": tab_name, "진행률 (%)": progress, "비어있는 필드": empty_fields_str})
 
