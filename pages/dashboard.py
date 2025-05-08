@@ -20,8 +20,35 @@ def connect_to_db():
     except Exception as e:
         st.error(f"DB 연결 오류: {str(e)}")
         return None
+    
+def get_empty_field_count(cursor, table, email_col, login_email):
+    try:
+        cursor.execute(f"SHOW COLUMNS FROM {table}")
+        columns = [col["Field"] for col in cursor.fetchall()]
 
-def get_empty_fields():
+        query = f"SELECT {', '.join(columns)} FROM {table} WHERE {email_col} = %s"
+        cursor.execute(query, (login_email,))
+        results = cursor.fetchall()
+
+        empty_count = 0
+        total_count = 0
+        for row in results:
+            for col in columns:
+                total_count += 1
+                if row[col] is None or str(row[col]).strip() == "":
+                    empty_count += 1
+        return empty_count, total_count
+    except pymysql.MySQLError as e:
+        st.warning(f"테이블 {table} 데이터 가져오기 오류: {str(e)}")
+        return 0, 0
+
+def calculate_completion_ratio(empty_count, total_count):
+    if total_count == 0:
+        return 100.0  # 데이터가 없는 경우 완료로 간주
+    filled_count = total_count - empty_count
+    return round((filled_count / total_count) * 100, 2)
+
+def get_tab_progress(login_email):
     try:
         conn = connect_to_db()
         if conn is None:
@@ -29,103 +56,57 @@ def get_empty_fields():
 
         cursor = conn.cursor()
 
-        # 이력관리 테이블 목록
-        resume_tables = [
-            "tb_resume_activities", "tb_resume_awards", "tb_resume_certifications", 
-            "tb_resume_education", "tb_resume_education_major", "tb_resume_experiences",
-            "tb_resume_personal_info", "tb_resume_positions", "tb_resume_self_introductions",
-            "tb_resume_skills", "tb_resume_training"
-        ]
-        empty_fields = []
+        # 탭 이름과 테이블 매핑
+        tab_table_map = {
+            "개인정보": [("tb_resume_personal_info", "login_email")],
+            "학력": [("tb_resume_education", "login_email"), ("tb_resume_education_major", "login_email")],
+            "역량": [("tb_resume_skills", "login_email"), ("tb_resume_certifications", "login_email")],
+            "경력": [("tb_resume_experiences", "login_email"), ("tb_resume_positions", "login_email")],
+            "수상": [("tb_resume_awards", "login_email")],
+            "기타활동": [("tb_resume_activities", "login_email"), ("tb_resume_training", "login_email")],
+            "자기소개": [("tb_resume_self_introductions", "login_email")]
+        }
 
-        for table in resume_tables:
-            try:
-                # 테이블의 모든 컬럼명 가져오기
-                cursor.execute(f"SHOW COLUMNS FROM {table}")
-                columns = [col["Field"] for col in cursor.fetchall()]
-                
-                # 각 필드의 빈 값 확인
-                query = f"SELECT {', '.join(columns)} FROM {table} WHERE login_email = %s"
-                cursor.execute(query, (st.user.email,))
-                results = cursor.fetchall()
+        tab_progress = []
 
-                for row in results:
-                    for col in columns:
-                        if row[col] is None or row[col] == "":
-                            empty_fields.append({"Table": table, "Field": col, "Status": "Empty"})
-            except pymysql.MySQLError as e:
-                st.warning(f"테이블 {table} 데이터 가져오기 오류: {str(e)}")
+        for tab_name, tables in tab_table_map.items():
+            total_empty = 0
+            total_fields = 0
+            for table, email_col in tables:
+                empty_count, total_count = get_empty_field_count(cursor, table, email_col, login_email)
+                total_empty += empty_count
+                total_fields += total_count
+            progress = calculate_completion_ratio(total_empty, total_fields)
+            tab_progress.append({"탭 이름": tab_name, "진행률 (%)": progress})
+
+        return tab_progress
     except Exception as e:
-        st.error(f"빈 필드 데이터 가져오기 오류: {str(e)}")
+        st.error(f"탭별 진행률 계산 오류: {str(e)}")
         return []
-    finally:
-        if conn:
-            conn.close()
-    return empty_fields
-
-def get_progress_data():
-    try:
-        conn = connect_to_db()
-        if conn is None:
-            return 0, 0
-        
-        cursor = conn.cursor()
-        
-        # 이력관리 진행률 계산
-        resume_tables = [
-        "tb_resume_activities", "tb_resume_awards", "tb_resume_certifications", 
-        "tb_resume_education", "tb_resume_education_major", "tb_resume_experiences",
-        "tb_resume_personal_info", "tb_resume_positions", "tb_resume_self_introductions",
-        "tb_resume_skills", "tb_resume_training"
-    ]
-        resume_count = 0
-        max_resume_count = len(resume_tables) * 1
-        try:
-            for table in resume_tables:
-                cursor.execute(f"SELECT COUNT(*) AS count FROM {table} WHERE login_email = %s", (st.user.email,))
-                count = cursor.fetchone()['count']
-                resume_count += 1 if count > 0 else 0
-
-            resume_percent = (resume_count / max_resume_count) * 100
-            
-        except pymysql.MySQLError as e:
-            st.warning(f"이력관리 데이터 가져오기 오류: {str(e)}")
-            resume_count = 0
-
-        # 공고관리 진행률 계산
-        try:
-            cursor.execute("SELECT COUNT(*) AS count FROM tb_job_postings WHERE login_email = %s", (st.user.email,))
-            jobs_count = cursor.fetchone()['count']
-            jobs_percent = 100 if jobs_count > 0 else 0
-        except pymysql.MySQLError as e:
-            st.warning(f"공고관리 데이터 가져오기 오류: {str(e)}")
-            jobs_count = 0
-
-        return resume_count, jobs_count
-    except Exception as e:
-        st.error(f"진행률 데이터 가져오기 오류: {str(e)}")
-        return 0, 0
     finally:
         if conn:
             conn.close()
     
 def show_dashboard_page():
     st.title("대시보드")
+    if st.user.name:
+        st.write(f"환영합니다, {st.user.name}님!")
+    else:
+        st.write("환영합니다, 사용자님!")
 
-    resume_percent, jobs_percent = get_progress_data()
+    # 로그인 이메일 가져오기
+    login_email = st.user.email
 
-    st.markdown(f"### 이력관리 완료 상태: **{resume_percent:.2f}%**")
-    st.markdown(f"### 공고관리 완료 상태: **{jobs_percent:.2f}%**")
-    
-    empty_fields = get_empty_fields()
+    # 탭별 진행률 가져오기
+    tab_progress = get_tab_progress(login_email)
 
-    if empty_fields:
-        df = pd.DataFrame(empty_fields)
-        st.markdown("### 이력관리 탭별 빈 필드 상태")
+    if tab_progress:
+        df = pd.DataFrame(tab_progress)
+        st.markdown("### 이력관리 탭별 진행률")
         st.dataframe(df)
     else:
-        st.markdown("### 모든 필드가 채워져 있습니다!")
+        st.markdown("### 진행률 데이터를 가져올 수 없습니다.")
 
-
+# 대시보드 페이지 표시
 if __name__ == "__main__":
     show_dashboard_page()
