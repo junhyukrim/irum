@@ -42,12 +42,16 @@ def get_filled_field_count(cursor, table, where_clause, where_values):
 
         filled_count = 0
         total_count = 0
+        empty_fields = []
+
         for row in results:
             for col in columns:
                 total_count += 1
                 if row[col] is not None and str(row[col]).strip() != "":
                     filled_count += 1
-        return filled_count, total_count
+                else:
+                    empty_fields.append(col)
+        return filled_count, total_count, empty_fields
     except pymysql.MySQLError as e:
         st.warning(f"테이블 {table} 데이터 가져오기 오류: {str(e)}")
         return 0, 0
@@ -97,6 +101,8 @@ def get_tab_progress(login_email):
         for tab_name, tables in tab_table_map.items():
             total_filled = 0
             total_fields = 0
+            all_empty_fields = []
+
             for table, id_col in tables:
                 if id_col == "login_email":
                     where_clause = f"WHERE {id_col} = %s"
@@ -110,12 +116,14 @@ def get_tab_progress(login_email):
                 else:
                     continue
 
-                filled_count, total_count = get_filled_field_count(cursor, table, where_clause, where_values)
+                filled_count, total_count, empty_fields = get_filled_field_count(cursor, table, where_clause, where_values)
                 total_filled += filled_count
                 total_fields += total_count
+                all_empty_fields.extend(empty_fields)
 
             progress = calculate_completion_ratio(total_filled, total_fields)
-            tab_progress.append({"탭 이름": tab_name, "진행률 (%)": progress})
+            empty_fields_str = ", ".join(all_empty_fields) if all_empty_fields else "없음"
+            tab_progress.append({"탭 이름": tab_name, "진행률 (%)": progress, "비어있는 필드": empty_fields_str})
 
         return tab_progress
     except Exception as e:
