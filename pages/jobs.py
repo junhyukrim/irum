@@ -223,17 +223,18 @@ def show_jobs_page():
     # 공고 선택 드롭다운
     selected_job = st.selectbox("저장된 공고 선택", job_titles)
 
-    job_data = {
-    'company_name': "", 'position': "", 'openings': 1, 'deadline': str(datetime.now().date()), 
-    'requirements': "", 'main_duties': "", 'submission': "", 'contact': "", 'company_website': "", 
-    'company_intro': "", 'talent': "", 'preferences': "", 'company_culture': "", 'faq': "", 
-    'additional_info': "", 'motivation': ""
-}
+    # 공고 id  초기화
+    job_id = None
 
     # 공고를 선택할 때 동작
     if selected_job == "새 공고 추가":
         # 새 공고를 선택하면 필드 초기화
-        st.session_state['job_data'] = job_data
+        st.session_state['job_data'] = {
+        'company_name': "", 'position': "", 'openings': 1, 'deadline': str(datetime.now().date()), 
+        'requirements': "", 'main_duties': "", 'submission': "", 'contact': "", 'company_website': "", 
+        'company_intro': "", 'talent': "", 'preferences': "", 'company_culture': "", 'faq': "", 
+        'additional_info': "", 'motivation': ""
+    }
         st.info("새 공고 추가 모드입니다.")
     else:
         # 기존 공고를 선택하면 DB에서 데이터 불러오기
@@ -381,7 +382,7 @@ def show_jobs_page():
                 st.session_state['save_success'] = False
                 st.error("저장에 실패했습니다.")
 
-    if job_id and st.button("삭제"):
+    if job_id is not None and st.button("삭제"):
         if delete_job(job_id, login_email):
             st.session_state.save_success = True
             st.success("성공적으로 삭제되었습니다!")
