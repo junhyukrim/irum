@@ -261,37 +261,41 @@ def show_jobs_page():
     
     col1, col2, col3 = st.columns([3, 3, 1])
     with col1:
-        company_name = st.text_input("기업명")
+        company_name = st.text_input("기업명", value=st.session_state['job_data'].get("company_name", ""))
     with col2:
-        position = st.text_input("직무명")
+        position = st.text_input("직무명", value=st.session_state['job_data'].get("position", ""))
     with col3:
-        openings = st.number_input("채용인원", min_value=1, value=1)
+        openings = st.number_input("채용인원", min_value=1, value=int(st.session_state['job_data'].get("openings", 1)))
 
     # 제출기한
-    deadline = st.date_input("제출기한", value=datetime.now().date())
+    deadline = st.date_input("제출기한", value=datetime.strptime(st.session_state['job_data'].get("deadline", str(datetime.now().date())), "%Y-%m-%d").date())
 
     # 자격요건 (여러 줄 입력 가능)
     requirements = st.text_area("자격요건", height=150,
-                              help="• 각 항목을 줄바꿈하여 입력하세요. 자동으로 '-' 기호가 붙습니다.")
+                            value=st.session_state['job_data'].get("requirements", ""),
+                            help="• 각 항목을 줄바꿈하여 입력하세요. 자동으로 '-' 기호가 붙습니다.")
 
     # 주요업무 (여러 줄 입력 가능)
     main_duties = st.text_area("주요업무", height=150,
-                             help="• 각 항목을 줄바꿈하여 입력하세요. 자동으로 '-' 기호가 붙습니다.")
+                            value=st.session_state['job_data'].get("main_duties", ""),
+                            help="• 각 항목을 줄바꿈하여 입력하세요. 자동으로 '-' 기호가 붙습니다.")
     
     # 지원동기 (여러 줄 입력 가능)
-    motivation = st.text_area("지원동기", height=150, value=job_data['motivation'],
-                                          help="• 회사에 지원하는 동기를 기재해주세요.")
+    motivation = st.text_area("지원동기", height=150, 
+                                        value=st.session_state['job_data'].get("motivation", ""),
+                                        help="• 회사에 지원하는 동기를 기재해주세요.")
 
     # 제출서류 & 지원방법 (여러 줄 입력 가능)
     submission = st.text_area("제출서류 & 지원방법", height=150,
+                            value=st.session_state['job_data'].get("submission", ""),
                             help="• 제출서류와 지원방법을 상세히 기재해주세요.")
     
     # 문의처와 홈페이지
     col4, col5 = st.columns(2)
     with col4:
-        contact = st.text_input("문의처(이메일/연락처)", value=job_data["contact"])
+        contact = st.text_input("문의처(이메일/연락처)", value=st.session_state['job_data'].get("contact", ""))
     with col5:
-        company_website = st.text_input("홈페이지 주소", value=job_data["company_website"])
+        company_website = st.text_input("홈페이지 주소", value=st.session_state['job_data'].get("company_website", ""))
     
     st.markdown("<hr>", unsafe_allow_html=True)
     
@@ -300,27 +304,33 @@ def show_jobs_page():
     
     # 기업소개 (여러 줄 입력 가능)
     company_intro = st.text_area("기업소개", height=100,
+                                value=st.session_state['job_data'].get("company_intro", ""),
                                 help="• 기업의 비전, 미션, 주요 사업 영역 등을 소개해주세요.")
     
     # 인재상 (여러 줄 입력 가능)
     talent = st.text_area("인재상", height=100,
-                         help="• 귀사가 추구하는 인재상을 기술해주세요.")
+                        value=st.session_state['job_data'].get("talent", ""),
+                        help="• 귀사가 추구하는 인재상을 기술해주세요.")
     
     # 우대조건 (여러 줄 입력 가능)
     preferences = st.text_area("우대조건", height=100,
-                             help="• 우대하는 자격요건이나 경험을 기재해주세요.")
+                            value=st.session_state['job_data'].get("preferences", ""),
+                            help="• 우대하는 자격요건이나 경험을 기재해주세요.")
     
     # 근무환경 (여러 줄 입력 가능)
     company_culture = st.text_area("근무환경", height=100,
-                                  help="• 근무지, 근무시간, 복리후생 등을 상세히 기재해주세요.")
+                                value=st.session_state['job_data'].get("company_culture", ""),
+                                help="• 근무지, 근무시간, 복리후생 등을 상세히 기재해주세요.")
     
     # FAQ (여러 줄 입력 가능)
     faq = st.text_area("FAQ", height=100,
-                      help="• 자주 묻는 질문과 답변을 입력해주세요.\n• Q: 질문\n  A: 답변 형식으로 작성해주세요.")
+                    value=st.session_state['job_data'].get("faq", ""),
+                    help="• 자주 묻는 질문과 답변을 입력해주세요.\n• Q: 질문\n  A: 답변 형식으로 작성해주세요.")
     
     # 기타 안내사항 (여러 줄 입력 가능)
     additional_info = st.text_area("기타 안내사항", height=100,
-                                 help="• 추가로 안내할 사항이 있다면 기재해주세요.")
+                                value=st.session_state['job_data'].get("additional_info", ""),
+                                help="• 추가로 안내할 사항이 있다면 기재해주세요.")
     
     # 입력값을 job_data에 다시 저장
     st.session_state['job_data']["company_name"] = company_name
