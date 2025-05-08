@@ -268,7 +268,16 @@ def show_jobs_page():
         openings = st.number_input("채용인원", min_value=1, value=int(st.session_state['job_data'].get("openings", 1)))
 
     # 제출기한
-    deadline = st.date_input("제출기한", value=datetime.strptime(st.session_state['job_data'].get("deadline", str(datetime.now().date())), "%Y-%m-%d").date())
+    deadline_value = st.session_state['job_data'].get("deadline", datetime.now().date())
+
+    # 문자열일 경우 변환
+    if isinstance(deadline_value, str):
+        try:
+            deadline_value = datetime.strptime(deadline_value, "%Y-%m-%d").date()
+        except ValueError:
+            deadline_value = datetime.now().date()
+
+    deadline = st.date_input("제출기한", value=deadline_value)
 
     # 자격요건 (여러 줄 입력 가능)
     requirements = st.text_area("자격요건", height=150,
