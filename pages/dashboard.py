@@ -54,12 +54,31 @@ def get_progress_data():
         cursor = conn.cursor()
         
         # 이력관리 진행률 계산
-        cursor.execute("SELECT COUNT(*) AS count FROM tb_resume WHERE user_email = %s", (st.session_state.user_email,))
-        resume_count = cursor.fetchone()['count']
+        try:
+            resume_tables = [
+            "tb_resume_activities", "tb_resume_awards", "tb_resume_certifications", 
+            "tb_resume_education", "tb_resume_education_major", "tb_resume_experiences",
+            "tb_resume_personal_info", "tb_resume_positions", "tb_resume_self_introductions",
+            "tb_resume_skills", "tb_resume_training"
+        ]
+            resume_count = 0
+
+            for table in resume_tables:
+                cursor.execute(f"SELECT COUNT(*) AS count FROM {table} WHERE user_email = %s", (st.user.email,))
+                count = cursor.fetchone()['count']
+                resume_count += count
+            
+        except pymysql.MySQLError as e:
+            st.warning(f"이력관리 데이터 가져오기 오류: {str(e)}")
+            resume_count = 0
 
         # 공고관리 진행률 계산
-        cursor.execute("SELECT COUNT(*) AS count FROM tb_job_postings WHERE login_email = %s", (st.session_state.user_email,))
-        jobs_count = cursor.fetchone()['count']
+        try:
+            cursor.execute("SELECT COUNT(*) AS count FROM tb_job_postings WHERE login_email = %s", (st.user.email,))
+            jobs_count = cursor.fetchone()['count']
+        except pymysql.MySQLError as e:
+            st.warning(f"공고관리 데이터 가져오기 오류: {str(e)}")
+            jobs_count = 0
 
         return resume_count, jobs_count
     except Exception as e:
@@ -71,7 +90,7 @@ def get_progress_data():
     
 def show_dashboard_page():
     st.title("대시보드")
-    st.write("환영합니다, " + st.experimental_user.name + "님!")
+    st.write("환영합니다, " + st.user.name + "님!")
 
     resume_count, jobs_count = get_progress_data()
 
