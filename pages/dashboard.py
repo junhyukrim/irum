@@ -1,32 +1,8 @@
 import streamlit as st
 import plotly.express as px
 import pymysql
+import pandas as pd
 from datetime import datetime
-# from pages.resume import load_personal_info, load_skills_info, load_education_info, load_career_info
-# from pages.jobs import load_jobs_info
-
-
-# def calculate_completion_ratio(total, filled):
-#     if total == 0:
-#         return 0
-#     return round((filled / total) * 100, 2)
-
-
-# def render_gauge_chart(title, value):
-#     fig = go.Figure(go.Indicator(
-#         mode="gauge+number",
-#         value=value,
-#         title={'text': title},
-#         gauge={
-#             'axis': {'range': [0, 100]},
-#             'bar': {'color': "#4285F4"},
-#             'steps': [
-#                 {'range': [0, 50], 'color': "#f2f2f2"},
-#                 {'range': [50, 100], 'color': "#d4edda"}
-#             ]
-#         }
-#     ))
-#     st.plotly_chart(fig, use_container_width=True)
 
 def connect_to_db():
     try:
@@ -44,7 +20,49 @@ def connect_to_db():
     except Exception as e:
         st.error(f"DB 연결 오류: {str(e)}")
         return None
-    
+
+def get_empty_fields():
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return []
+
+        cursor = conn.cursor()
+
+        # 이력관리 테이블 목록
+        resume_tables = [
+            "tb_resume_activities", "tb_resume_awards", "tb_resume_certifications", 
+            "tb_resume_education", "tb_resume_education_major", "tb_resume_experiences",
+            "tb_resume_personal_info", "tb_resume_positions", "tb_resume_self_introductions",
+            "tb_resume_skills", "tb_resume_training"
+        ]
+        empty_fields = []
+
+        for table in resume_tables:
+            try:
+                # 테이블의 모든 컬럼명 가져오기
+                cursor.execute(f"SHOW COLUMNS FROM {table}")
+                columns = [col["Field"] for col in cursor.fetchall()]
+                
+                # 각 필드의 빈 값 확인
+                query = f"SELECT {', '.join(columns)} FROM {table} WHERE login_email = %s"
+                cursor.execute(query, (st.user.email,))
+                results = cursor.fetchall()
+
+                for row in results:
+                    for col in columns:
+                        if row[col] is None or row[col] == "":
+                            empty_fields.append({"Table": table, "Field": col, "Status": "Empty"})
+            except pymysql.MySQLError as e:
+                st.warning(f"테이블 {table} 데이터 가져오기 오류: {str(e)}")
+    except Exception as e:
+        st.error(f"빈 필드 데이터 가져오기 오류: {str(e)}")
+        return []
+    finally:
+        if conn:
+            conn.close()
+    return empty_fields
+
 def get_progress_data():
     try:
         conn = connect_to_db()
@@ -54,19 +72,21 @@ def get_progress_data():
         cursor = conn.cursor()
         
         # 이력관리 진행률 계산
+        resume_tables = [
+        "tb_resume_activities", "tb_resume_awards", "tb_resume_certifications", 
+        "tb_resume_education", "tb_resume_education_major", "tb_resume_experiences",
+        "tb_resume_personal_info", "tb_resume_positions", "tb_resume_self_introductions",
+        "tb_resume_skills", "tb_resume_training"
+    ]
+        resume_count = 0
+        max_resume_count = len(resume_tables) * 1
         try:
-            resume_tables = [
-            "tb_resume_activities", "tb_resume_awards", "tb_resume_certifications", 
-            "tb_resume_education", "tb_resume_education_major", "tb_resume_experiences",
-            "tb_resume_personal_info", "tb_resume_positions", "tb_resume_self_introductions",
-            "tb_resume_skills", "tb_resume_training"
-        ]
-            resume_count = 0
-
             for table in resume_tables:
-                cursor.execute(f"SELECT COUNT(*) AS count FROM {table} WHERE user_email = %s", (st.user.email,))
+                cursor.execute(f"SELECT COUNT(*) AS count FROM {table} WHERE login_email = %s", (st.user.email,))
                 count = cursor.fetchone()['count']
-                resume_count += count
+                resume_count += 1 if count > 0 else 0
+
+            resume_percent = (resume_count / max_resume_count) * 100
             
         except pymysql.MySQLError as e:
             st.warning(f"이력관리 데이터 가져오기 오류: {str(e)}")
@@ -76,6 +96,7 @@ def get_progress_data():
         try:
             cursor.execute("SELECT COUNT(*) AS count FROM tb_job_postings WHERE login_email = %s", (st.user.email,))
             jobs_count = cursor.fetchone()['count']
+            jobs_percent = 100 if jobs_count > 0 else 0
         except pymysql.MySQLError as e:
             st.warning(f"공고관리 데이터 가져오기 오류: {str(e)}")
             jobs_count = 0
@@ -90,18 +111,21 @@ def get_progress_data():
     
 def show_dashboard_page():
     st.title("대시보드")
-    st.write("환영합니다, " + st.user.name + "님!")
 
-    resume_count, jobs_count = get_progress_data()
+    resume_percent, jobs_percent = get_progress_data()
 
-    # 시각화 데이터 준비
-    progress_data = {
-        "페이지": ["이력관리", "공고관리"],
-        "완성도": [resume_count, jobs_count]
-    }
+    st.markdown(f"### 이력관리 완료 상태: **{resume_percent:.2f}%**")
+    st.markdown(f"### 공고관리 완료 상태: **{jobs_percent:.2f}%**")
+    
+    empty_fields = get_empty_fields()
 
-    # 막대 그래프 그리기
-    fig = px.bar(progress_data, x="페이지", y="완성도", title="페이지별 완료 상태",
-                 color="페이지", text="완성도", height=400)
+    if empty_fields:
+        df = pd.DataFrame(empty_fields)
+        st.markdown("### 이력관리 탭별 빈 필드 상태")
+        st.dataframe(df)
+    else:
+        st.markdown("### 모든 필드가 채워져 있습니다!")
 
-    st.plotly_chart(fig)
+
+if __name__ == "__main__":
+    show_dashboard_page()
