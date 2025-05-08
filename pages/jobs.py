@@ -377,21 +377,22 @@ def show_jobs_page():
     div[data-testid="stHorizontalBlock"] div.stButton > button:not([kind="primary"]):hover {
         background-color: #e8f0fe !important;
     }
-    .button-container {
+    .button-row {
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 20px;
+            margin-top: 10px;
     </style>
     """, unsafe_allow_html=True)
 
     # 버튼 배치
-    st.markdown('<div class="button-container">', unsafe_allow_html=True)
+    st.markdown('<div class="button-row">', unsafe_allow_html=True)
 
     cols = st.columns(8)
     for i in range(6): 
         cols[i].empty()
 
-    # 삭제 버튼 (왼쪽)
+    # 삭제 버튼 
     with cols[6]:
         if job_id is not None and st.button("삭제"):
             if delete_job(job_id, login_email):
@@ -400,7 +401,7 @@ def show_jobs_page():
             else:
                 st.error("삭제에 실패했습니다.")
 
-    # 저장 버튼 (오른쪽)
+    # 저장 버튼 
     with cols[7]:
         if st.button("저장"):
             st.session_state['job_data'].update({
