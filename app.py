@@ -1,5 +1,6 @@
 import streamlit as st
 import streamlit.components.v1 as components
+from pages.dashboard import show_dashboard_page
 from pages.resume import show_resume_page
 from pages.jobs import show_jobs_page
 from pages.documents import show_documents_page
@@ -137,11 +138,12 @@ def main_screen():
         st.session_state.last_clicked_button = 'dashboard'
 
     # 로그인한 사용자 정보 저장
-    if st.experimental_user.email:
-        st.session_state.user_email = st.experimental_user.email
+    if st.user.email:
+        st.session_state.user_email = st.user.email
+        st.write(f"환영합니다, {st.experimental_user.name}님!")
     else:
         st.write("로그인 정보 없음")
-        st.write("experimental_user 정보:", st.experimental_user)
+        st.write("experimental_user 정보:", st.user)
 
     # 기본 pages 네비게이션 숨기기
     st.markdown("""
@@ -174,8 +176,7 @@ def main_screen():
 
     # 현재 페이지에 따른 컨텐츠 표시
     if st.session_state.current_page == '대시보드':
-        st.markdown('<h3 class="main-header">대시보드</h3>', unsafe_allow_html=True)
-        st.write("환영합니다, " + st.experimental_user.name + "님!")
+        show_dashboard_page()
         
     elif st.session_state.current_page == '이력관리':
         show_resume_page()
@@ -186,7 +187,7 @@ def main_screen():
     elif st.session_state.current_page == '서류관리':
         show_documents_page()
 
-if not st.experimental_user.is_logged_in:
+if not st.user.is_logged_in:
     login_screen()
 else:
     main_screen() 
