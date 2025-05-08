@@ -21,6 +21,51 @@ def connect_to_db():
         st.error(f"DB 연결 오류: {str(e)}")
         return None
     
+def map_column_to_field(table, column):
+    field_mapping = {
+        # 개인정보
+        "tb_resume_personal_info": {
+            "name": "이름", "birth_date": "생년월일", "phone": "전화번호", "email": "이메일"
+        },
+        # 학력
+        "tb_resume_education": {
+            "school_name": "학교명", "degree": "학위", "major": "전공", "gpa": "학점"
+        },
+        "tb_resume_education_major": {
+            "department": "학과", "degree": "학위", "gpa": "학점"
+        },
+        # 역량
+        "tb_resume_skills": {
+            "skill_name": "기술명", "proficiency": "숙련도"
+        },
+        "tb_resume_certifications": {
+            "cert_name": "자격증명", "issue_date": "발급일"
+        },
+        # 경력
+        "tb_resume_experiences": {
+            "company_name": "회사명", "position": "직무", "start_date": "시작일", "end_date": "종료일"
+        },
+        "tb_resume_positions": {
+            "position": "직무명", "promotion_date": "승진일", "retirement_date": "퇴직일"
+        },
+        # 수상
+        "tb_resume_awards": {
+            "award_name": "수상명", "award_date": "수상일"
+        },
+        # 기타활동
+        "tb_resume_activities": {
+            "activity_name": "활동명", "activity_date": "활동일"
+        },
+        "tb_resume_training": {
+            "training_name": "교육명", "training_date": "교육일"
+        },
+        # 자기소개
+        "tb_resume_self_introductions": {
+            "intro_text": "자기소개 내용"
+        }
+    }
+    return field_mapping.get(table, {}).get(column, column)
+    
 def get_related_ids(cursor, table, id_column, email_col, login_email):
     try:
         query = f"SELECT id FROM {table} WHERE {email_col} = %s"
@@ -50,11 +95,12 @@ def get_filled_field_count(cursor, table, where_clause, where_values):
                 if row[col] is not None and str(row[col]).strip() != "":
                     filled_count += 1
                 else:
-                    empty_fields.append(col)
+                    empty_fields.append(map_column_to_field(table, col))
+
         return filled_count, total_count, empty_fields
     except pymysql.MySQLError as e:
         st.warning(f"테이블 {table} 데이터 가져오기 오류: {str(e)}")
-        return 0, 0
+        return 0, 0, []
 
 def calculate_completion_ratio(filled_count, total_count):
     if total_count == 0:
@@ -69,16 +115,12 @@ def get_tab_progress(login_email):
 
         cursor = conn.cursor()
 
-        # 교육 ID와 경력 ID 가져오기
-        education_ids = get_related_ids(cursor, "tb_resume_education", "id", "login_email", login_email)
-        experience_ids = get_related_ids(cursor, "tb_resume_experiences", "id", "login_email", login_email)
-
         # 탭 이름과 테이블 매핑
         tab_table_map = {
             "개인정보": [("tb_resume_personal_info", "login_email")],
             "학력": [
                 ("tb_resume_education", "login_email"),
-                ("tb_resume_education_major", "education_id")
+                ("tb_resume_education_major", "login_email")
             ],
             "역량": [
                 ("tb_resume_skills", "login_email"),
@@ -86,7 +128,7 @@ def get_tab_progress(login_email):
             ],
             "경력": [
                 ("tb_resume_experiences", "login_email"),
-                ("tb_resume_positions", "experience_id")
+                ("tb_resume_positions", "login_email")
             ],
             "수상": [("tb_resume_awards", "login_email")],
             "기타활동": [
@@ -104,17 +146,8 @@ def get_tab_progress(login_email):
             all_empty_fields = []
 
             for table, id_col in tables:
-                if id_col == "login_email":
-                    where_clause = f"WHERE {id_col} = %s"
-                    where_values = (login_email,)
-                elif id_col == "education_id" and education_ids:
-                    where_clause = f"WHERE {id_col} IN ({', '.join(map(str, education_ids))})"
-                    where_values = ()
-                elif id_col == "experience_id" and experience_ids:
-                    where_clause = f"WHERE {id_col} IN ({', '.join(map(str, experience_ids))})"
-                    where_values = ()
-                else:
-                    continue
+                where_clause = f"WHERE {id_col} = %s"
+                where_values = (login_email,)
 
                 filled_count, total_count, empty_fields = get_filled_field_count(cursor, table, where_clause, where_values)
                 total_filled += filled_count
@@ -134,12 +167,11 @@ def get_tab_progress(login_email):
             conn.close()
     
 def show_dashboard_page():
+    st.title("대시보드")
     if st.user.name:
         st.write(f"환영합니다, {st.user.name}님!")
     else:
         st.write("환영합니다, 사용자님!")
-    
-    st.title("대시보드")
 
     # 로그인 이메일 가져오기
     login_email = st.user.email
@@ -149,7 +181,7 @@ def show_dashboard_page():
 
     if tab_progress:
         df = pd.DataFrame(tab_progress)
-        st.markdown("### 이력관리 탭별 진행률")
+        st.markdown("### 이력관리 탭별 진행률 및 비어있는 필드")
         st.dataframe(df)
     else:
         st.markdown("### 진행률 데이터를 가져올 수 없습니다.")
