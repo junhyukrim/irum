@@ -353,6 +353,7 @@ def show_jobs_page():
     cols = st.columns(8)
     for i in range(7): 
         cols[i].empty()
+
     with cols[7]:
         if st.button("저장"):
             job_data.update({
@@ -362,11 +363,13 @@ def show_jobs_page():
                 "deadline": str(deadline),
                 "requirements": requirements
             })
-        if save_job(login_email, job_data, job_id):
-            st.session_state.save_success = True
-            st.success("성공적으로 저장되었습니다!")
-        else:
-            st.error("저장에 실패했습니다.")
+
+            if save_job(login_email, job_data, job_id):
+                st.session_state['save_success'] = True
+                st.success("성공적으로 저장되었습니다!")
+            else:
+                st.session_state['save_success'] = False
+                st.error("저장에 실패했습니다.")
 
     if job_id and st.button("삭제"):
         if delete_job(job_id, login_email):
@@ -375,12 +378,8 @@ def show_jobs_page():
         else:
             st.error("삭제에 실패했습니다.")
 
-    if st.session_state.save_success:
+    if 'save_success' in st.session_state and st.session_state['save_success']:
         st.success("작업이 완료되었습니다!")
         st.session_state.save_success = False
 
 show_jobs_page()
-
-    
-
-
