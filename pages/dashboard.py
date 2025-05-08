@@ -21,13 +21,23 @@ def connect_to_db():
         st.error(f"DB 연결 오류: {str(e)}")
         return None
     
-def get_empty_field_count(cursor, table, email_col, login_email):
+def get_related_ids(cursor, table, id_column, email_col, login_email):
+    try:
+        query = f"SELECT id FROM {table} WHERE {email_col} = %s"
+        cursor.execute(query, (login_email,))
+        results = cursor.fetchall()
+        return [row['id'] for row in results]
+    except pymysql.MySQLError as e:
+        st.warning(f"{table} 테이블 ID 가져오기 오류: {str(e)}")
+        return []
+    
+def get_empty_field_count(cursor, table, where_clause, where_values):
     try:
         cursor.execute(f"SHOW COLUMNS FROM {table}")
         columns = [col["Field"] for col in cursor.fetchall()]
 
-        query = f"SELECT {', '.join(columns)} FROM {table} WHERE {email_col} = %s"
-        cursor.execute(query, (login_email,))
+        query = f"SELECT {', '.join(columns)} FROM {table} {where_clause}"
+        cursor.execute(query, where_values)
         results = cursor.fetchall()
 
         empty_count = 0
@@ -44,7 +54,7 @@ def get_empty_field_count(cursor, table, email_col, login_email):
 
 def calculate_completion_ratio(empty_count, total_count):
     if total_count == 0:
-        return 100.0  # 데이터가 없는 경우 완료로 간주
+        return 100.0
     filled_count = total_count - empty_count
     return round((filled_count / total_count) * 100, 2)
 
@@ -56,14 +66,30 @@ def get_tab_progress(login_email):
 
         cursor = conn.cursor()
 
+        # 교육 ID와 경력 ID 가져오기
+        education_ids = get_related_ids(cursor, "tb_resume_education", "id", "login_email", login_email)
+        experience_ids = get_related_ids(cursor, "tb_resume_experiences", "id", "login_email", login_email)
+
         # 탭 이름과 테이블 매핑
         tab_table_map = {
             "개인정보": [("tb_resume_personal_info", "login_email")],
-            "학력": [("tb_resume_education", "login_email"), ("tb_resume_education_major", "login_email")],
-            "역량": [("tb_resume_skills", "login_email"), ("tb_resume_certifications", "login_email")],
-            "경력": [("tb_resume_experiences", "login_email"), ("tb_resume_positions", "login_email")],
+            "학력": [
+                ("tb_resume_education", "login_email"),
+                ("tb_resume_education_major", "education_id")
+            ],
+            "역량": [
+                ("tb_resume_skills", "login_email"),
+                ("tb_resume_certifications", "login_email")
+            ],
+            "경력": [
+                ("tb_resume_experiences", "login_email"),
+                ("tb_resume_positions", "experience_id")
+            ],
             "수상": [("tb_resume_awards", "login_email")],
-            "기타활동": [("tb_resume_activities", "login_email"), ("tb_resume_training", "login_email")],
+            "기타활동": [
+                ("tb_resume_activities", "login_email"),
+                ("tb_resume_training", "login_email")
+            ],
             "자기소개": [("tb_resume_self_introductions", "login_email")]
         }
 
@@ -72,10 +98,23 @@ def get_tab_progress(login_email):
         for tab_name, tables in tab_table_map.items():
             total_empty = 0
             total_fields = 0
-            for table, email_col in tables:
-                empty_count, total_count = get_empty_field_count(cursor, table, email_col, login_email)
+            for table, id_col in tables:
+                if id_col == "login_email":
+                    where_clause = f"WHERE {id_col} = %s"
+                    where_values = (login_email,)
+                elif id_col == "education_id" and education_ids:
+                    where_clause = f"WHERE {id_col} IN ({', '.join(map(str, education_ids))})"
+                    where_values = ()
+                elif id_col == "experience_id" and experience_ids:
+                    where_clause = f"WHERE {id_col} IN ({', '.join(map(str, experience_ids))})"
+                    where_values = ()
+                else:
+                    continue
+
+                empty_count, total_count = get_empty_field_count(cursor, table, where_clause, where_values)
                 total_empty += empty_count
                 total_fields += total_count
+
             progress = calculate_completion_ratio(total_empty, total_fields)
             tab_progress.append({"탭 이름": tab_name, "진행률 (%)": progress})
 
