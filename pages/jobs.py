@@ -377,13 +377,30 @@ def show_jobs_page():
     div[data-testid="stHorizontalBlock"] div.stButton > button:not([kind="primary"]):hover {
         background-color: #e8f0fe !important;
     }
+    .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
     </style>
     """, unsafe_allow_html=True)
 
+    # 버튼 배치
+    st.markdown('<div class="button-container">', unsafe_allow_html=True)
+
     cols = st.columns(8)
-    for i in range(7): 
+    for i in range(6): 
         cols[i].empty()
 
+    # 삭제 버튼 (왼쪽)
+    with cols[6]:
+        if job_id is not None and st.button("삭제"):
+            if delete_job(job_id, login_email):
+                st.session_state.save_success = True
+                st.success("성공적으로 삭제되었습니다!")
+            else:
+                st.error("삭제에 실패했습니다.")
+
+    # 저장 버튼 (오른쪽)
     with cols[7]:
         if st.button("저장"):
             st.session_state['job_data'].update({
@@ -405,7 +422,6 @@ def show_jobs_page():
                 "additional_info": additional_info
             })
 
-
             if save_job(login_email, st.session_state['job_data'], job_id):
                 st.session_state['save_success'] = True
                 st.success("성공적으로 저장되었습니다!")
@@ -413,13 +429,9 @@ def show_jobs_page():
                 st.session_state['save_success'] = False
                 st.error("저장에 실패했습니다.")
 
-    if job_id is not None and st.button("삭제"):
-        if delete_job(job_id, login_email):
-            st.session_state.save_success = True
-            st.success("성공적으로 삭제되었습니다!")
-        else:
-            st.error("삭제에 실패했습니다.")
+    st.markdown('</div>', unsafe_allow_html=True)
 
+    # 성공 메시지 표시
     if 'save_success' in st.session_state and st.session_state['save_success']:
         st.success("작업이 완료되었습니다!")
         st.session_state.save_success = False
