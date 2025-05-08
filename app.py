@@ -140,7 +140,7 @@ def main_screen():
     # 로그인한 사용자 정보 저장
     if st.user.email:
         st.session_state.user_email = st.user.email
-        st.write(f"환영합니다, {st.experimental_user.name}님!")
+        
     else:
         st.write("로그인 정보 없음")
         st.write("experimental_user 정보:", st.user)
