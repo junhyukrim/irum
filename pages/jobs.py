@@ -217,25 +217,35 @@ def show_jobs_page():
     jobs, message = load_jobs_info(login_email)
     if not jobs:
         st.warning(message)
-    job_titles = [job['company_name'] for job in jobs]
+    job_titles = ["새 공고 추가"] + [job['company_name'] for job in jobs]
     job_ids = {job['company_name']: job['id'] for job in jobs}
 
     # 공고 선택 드롭다운
-    selected_job = st.selectbox("저장된 공고 선택", ["새 공고 추가"] + job_titles)
-    job_id = job_ids.get(selected_job, None)
+    selected_job = st.selectbox("저장된 공고 선택", job_titles)
 
-    job_data = {key: "" for key in [
-        'company_name', 'position', 'openings', 'deadline', 'requirements', 'main_duties', 'submission',
-        'contact', 'company_website', 'company_intro', 'talent', 'preferences', 'company_culture', 'faq',
-        'additional_info', 'motivation']}
+    job_data = {
+    'company_name': "", 'position': "", 'openings': 1, 'deadline': str(datetime.now().date()), 
+    'requirements': "", 'main_duties': "", 'submission': "", 'contact': "", 'company_website': "", 
+    'company_intro': "", 'talent': "", 'preferences': "", 'company_culture': "", 'faq': "", 
+    'additional_info': "", 'motivation': ""
+}
 
-    # 기존 공고 선택 시 데이터 불러오기
-    if selected_job != "새 공고 추가" and job_id:
-        db_data, msg = load_single_job(job_id)
-        if db_data:
-            job_data.update(db_data)
-        else:
-            st.warning(msg)
+    # 공고를 선택할 때 동작
+    if selected_job == "새 공고 추가":
+        # 새 공고를 선택하면 필드 초기화
+        st.session_state['job_data'] = job_data
+        st.info("새 공고 추가 모드입니다.")
+    else:
+        # 기존 공고를 선택하면 DB에서 데이터 불러오기
+        job_id = job_ids.get(selected_job, None)
+        if job_id:
+            db_data, msg = load_single_job(job_id)
+            if db_data:
+                # 불러온 데이터를 세션 상태에 저장
+                st.session_state['job_data'] = db_data
+                st.success(f"{selected_job} 공고 데이터를 불러왔습니다.")
+            else:
+                st.warning(msg)
 
     # 필수 채용공고 양식
     st.markdown('<h5 class="section-header">필수 채용공고 양식</h5>', unsafe_allow_html=True)
