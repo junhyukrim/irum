@@ -24,15 +24,31 @@ def connect_to_db():
     
 def show_gauge_chart(progress, title):
     fig = go.Figure(go.Indicator(
-        mode='gauge+number',
+        mode="gauge+number+delta",
         value=progress,
-        title={'text': title},
-        gauge={'axis': {'range': [0, 100]},
-               'bar': {'color': 'blue'},
-               'steps': [
-                   {'range': [0, 50], 'color': 'lightgray'},
-                   {'range': [50, 100], 'color': 'lightblue'}]}
-    ))
+        title={"text": title},
+        domain={'x': [0, 1], 'y': [0, 1]},
+        gauge={
+            "shape": "semi",
+            "axis": {"range": [0, 100], "tickwidth": 1, "tickcolor": "darkgray"},
+            "bar": {"color": "#4285F4"},
+            "bgcolor": "white",
+            "steps": [
+                {"range": [0, progress], "color": "#4285F4"},
+                {"range": [progress, 100], "color": "lightgray"}
+                ],
+            "threshold": {
+                "line": {"color": "black", "width": 4},
+                "thickness": 0.75,
+                "value": progress
+            }
+        },
+        number={"valueformat": "/100"}
+))
+    fig.update_layout(
+        margin=dict(l=0, r=0, t=0, b=0),
+        height=300
+    )
     st.plotly_chart(fig)
     
 def map_column_to_field(table, column):
@@ -91,7 +107,7 @@ def get_related_ids(cursor, table, id_column, email_col, login_email):
         query = f"SELECT id FROM {table} WHERE {email_col} = %s"
         cursor.execute(query, (login_email,))
         results = cursor.fetchall()
-        return [row['id'] for row in results]
+        return [row["id"] for row in results]
     except pymysql.MySQLError as e:
         st.warning(f"{table} 테이블 ID 가져오기 오류: {str(e)}")
         return []
@@ -101,7 +117,7 @@ def get_filled_field_count(cursor, table, where_clause, where_values):
         cursor.execute(f"SHOW COLUMNS FROM {table}")
         columns = [col["Field"] for col in cursor.fetchall()]
 
-        query = f"SELECT {', '.join(columns)} FROM {table} {where_clause}"
+        query = f"SELECT {", ".join(columns)} FROM {table} {where_clause}"
         cursor.execute(query, where_values)
         results = cursor.fetchall()
 
@@ -172,7 +188,7 @@ def get_resume_progress(login_email):
                 cursor.execute(f"SHOW COLUMNS FROM {table}")
                 columns = [col["Field"] for col in cursor.fetchall()]
                 
-                query = f"SELECT {', '.join(columns)} FROM {table} {where_clause}"
+                query = f"SELECT {", ".join(columns)} FROM {table} {where_clause}"
                 cursor.execute(query, where_values)
                 results = cursor.fetchall()
 
@@ -205,18 +221,18 @@ def get_job_posting_progress(login_email):
         cursor = conn.cursor()
 
         # 공고관리 테이블
-        table_name = 'tb_job_postings'
-        where_clause = 'WHERE login_email = %s'
+        table_name = "tb_job_postings"
+        where_clause = "WHERE login_email = %s"
         where_values = (login_email,)
 
         # 필수 필드명 가져오기
         essential_columns = [
-            'company_name', 'position', 'openings', 'deadline', 'requirements', 
-            'main_duties', 'motivation', 'submission', 'contact', 'company_website'
+            "company_name", "position", "openings", "deadline", "requirements", 
+            "main_duties", "motivation", "submission", "contact", "company_website"
         ]
 
         # 데이터 가져오기
-        query = f'SELECT {', '.join(essential_columns)} FROM {table_name} {where_clause}'
+        query = f"SELECT {", ".join(essential_columns)} FROM {table_name} {where_clause}"
         cursor.execute(query, where_values)
         results = cursor.fetchall()
 
@@ -226,16 +242,16 @@ def get_job_posting_progress(login_email):
 
         for row in results:
             for col in essential_columns:
-                if row[col] is not None and str(row[col]).strip() != '':
+                if row[col] is not None and str(row[col]).strip() != "":
                     filled_count += 1
                 else:
                     empty_fields.append(map_column_to_field("tb_job_postings", col))
 
         progress = round((filled_count / total_count) * 100, 2) if total_count else 0
-        empty_fields_str = ', '.join(empty_fields) if empty_fields else '없음'
-        return [{'공고관리 탭': '공고관리', '진행률 (%)': progress, '비어있는 필드': empty_fields_str}]
+        empty_fields_str = ", ".join(empty_fields) if empty_fields else "없음"
+        return [{"공고관리 탭": "공고관리", "진행률 (%)": progress, "비어있는 필드": empty_fields_str}]
     except Exception as e:
-        st.error(f'공고관리 진행률 계산 오류: {str(e)}')
+        st.error(f"공고관리 진행률 계산 오류: {str(e)}")
         return []
     finally:
         if conn:
@@ -251,12 +267,12 @@ def get_additional_job_posting_progress(login_email):
 
         # 추가 채용공고 필드
         additional_columns = [
-            'company_intro', 'talent', 'preferences', 
-            'company_culture', 'faq', 'additional_info'
+            "company_intro", "talent", "preferences", 
+            "company_culture", "faq", "additional_info"
         ]
 
         # 데이터 가져오기
-        query = f"SELECT {', '.join(additional_columns)} FROM tb_job_postings WHERE login_email = %s"
+        query = f"SELECT {", ".join(additional_columns)} FROM tb_job_postings WHERE login_email = %s"
         cursor.execute(query, (login_email,))
         results = cursor.fetchall()
 
@@ -278,9 +294,7 @@ def get_additional_job_posting_progress(login_email):
 def show_tag_box(empty_fields, title):
     st.markdown(f"### {title}")
     if empty_fields:
-        selected = st.multiselect("비어있는 필드", empty_fields, empty_fields)
-        if selected:
-            st.markdown(f"선택된 비어있는 필드: {', '.join(selected)}")
+        st.multiselect("비어있는 필드", empty_fields, empty_fields)
     else:
         st.markdown("모든 필드가 입력되었습니다.")
 
@@ -306,7 +320,7 @@ def show_dashboard_page():
         return
 
     # 컬럼 구조 설정
-    col1, col2 = st.columns(2)
+    col1, _, col2 = st.columns([1, 0.1, 1])
 
     # 이력관리 진행률 표시
     with col1:
@@ -321,24 +335,24 @@ def show_dashboard_page():
         add_job_progress = get_additional_job_posting_progress(login_email)
 
         if job_progress:
-            st.markdown('#### 필수 채용공고 진행률')
-            progress_value = job_progress[0]['진행률 (%)']
-            empty_fields = job_progress[0]['비어있는 필드'].split(', ')
-            show_gauge_chart(progress_value, '필수 채용공고 진행률')
+            st.markdown("#### 필수 채용공고 진행률")
+            progress_value = job_progress[0]["진행률 (%)"]
+            empty_fields = job_progress[0]["비어있는 필드"].split(", ")
+            show_gauge_chart(progress_value, "필수 채용공고 진행률")
             show_tag_box(empty_fields, "비어있는 필드")
         else:
-            st.markdown('### 필수 채용공고 진행률 데이터를 가져올 수 없습니다.')
+            st.markdown("필수 채용공고 진행률 데이터를 가져올 수 없습니다.")
 
         if add_job_progress:
-            st.markdown('#### 추가 채용공고 양식 입력 상태')
-            filled_count = sum(1 for field in add_job_progress if '✅' in field['입력 상태'])
+            st.markdown("#### 추가 채용공고 양식 입력 상태")
+            filled_count = sum(1 for field in add_job_progress if "✅" in field["입력 상태"])
             total_count = len(add_job_progress)
             progress_value = (filled_count / total_count) * 100
-            show_gauge_chart(progress_value, '추가 채용공고 진행률')
-            empty_fields = [field['필드명'] for field in add_job_progress if '❌' in field['입력 상태']]
+            show_gauge_chart(progress_value, "추가 채용공고 진행률")
+            empty_fields = [field["필드명"] for field in add_job_progress if "❌" in field["입력 상태"]]
             show_tag_box(empty_fields, "추가 채용공고 비어있는 필드")
         else:
-            st.markdown('### 추가 채용공고 진행률 데이터를 가져올 수 없습니다.')
+            st.markdown("### 추가 채용공고 진행률 데이터를 가져올 수 없습니다.")
 
 # 대시보드 페이지 표시
 if __name__ == "__main__":
