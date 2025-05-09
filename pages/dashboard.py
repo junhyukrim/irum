@@ -1,5 +1,6 @@
 import streamlit as st
 import plotly.express as px
+import plotly.graph_objects as go
 import pymysql
 import pandas as pd
 from datetime import datetime
@@ -20,6 +21,19 @@ def connect_to_db():
     except Exception as e:
         st.error(f"DB 연결 오류: {str(e)}")
         return None
+    
+def show_gauge_chart(progress, title):
+    fig = go.Figure(go.Indicator(
+        mode='gauge+number',
+        value=progress,
+        title={'text': title},
+        gauge={'axis': {'range': [0, 100]},
+               'bar': {'color': 'blue'},
+               'steps': [
+                   {'range': [0, 50], 'color': 'lightgray'},
+                   {'range': [50, 100], 'color': 'lightblue'}]}
+    ))
+    st.plotly_chart(fig)
     
 def map_column_to_field(table, column):
     field_mapping = {
@@ -261,6 +275,15 @@ def get_additional_job_posting_progress(login_email):
         if conn:
             conn.close()
 
+def show_tag_box(empty_fields, title):
+    st.markdown(f"### {title}")
+    if empty_fields:
+        selected = st.multiselect("비어있는 필드", empty_fields, empty_fields)
+        if selected:
+            st.markdown(f"선택된 비어있는 필드: {', '.join(selected)}")
+    else:
+        st.markdown("모든 필드가 입력되었습니다.")
+
 def show_dashboard_page():
     st.title("대시보드")
     if st.user.name:
@@ -276,7 +299,7 @@ def show_dashboard_page():
 
     if tab_progress:
         df = pd.DataFrame(tab_progress)
-        st.markdown("## 이력관리 탭별 진행사항")
+        st.markdown("## 이력관리 진행사항")
         st.dataframe(df)
     else:
         st.markdown("### 진행률 데이터를 가져올 수 없습니다.")
@@ -285,16 +308,29 @@ def show_dashboard_page():
     job_porgress = get_job_posting_progress(login_email)
     add_job_progress = get_additional_job_posting_progress(login_email)
 
-    if job_porgress:
-        df_job = pd.DataFrame(job_porgress)
+    # 필수 채용공고 양식 진행률
+    job_progress = get_job_posting_progress(login_email)
+    if job_progress:
         st.markdown("## 공고관리 진행사항")
-        st.markdown("### 필수 채용공고")
-        st.dataframe(df_job)
-        st.markdown("### 추가 채용공고")
-        df_add_job = pd.DataFrame(add_job_progress)
-        st.dataframe(df_add_job)
+        st.markdown('### 필수 채용공고 진행률')
+        progress_value = job_progress[0]['진행률 (%)']
+        empty_fields = job_progress[0]['비어있는 필드'].split(', ')
+        show_gauge_chart(progress_value, '필수 채용공고 진행률')
+        show_tag_box(empty_fields, "비어있는 필드")
     else:
-        st.markdown("### 공고관리 진행률 데이터를 가져올 수 없습니다.")
+        st.markdown('### 필수 채용공고 진행률 데이터를 가져올 수 없습니다.')
+
+     # 추가 채용공고 양식 진행률
+    if add_job_progress:
+        st.markdown('### 추가 채용공고 양식 입력 상태')
+        filled_count = sum(1 for field in add_job_progress if '✅' in field['입력 상태'])
+        total_count = len(add_job_progress)
+        progress_value = (filled_count / total_count) * 100
+        show_gauge_chart(progress_value, '추가 채용공고 진행률')
+        empty_fields = [field['필드명'] for field in add_job_progress if '❌' in field['입력 상태']]
+        show_tag_box(empty_fields, "추가 채용공고 비어있는 필드")
+    else:
+        st.markdown('### 추가 채용공고 진행률 데이터를 가져올 수 없습니다.')
 
 # 대시보드 페이지 표시
 if __name__ == "__main__":
