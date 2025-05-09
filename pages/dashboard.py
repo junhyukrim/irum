@@ -284,53 +284,61 @@ def show_tag_box(empty_fields, title):
     else:
         st.markdown("모든 필드가 입력되었습니다.")
 
+# 진행률 데이터 표시 함수
+def display_progress_section(title, progress_data):
+    if progress_data:
+        st.markdown(f"##### {title}")
+        df = pd.DataFrame(progress_data)
+        st.dataframe(df)
+    else:
+        st.markdown(f"##### {title} 진행률 데이터를 가져올 수 없습니다.")
+
 def show_dashboard_page():
     st.title("대시보드")
     if st.user.name:
         st.write(f"환영합니다, {st.user.name}님!")
+        login_email = st.user.email
     else:
         st.write("환영합니다, 사용자님!")
 
-    # 로그인 이메일 가져오기
-    login_email = st.user.email
+    if not login_email:
+        st.warning("로그인이 필요합니다.")
+        return
 
-    # 탭별 진행률 가져오기
-    tab_progress = get_resume_progress(login_email)
+    # 컬럼 구조 설정
+    col1, col2 = st.columns(2)
 
-    if tab_progress:
-        df = pd.DataFrame(tab_progress)
-        st.markdown("## 이력관리 진행사항")
-        st.dataframe(df)
-    else:
-        st.markdown("### 진행률 데이터를 가져올 수 없습니다.")
+    # 이력관리 진행률 표시
+    with col1:
+        st.markdown("### 이력관리 진행사항")
+        tab_progress = get_resume_progress(login_email)
+        display_progress_section("이력관리", tab_progress)
 
-    # 공고관리 진행률 가져오기
-    job_porgress = get_job_posting_progress(login_email)
-    add_job_progress = get_additional_job_posting_progress(login_email)
+    # 공고관리 진행률 표시
+    with col2:
+        st.markdown("### 공고관리 진행사항")
+        job_progress = get_job_posting_progress(login_email)
+        add_job_progress = get_additional_job_posting_progress(login_email)
 
-    # 필수 채용공고 양식 진행률
-    job_progress = get_job_posting_progress(login_email)
-    if job_progress:
-        st.markdown("## 공고관리 진행사항")
-        st.markdown('### 필수 채용공고 진행률')
-        progress_value = job_progress[0]['진행률 (%)']
-        empty_fields = job_progress[0]['비어있는 필드'].split(', ')
-        show_gauge_chart(progress_value, '필수 채용공고 진행률')
-        show_tag_box(empty_fields, "비어있는 필드")
-    else:
-        st.markdown('### 필수 채용공고 진행률 데이터를 가져올 수 없습니다.')
+        if job_progress:
+            st.markdown('#### 필수 채용공고 진행률')
+            progress_value = job_progress[0]['진행률 (%)']
+            empty_fields = job_progress[0]['비어있는 필드'].split(', ')
+            show_gauge_chart(progress_value, '필수 채용공고 진행률')
+            show_tag_box(empty_fields, "비어있는 필드")
+        else:
+            st.markdown('### 필수 채용공고 진행률 데이터를 가져올 수 없습니다.')
 
-     # 추가 채용공고 양식 진행률
-    if add_job_progress:
-        st.markdown('### 추가 채용공고 양식 입력 상태')
-        filled_count = sum(1 for field in add_job_progress if '✅' in field['입력 상태'])
-        total_count = len(add_job_progress)
-        progress_value = (filled_count / total_count) * 100
-        show_gauge_chart(progress_value, '추가 채용공고 진행률')
-        empty_fields = [field['필드명'] for field in add_job_progress if '❌' in field['입력 상태']]
-        show_tag_box(empty_fields, "추가 채용공고 비어있는 필드")
-    else:
-        st.markdown('### 추가 채용공고 진행률 데이터를 가져올 수 없습니다.')
+        if add_job_progress:
+            st.markdown('#### 추가 채용공고 양식 입력 상태')
+            filled_count = sum(1 for field in add_job_progress if '✅' in field['입력 상태'])
+            total_count = len(add_job_progress)
+            progress_value = (filled_count / total_count) * 100
+            show_gauge_chart(progress_value, '추가 채용공고 진행률')
+            empty_fields = [field['필드명'] for field in add_job_progress if '❌' in field['입력 상태']]
+            show_tag_box(empty_fields, "추가 채용공고 비어있는 필드")
+        else:
+            st.markdown('### 추가 채용공고 진행률 데이터를 가져올 수 없습니다.')
 
 # 대시보드 페이지 표시
 if __name__ == "__main__":
