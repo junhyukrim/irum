@@ -229,7 +229,7 @@ def get_job_posting_progress(login_email):
                 if row[col] is not None and str(row[col]).strip() != '':
                     filled_count += 1
                 else:
-                    empty_fields.append(map_column_to_field(col))
+                    empty_fields.append(map_column_to_field("tb_job_postings", col))
 
         progress = round((filled_count / total_count) * 100, 2) if total_count else 0
         empty_fields_str = ', '.join(empty_fields) if empty_fields else '없음'
