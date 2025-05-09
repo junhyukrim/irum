@@ -23,34 +23,28 @@ def connect_to_db():
         return None
     
 def show_gauge_chart(progress, title):
-    fig = go.Figure(go.Indicator(
-        mode="gauge+number+delta",
-        value=progress,
-        title={"text": title},
-        domain={'x': [0, 1], 'y': [0, 1]},
-        gauge={
-            "shape": "semi",
-            "axis": {"range": [0, 100], "tickwidth": 1, "tickcolor": "darkgray"},
-            "bar": {"color": "#4285F4"},
-            "bgcolor": "white",
-            "steps": [
-                {"range": [0, progress], "color": "#4285F4"},
-                {"range": [progress, 100], "color": "lightgray"}
-                ],
-            "threshold": {
-                "line": {"color": "black", "width": 4},
-                "thickness": 0.75,
-                "value": progress
-            }
-        },
-        number={"valueformat": "/100"}
-))
+    fig = go.Figure(go.Pie(
+        values=[progress, 100 - progress],
+        labels=["Used", "Available"],
+        hole=0.7,
+        direction="clockwise",
+        sort=False,
+        textinfo="label+percent",
+        textposition="inside",
+        marker=dict(colors=["#4285F4", "lightgray"]),
+        showlegend=True
+    ))
+    fig.update_traces(marker=dict(line=dict(color="#000000", width=2)))
     fig.update_layout(
-        margin=dict(l=0, r=0, t=0, b=0),
-        height=300
+        title={'text': title, 'x': 0.5},
+        annotations=[
+            dict(text=f"{progress}/100", x=0.5, y=0.5, font_size=20, showarrow=False)
+        ],
+        height=300,
+        margin=dict(t=40, b=20, l=0, r=0)
     )
     st.plotly_chart(fig)
-    
+
 def map_column_to_field(table, column):
     field_mapping = {
         "tb_resume_personal_info": {
