@@ -63,9 +63,15 @@ def map_column_to_field(table, column):
         "tb_resume_self_introductions": {
             "topic_category": "자기소개분야", "topic_title": "주제", "content": "자기소개문"
         },
+        "tb_job_postings": {
+            "company_name": "기업명", "position": "직무명", "openings": "채용인원", "deadline": "제출기한",
+            "requirements": "자격요건", "main_duties": "주요업무", "motivation": "지원동기", "submission": "제출서류&지원방법",
+            "contact": "문의처", "company_website": "홈페이지 주소", "company_intro": "기업소개", "talent": "인재상",
+            "preferences": "우대조건", "company_culture": "근무환경", "faq": "FAQ", "additional_info": "기타 안내사항" 
+        }
     }
     return field_mapping.get(table, {}).get(column, column)
-    
+
 def get_related_ids(cursor, table, id_column, email_col, login_email):
     try:
         query = f"SELECT id FROM {table} WHERE {email_col} = %s"
@@ -176,7 +182,7 @@ def get_resume_progress(login_email):
         if conn:
             conn.close()
 
-def get_career_progress(login_email):
+def get_job_posting_progress(login_email):
     try:
         conn = connect_to_db()
         if conn is None:
@@ -184,43 +190,72 @@ def get_career_progress(login_email):
 
         cursor = conn.cursor()
 
-        # 경력관리 테이블 매핑
-        career_table_map = {
-            "경력": [
-                ("tb_resume_experiences", "login_email"),
-                ("tb_resume_positions", "experience_id")
-            ]
-        }
+        # 공고관리 테이블
+        table_name = 'tb_job_postings'
+        where_clause = 'WHERE login_email = %s'
+        where_values = (login_email,)
 
-        career_progress = []
+        # 필수 필드명 가져오기
+        essential_columns = [
+            'company_name', 'position', 'openings', 'deadline', 'requirements', 
+            'main_duties', 'motivation', 'submission', 'contact', 'company_website'
+        ]
 
-        for tab_name, tables in career_table_map.items():
-            total_filled = 0
-            total_fields = 0
-            all_empty_fields = []
+        # 데이터 가져오기
+        query = f'SELECT {', '.join(essential_columns)} FROM {table_name} {where_clause}'
+        cursor.execute(query, where_values)
+        results = cursor.fetchall()
 
-            for table, id_col in tables:
-                if id_col == "login_email":
-                    where_clause = f"WHERE {id_col} = %s"
-                    where_values = (login_email,)
-                elif id_col == "experience_id":
-                    where_clause = f"WHERE {id_col} IN (SELECT id FROM tb_resume_experiences WHERE login_email = %s)"
-                    where_values = (login_email,)
+        filled_count = 0
+        total_count = len(essential_columns)
+        empty_fields = []
+
+        for row in results:
+            for col in essential_columns:
+                if row[col] is not None and str(row[col]).strip() != '':
+                    filled_count += 1
                 else:
-                    continue
+                    empty_fields.append(map_column_to_field(col))
 
-                filled_count, total_count, empty_fields = get_filled_field_count(cursor, table, where_clause, where_values)
-                total_filled += filled_count
-                total_fields += total_count
-                all_empty_fields.extend(empty_fields)
-
-            progress = calculate_completion_ratio(total_filled, total_fields)
-            empty_fields_str = ", ".join(all_empty_fields) if all_empty_fields else "없음"
-            career_progress.append({"경력관리 탭": tab_name, "진행률 (%)": progress, "비어있는 필드": empty_fields_str})
-
-        return career_progress
+        progress = round((filled_count / total_count) * 100, 2) if total_count else 0
+        empty_fields_str = ', '.join(empty_fields) if empty_fields else '없음'
+        return [{'공고관리 탭': '공고관리', '진행률 (%)': progress, '비어있는 필드': empty_fields_str}]
     except Exception as e:
-        st.error(f"경력관리 진행률 계산 오류: {str(e)}")
+        st.error(f'공고관리 진행률 계산 오류: {str(e)}')
+        return []
+    finally:
+        if conn:
+            conn.close()
+
+def get_additional_job_posting_progress(login_email):
+    try:
+        conn = connect_to_db()
+        if conn is None:
+            return []
+
+        cursor = conn.cursor()
+
+        # 추가 채용공고 필드
+        additional_columns = [
+            'company_intro', 'talent', 'preferences', 
+            'company_culture', 'faq', 'additional_info'
+        ]
+
+        # 데이터 가져오기
+        query = f"SELECT {', '.join(additional_columns)} FROM tb_job_postings WHERE login_email = %s"
+        cursor.execute(query, (login_email,))
+        results = cursor.fetchall()
+
+        additional_progress = []
+
+        for row in results:
+            for col in additional_columns:
+                status = "✅ 입력됨" if row[col] and str(row[col]).strip() != "" else "❌ 입력 안 됨"
+                additional_progress.append({"필드명": map_column_to_field(col), "입력 상태": status})
+
+        return additional_progress
+    except Exception as e:
+        st.error(f"추가 채용공고 진행률 계산 오류: {str(e)}")
         return []
     finally:
         if conn:
@@ -241,21 +276,25 @@ def show_dashboard_page():
 
     if tab_progress:
         df = pd.DataFrame(tab_progress)
-        st.markdown("### 이력관리 탭별 진행률 및 비어있는 필드")
+        st.markdown("## 이력관리 탭별 진행사항")
         st.dataframe(df)
     else:
         st.markdown("### 진행률 데이터를 가져올 수 없습니다.")
 
+    # 공고관리 진행률 가져오기
+    job_porgress = get_job_posting_progress(login_email)
+    add_job_progress = get_additional_job_posting_progress(login_email)
 
-    # 경력관리 진행률 가져오기
-    career_progress = get_career_progress(login_email)
-
-    if career_progress:
-        df_career = pd.DataFrame(career_progress)
-        st.markdown("### 경력관리 진행률 및 비어있는 필드")
-        st.dataframe(df_career)
+    if job_porgress:
+        df_job = pd.DataFrame(job_porgress)
+        st.markdown("## 공고관리 진행사항")
+        st.markdown("### 필수 채용공고")
+        st.dataframe(df_job)
+        st.markdown("### 추가 채용공고")
+        df_add_job = pd.DataFrame(add_job_progress)
+        st.dataframe(df_add_job)
     else:
-        st.markdown("### 경력관리 진행률 데이터를 가져올 수 없습니다.")
+        st.markdown("### 공고관리 진행률 데이터를 가져올 수 없습니다.")
 
 # 대시보드 페이지 표시
 if __name__ == "__main__":
