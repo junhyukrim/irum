@@ -33,7 +33,7 @@ def show_gauge_chart(progress, title):
         marker=dict(colors=["#4285F4", "lightgray"]),
         showlegend=True
     ))
-    fig.update_traces(marker=dict(line=dict(color="#000000", width=1)))
+    fig.update_traces(marker=dict(line=dict(color="#000000", width=0.5)))
     fig.update_layout(
         annotations=[
             dict(text=f"{progress}/100", x=0.5, y=0.5, font_size=30, showarrow=False)
@@ -340,7 +340,7 @@ def show_dashboard_page():
             st.markdown("#### 필수 채용공고 진행률")
             progress_value = job_progress[0]["진행률 (%)"]
             empty_fields = job_progress[0]["비어있는 필드"].split(", ")
-            show_gauge_chart(progress_value)
+            show_gauge_chart(progress_value, "필수 채용공고")
             show_tag_box(empty_fields, "비어있는 필드")
         else:
             st.markdown("필수 채용공고 진행률 데이터를 가져올 수 없습니다.")
@@ -350,7 +350,7 @@ def show_dashboard_page():
             filled_count = sum(1 for field in add_job_progress if "✅" in field["입력 상태"])
             total_count = len(add_job_progress)
             progress_value = (filled_count / total_count) * 100
-            show_gauge_chart(progress_value)
+            show_gauge_chart(progress_value, "추가 채용공고")
             empty_fields = [field["필드명"] for field in add_job_progress if "❌" in field["입력 상태"]]
             show_tag_box(empty_fields, "추가 채용공고 비어있는 필드")
         else:
