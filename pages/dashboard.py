@@ -325,7 +325,7 @@ def show_dashboard_page():
                 progress = item['진행률 (%)']
                 empty_fields = item['비어있는 필드'].split(', ')
                 st.markdown(f"#### {tab_name}")
-                show_gauge_chart(progress)
+                show_gauge_chart(progress, tab_name)
                 show_tag_box(empty_fields, f"{tab_name} 비어있는 필드")
         else:
             st.markdown("### 이력관리 진행률 데이터를 가져올 수 없습니다.")
