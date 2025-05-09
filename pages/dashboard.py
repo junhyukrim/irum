@@ -28,50 +28,41 @@ def map_column_to_field(table, column):
             "en_firstname": "영문 이름", "en_lastname": "영문 성",
             "nationality": "국적", "gender": "성별", "birth_date": "생년월일", 
             "address": "주소", "email": "이메일", "contact_number": "연락처", 
-            "photo_url": "사진 링크", "military_status": "병역 여부",
+            "photo_url": "사진 링크", "military_status": "병역",
             "military_type": "병역 유형", "military_rank": "계급", 
             "veterans_status": "보훈 여부", "service_start": "복무 시작일", 
             "service_end": "복무 종료일", "discharge_type": "전역 유형"
         },
         "tb_resume_education": {
-            "institution": "학교명", "start_date": "입학일", "end_date": "졸업일", "note": "비고"
+            "institution": "교육기관", "start_date": "입학년월", "end_date": "졸업년월", "note": "비고"
         },
         "tb_resume_education_major": {
-            "department": "학과", "major": "전공", "degree": "학위", "gpa": "평점"
+            "department": "학부 또는 분야", "major": "학과, 전공, 세부내용", "degree": "학위", "gpa": "성적"
         },
         "tb_resume_skills": {
-            "skill_name": "기술명", "skill_level": "숙련도", "note": "비고"
+            "skill_name": "기술 및 역량", "skill_level": "성취수준", "note": "비고"
         },
         "tb_resume_certifications": {
-            "certification_name": "자격증명", "issue_date": "취득일", "issuing_agency": "발급 기관"
+            "certification_name": "자격증명", "issue_date": "취득일", "issuing_agency": "발급기관"
         },
         "tb_resume_experiences": {
-            "company_name": "회사명", "position": "직위", "join_date": "입사일", "leave_date": "퇴사일"
+            "company_name": "회사명", "join_date": "입사년월", "leave_date": "퇴사년월", "leave_reason": "퇴사사유"
         },
         "tb_resume_positions": {
-            "position": "직위명", "promotion_date": "승진일", "retirement_date": "퇴직일", "description": "직무 설명"
+            "position": "직위/직책", "promotion_date": "취임일", "retirement_date": "퇴임일", "description": "업무내용"
         },
         "tb_resume_awards": {
-            "award_name": "수상명", "award_date": "수상일", "awarding_body": "수상 기관", "note": "비고"
+            "award_name": "수상명", "award_date": "수상일", "awarding_body": "수여기관", "note": "비고"
         },
         "tb_resume_activities": {
-            "activity_name": "활동명", "organization": "소속", "start_date": "활동 시작일", "end_date": "활동 종료일"
+            "activity_name": "활동명", "organization": "소속", "start_date": "시작년월", "end_date": "종료년월", "role" : "직책/역할", "link": "링크", "details": "활동 세부내역"
         },
         "tb_resume_training": {
             "description": "교육 내용"
         },
         "tb_resume_self_introductions": {
-            "topic_category": "자기소개 유형", "topic_title": "제목", "content": "내용"
+            "topic_category": "자기소개분야", "topic_title": "주제", "content": "자기소개문"
         },
-        "tb_resume_experiences": {
-            "company_name": "회사명", "position": "직위", 
-            "join_date": "입사일", "leave_date": "퇴사일", 
-            "description": "업무 설명"
-        },
-        "tb_resume_positions": {
-            "position": "직위명", "promotion_date": "승진일", 
-            "retirement_date": "퇴직일", "description": "직무 설명"
-        }
     }
     return field_mapping.get(table, {}).get(column, column)
     
