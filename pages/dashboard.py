@@ -16,32 +16,30 @@ def connect_to_db():
             cursorclass=pymysql.cursors.DictCursor,
             charset="utf8mb4"
         )
-
         return connection
     except Exception as e:
         st.error(f"DB 연결 오류: {str(e)}")
         return None
     
-def show_gauge_chart(progress, title):
+def show_gauge_chart(progress):
     fig = go.Figure(go.Pie(
         values=[progress, 100 - progress],
-        labels=["Used", "Available"],
+        labels=["입력됨", "입력 안 됨"],
         hole=0.7,
         direction="clockwise",
         sort=False,
         textinfo="label+percent",
         textposition="inside",
-        marker=dict(colors=["#4285F4", "lightgray"]),
+        marker=dict(colors=["#4285F4", "brightgray"]),
         showlegend=True
     ))
-    fig.update_traces(marker=dict(line=dict(color="#000000", width=2)))
+    fig.update_traces(marker=dict(line=dict(color="#000000", width=1)))
     fig.update_layout(
-        title={'text': title, 'x': 0.5},
         annotations=[
-            dict(text=f"{progress}/100", x=0.5, y=0.5, font_size=20, showarrow=False)
+            dict(text=f"{progress}/100", x=0.5, y=0.5, font_size=30, showarrow=False)
         ],
         height=300,
-        margin=dict(t=40, b=20, l=0, r=0)
+        margin=dict(t=0, b=20, l=0, r=0)
     )
     st.plotly_chart(fig)
 
@@ -275,7 +273,7 @@ def get_additional_job_posting_progress(login_email):
         for row in results:
             for col in additional_columns:
                 status = "✅ 입력됨" if row[col] and str(row[col]).strip() != "" else "❌ 입력 안 됨"
-                additional_progress.append({"필드명": map_column_to_field(col), "입력 상태": status})
+                additional_progress.append({"필드명": map_column_to_field("tb_job_postings", col), "입력 상태": status})
 
         return additional_progress
     except Exception as e:
@@ -288,7 +286,8 @@ def get_additional_job_posting_progress(login_email):
 def show_tag_box(empty_fields, title):
     st.markdown(f"### {title}")
     if empty_fields:
-        st.multiselect("비어있는 필드", empty_fields, empty_fields)
+        styled_fields = [f'<span style="background-color:#4285F4; color:white; padding:5px; margin:2px; border-radius:5px;">{field}</span>' for field in empty_fields]
+        st.markdown(" ".join(styled_fields), unsafe_allow_html=True)
     else:
         st.markdown("모든 필드가 입력되었습니다.")
 
@@ -320,7 +319,16 @@ def show_dashboard_page():
     with col1:
         st.markdown("### 이력관리 진행사항")
         tab_progress = get_resume_progress(login_email)
-        display_progress_section("이력관리", tab_progress)
+        if tab_progress:
+            for item in tab_progress:
+                tab_name = item['탭 이름']
+                progress = item['진행률 (%)']
+                empty_fields = item['비어있는 필드'].split(', ')
+                st.markdown(f"#### {tab_name}")
+                show_gauge_chart(progress)
+                show_tag_box(empty_fields, f"{tab_name} 비어있는 필드")
+        else:
+            st.markdown("### 이력관리 진행률 데이터를 가져올 수 없습니다.")
 
     # 공고관리 진행률 표시
     with col2:
@@ -332,17 +340,17 @@ def show_dashboard_page():
             st.markdown("#### 필수 채용공고 진행률")
             progress_value = job_progress[0]["진행률 (%)"]
             empty_fields = job_progress[0]["비어있는 필드"].split(", ")
-            show_gauge_chart(progress_value, "필수 채용공고 진행률")
+            show_gauge_chart(progress_value)
             show_tag_box(empty_fields, "비어있는 필드")
         else:
             st.markdown("필수 채용공고 진행률 데이터를 가져올 수 없습니다.")
 
         if add_job_progress:
-            st.markdown("#### 추가 채용공고 양식 입력 상태")
+            st.markdown("#### 추가 채용공고 진행률")
             filled_count = sum(1 for field in add_job_progress if "✅" in field["입력 상태"])
             total_count = len(add_job_progress)
             progress_value = (filled_count / total_count) * 100
-            show_gauge_chart(progress_value, "추가 채용공고 진행률")
+            show_gauge_chart(progress_value)
             empty_fields = [field["필드명"] for field in add_job_progress if "❌" in field["입력 상태"]]
             show_tag_box(empty_fields, "추가 채용공고 비어있는 필드")
         else:
