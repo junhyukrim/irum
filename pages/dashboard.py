@@ -21,7 +21,7 @@ def connect_to_db():
         st.error(f"DB 연결 오류: {str(e)}")
         return None
     
-def show_gauge_chart(progress):
+def show_gauge_chart(progress, title):
     fig = go.Figure(go.Pie(
         values=[progress, 100 - progress],
         labels=["입력됨", "입력 안 됨"],
@@ -30,7 +30,7 @@ def show_gauge_chart(progress):
         sort=False,
         textinfo="label+percent",
         textposition="inside",
-        marker=dict(colors=["#4285F4", "brightgray"]),
+        marker=dict(colors=["#4285F4", "lightgray"]),
         showlegend=True
     ))
     fig.update_traces(marker=dict(line=dict(color="#000000", width=1)))
@@ -41,7 +41,7 @@ def show_gauge_chart(progress):
         height=300,
         margin=dict(t=0, b=20, l=0, r=0)
     )
-    st.plotly_chart(fig)
+    st.plotly_chart(fig, key=f"gauge_{title}")
 
 def map_column_to_field(table, column):
     field_mapping = {
