@@ -241,6 +241,15 @@ def get_job_posting_progress(login_email):
             "main_duties", "motivation", "submission", "contact", "company_website"
         ]
 
+        # 추가 필드명
+        additional_columns = [
+            "company_intro", "talent", "preferences", 
+            "company_culture", "faq", "additional_info"
+        ]
+
+        # 전체 필드명 (필수 + 추가)
+        all_columns = essential_columns + additional_columns
+
         # 데이터 가져오기
         query = f"SELECT id, company_name, {', '.join(essential_columns)} FROM {table_name} {where_clause}"
         cursor.execute(query, where_values)
@@ -263,6 +272,7 @@ def get_job_posting_progress(login_email):
             conn.close()
 
 def get_additional_job_posting_progress(login_email):
+
     try:
         conn = connect_to_db()
         if conn is None:
