@@ -31,7 +31,7 @@ else:
     st.write("환영합니다, 사용자님!")
     login_email = ""
     
-def show_gauge_chart(progress, title):
+def show_half_gauge_chart(progress, title):
     fig = go.Figure(go.Pie(
         values=[progress, 100 - progress],
         labels=["입력됨", "입력 안 됨"],
@@ -41,17 +41,32 @@ def show_gauge_chart(progress, title):
         textinfo="label+percent",
         textposition="inside",
         marker=dict(colors=["#4285F4", "lightgray"]),
-        showlegend=True
+        startangle=180,
+        showlegend=False
     ))
     fig.update_traces(marker=dict(line=dict(color="#000000", width=0.5)))
     fig.update_layout(
-        annotations=[
-            dict(text=f"{progress}/100", x=0.5, y=0.5, font_size=30, showarrow=False)
-        ],
+        title=title,
         height=300,
         margin=dict(t=0, b=20, l=0, r=0)
     )
-    st.plotly_chart(fig, key=f"gauge_{title}")
+    st.plotly_chart(fig)
+
+def show_bar_chart(data, title):
+    df = pd.DataFrame(data)
+    fig = px.bar(df, x='탭 이름', y='진행률 (%)', title=title)
+    st.plotly_chart(fig)
+
+def show_job_progress_table(data, title):
+    df = pd.DataFrame(data)
+    st.markdown(f"#### {title}")
+    st.dataframe(df)
+
+def show_empty_fields_table(data, title):
+    empty_fields = [{"탭 이름": item['탭 이름'], "비어있는 필드": item['비어있는 필드']} for item in data]
+    df = pd.DataFrame(empty_fields)
+    st.markdown(f"#### {title}")
+    st.dataframe(df)
 
 def map_column_to_field(table, column):
     field_mapping = {
@@ -313,48 +328,31 @@ def display_progress_section(title, progress_data):
 def show_dashboard_page():
     st.title("대시보드")
     # 컬럼 구조 설정
-    col1, _, col2 = st.columns([1, 0.1, 1])
+    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
 
     # 이력관리 진행률 표시
     with col1:
         st.markdown("### 이력관리 진행사항")
         tab_progress = get_resume_progress(login_email)
-        if tab_progress:
-            for item in tab_progress:
-                tab_name = item['탭 이름']
-                progress = item['진행률 (%)']
-                empty_fields = item['비어있는 필드'].split(', ')
-                st.markdown(f"#### {tab_name}")
-                show_gauge_chart(progress, tab_name)
-                show_tag_box(empty_fields, f"{tab_name} 비어있는 필드")
-        else:
-            st.markdown("### 이력관리 진행률 데이터를 가져올 수 없습니다.")
+        total_progress = sum(item['진행률 (%)'] for item in tab_progress) / len(tab_progress)
+        show_half_gauge_chart(total_progress, "이력관리 진행률")
+
+    with col2:
+        st.markdown("### 이력관리 탭별 진행률")
+        show_bar_chart(tab_progress, "이력관리 탭별 진행률")
+        show_empty_fields_table(tab_progress, "이력관리 비어있는 필드")
 
     # 공고관리 진행률 표시
-    with col2:
+    with col3:
         st.markdown("### 공고관리 진행사항")
         job_progress = get_job_posting_progress(login_email)
+        total_job_progress = job_progress[0]["진행률 (%)"] if job_progress else 0
+        show_half_gauge_chart(total_job_progress, "공고관리 진행률")
+    
+    with col4:
+        st.markdown("### 공고별 진행률")
         add_job_progress = get_additional_job_posting_progress(login_email)
-
-        if job_progress:
-            st.markdown("#### 필수 채용공고 진행률")
-            progress_value = job_progress[0]["진행률 (%)"]
-            empty_fields = job_progress[0]["비어있는 필드"].split(", ")
-            show_gauge_chart(progress_value, "필수 채용공고")
-            show_tag_box(empty_fields, "비어있는 필드")
-        else:
-            st.markdown("필수 채용공고 진행률 데이터를 가져올 수 없습니다.")
-
-        if add_job_progress:
-            st.markdown("#### 추가 채용공고 진행률")
-            filled_count = sum(1 for field in add_job_progress if "✅" in field["입력 상태"])
-            total_count = len(add_job_progress)
-            progress_value = (filled_count / total_count) * 100
-            show_gauge_chart(progress_value, "추가 채용공고")
-            empty_fields = [field["필드명"] for field in add_job_progress if "❌" in field["입력 상태"]]
-            show_tag_box(empty_fields, "추가 채용공고 비어있는 필드")
-        else:
-            st.markdown("### 추가 채용공고 진행률 데이터를 가져올 수 없습니다.")
+        show_job_progress_table(add_job_progress, "공고별 진행률")
 
 # 대시보드 페이지 표시
 if __name__ == "__main__":
