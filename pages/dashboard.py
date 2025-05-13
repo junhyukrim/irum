@@ -304,15 +304,11 @@ def display_progress_section(title, progress_data):
 
 def show_dashboard_page():
     st.title("대시보드")
-    if st.user.name:
-        st.write(f"환영합니다, {st.user.name}님!")
-        login_email = st.user.email
-    else:
-        st.write("환영합니다, 사용자님!")
-
+    login_email = st.user.email
     if not login_email:
         st.warning("로그인이 필요합니다.")
-        return
+    else:
+        st.success(f"환영합니다, {login_email}님!")
 
     # 컬럼 구조 설정
     col1, _, col2 = st.columns([1, 0.1, 1])
