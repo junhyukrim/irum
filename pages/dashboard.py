@@ -34,14 +34,13 @@ else:
 def show_half_gauge_chart(progress, title):
     fig = go.Figure(go.Pie(
         values=[progress, 100 - progress],
-        labels=["입력됨", "입력 안 됨"],
+        labels=["완료", "미완료"],
         hole=0.7,
         direction="clockwise",
         sort=False,
         textinfo="label+percent",
         textposition="inside",
         marker=dict(colors=["#4285F4", "lightgray"]),
-        startangle=180,
         showlegend=False
     ))
     fig.update_traces(marker=dict(line=dict(color="#000000", width=0.5)))
