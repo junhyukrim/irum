@@ -22,6 +22,12 @@ def connect_to_db():
     except Exception as e:
         st.error(f"DB 연결 오류: {str(e)}")
         return None
+
+login_email = st.user.email
+if not st.user.name:
+    st.warning("로그인이 필요합니다.")
+else:
+    st.success(f"환영합니다, {st.user.name}님!")
     
 def show_gauge_chart(progress, title):
     fig = go.Figure(go.Pie(
@@ -304,12 +310,6 @@ def display_progress_section(title, progress_data):
 
 def show_dashboard_page():
     st.title("대시보드")
-    login_email = st.user.email
-    if not login_email:
-        st.warning("로그인이 필요합니다.")
-    else:
-        st.success(f"환영합니다, {login_email}님!")
-
     # 컬럼 구조 설정
     col1, _, col2 = st.columns([1, 0.1, 1])
 
