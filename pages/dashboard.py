@@ -242,24 +242,19 @@ def get_job_posting_progress(login_email):
         ]
 
         # 데이터 가져오기
-        query = f"SELECT {", ".join(essential_columns)} FROM {table_name} {where_clause}"
+        query = f"SELECT id, company_name, {', '.join(essential_columns)} FROM {table_name} {where_clause}"
         cursor.execute(query, where_values)
         results = cursor.fetchall()
 
-        filled_count = 0
-        total_count = len(essential_columns)
-        empty_fields = []
+        job_progress = []
 
         for row in results:
-            for col in essential_columns:
-                if row[col] is not None and str(row[col]).strip() != "":
-                    filled_count += 1
-                else:
-                    empty_fields.append(map_column_to_field("tb_job_postings", col))
+            filled_count = sum(1 for col in essential_columns if row[col] and str(row[col]).strip() != "")
+            total_count = len(essential_columns)
+            progress = round((filled_count / total_count) * 100, 1) if total_count else 0
+            job_progress.append({"공고 이름": row["company_name"], "진행률 (%)": progress})
 
-        progress = round((filled_count / total_count) * 100, 1) if total_count else 0
-        empty_fields_str = ", ".join(empty_fields) if empty_fields else "없음"
-        return [{"공고관리 탭": "공고관리", "진행률 (%)": progress, "비어있는 필드": empty_fields_str}]
+        return job_progress
     except Exception as e:
         st.error(f"공고관리 진행률 계산 오류: {str(e)}")
         return []
@@ -328,10 +323,12 @@ def show_dashboard_page():
     with col2:
         st.markdown("### 공고관리 진행사항")
         job_progress = get_job_posting_progress(login_email)
-        add_job_progress = get_additional_job_posting_progress(login_email)
-        combined_progress = combine_job_progress(job_progress, add_job_progress)
-        total_job_progress = sum(item["진행률 (%)"] for item in combined_progress) / len(combined_progress) if combined_progress else 0
-        show_bar_chart(tab_progress, "공고 이름", "진행률 (%)", "공고별 진행률")
+        if job_progress:
+            total_job_progress = sum(item["진행률 (%)"] for item in job_progress) / len(job_progress)
+            show_progress_bar(total_job_progress, "공고관리 진행률")
+            show_bar_chart(job_progress, "공고 이름", "진행률 (%)", "공고별 진행률")
+        else:
+            st.warning("공고관리 데이터가 없습니다.")
 
 # 대시보드 페이지 표시
 if __name__ == "__main__":
