@@ -319,8 +319,7 @@ def display_progress_section(title, progress_data):
     else:
         st.markdown(f"##### {title} 진행률 데이터를 가져올 수 없습니다.")
 
-# 대시보드 페이지 표시
-if __name__ == "__main__":
+def show_dashboard_page():
     st.title("대시보드")
 
     col1, col2 = st.columns([1, 1])
@@ -343,3 +342,7 @@ if __name__ == "__main__":
         total_job_progress = sum(item["진행률 (%)"] for item in combined_progress) / len(combined_progress) if combined_progress else 0
         show_progress_bar(total_job_progress, "진행률")
         show_bar_chart(combined_progress, "공고별 진행률")
+
+# 대시보드 페이지 표시
+if __name__ == "__main__":
+    show_dashboard_page()
