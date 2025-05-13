@@ -35,12 +35,17 @@ def show_progress_bar(progress, title):
     st.markdown(f"#### {title} ({progress}%)")
     st.progress(progress / 100)
 
-def show_bar_chart(data, title, x_column, y_column):
-    st.write(title)
+def show_bar_chart(data, x_column, y_column, title):
     df = pd.DataFrame(data)
     fig = px.bar(df, x=x_column, y=y_column, title=title)
     fig.update_layout(showlegend=False)
     st.plotly_chart(fig)
+
+def show_empty_fields_table(data, title):
+    empty_fields = [{"탭 이름": item['탭 이름'], "비어있는 필드": item['비어있는 필드']} for item in data]
+    df = pd.DataFrame(empty_fields)
+    st.markdown(f"#### {title}")
+    st.dataframe(df)
 
 def combine_job_progress(job_progress, add_job_progress):
     combined = []
@@ -53,12 +58,6 @@ def combine_job_progress(job_progress, add_job_progress):
 
 def show_job_progress_table(data, title):
     df = pd.DataFrame(data)
-    st.markdown(f"#### {title}")
-    st.dataframe(df)
-
-def show_empty_fields_table(data, title):
-    empty_fields = [{"탭 이름": item['탭 이름'], "비어있는 필드": item['비어있는 필드']} for item in data]
-    df = pd.DataFrame(empty_fields)
     st.markdown(f"#### {title}")
     st.dataframe(df)
 
@@ -322,7 +321,7 @@ def show_dashboard_page():
         tab_progress = get_resume_progress(login_email)
         total_progress = sum(item['진행률 (%)'] for item in tab_progress) / len(tab_progress)
         show_progress_bar(total_progress, "진행률")
-        show_bar_chart(tab_progress, "탭 이름", "진행률 (%)", "진행률 (%)")
+        show_bar_chart(tab_progress, "탭 이름", "진행률 (%)", "탭별 진행률")
         show_empty_fields_table(tab_progress, "이력관리 비어있는 필드")
     
     # 공고관리 진행률 표시
@@ -332,8 +331,7 @@ def show_dashboard_page():
         add_job_progress = get_additional_job_posting_progress(login_email)
         combined_progress = combine_job_progress(job_progress, add_job_progress)
         total_job_progress = sum(item["진행률 (%)"] for item in combined_progress) / len(combined_progress) if combined_progress else 0
-        show_progress_bar(total_job_progress, "진행률")
-        show_bar_chart(tab_progress, "공고이름", "진행률 (%)", "진행률 (%)")
+        show_bar_chart(tab_progress, "공고 이름", "진행률 (%)", "공고별 진행률")
 
 # 대시보드 페이지 표시
 if __name__ == "__main__":
