@@ -224,8 +224,13 @@ def get_resume_progress(login_email):
 
 def get_job_posting_progress(login_email):
     try:
+        if not login_email:
+            st.warning("로그인 이메일이 설정되지 않았습니다.")
+            return []
+        
         conn = connect_to_db()
         if conn is None:
+            st.warning("DB 연결 실패")
             return []
 
         cursor = conn.cursor()
@@ -235,24 +240,39 @@ def get_job_posting_progress(login_email):
         where_clause = "WHERE login_email = %s"
         where_values = (login_email,)
 
-        # 필수 필드명 가져오기
+        # 필수 필드명
         essential_columns = [
             "company_name", "position", "openings", "deadline", "requirements", 
             "main_duties", "motivation", "submission", "contact", "company_website"
         ]
 
+        # 추가 필드명
+        additional_columns = [
+            "company_intro", "talent", "preferences", 
+            "company_culture", "faq", "additional_info"
+        ]
+
+        # 전체 필드명 (필수 + 추가)
+        all_columns = essential_columns + additional_columns
+
         # 데이터 가져오기
-        query = f"SELECT id, company_name, {', '.join(essential_columns)} FROM {table_name} {where_clause}"
+        query = f"SELECT id, company_name, {', '.join(all_columns)} FROM {table_name} {where_clause}"
         cursor.execute(query, where_values)
         results = cursor.fetchall()
+
+        if not results:
+            st.warning("공고 데이터를 불러오지 못했습니다. 데이터가 없거나 잘못된 이메일입니다.")
+            return []
 
         job_progress = []
 
         for row in results:
-            filled_count = sum(1 for col in essential_columns if row[col] and str(row[col]).strip() != "")
-            total_count = len(essential_columns)
+            filled_count = sum(1 for col in all_columns if row[col] and str(row[col]).strip() != "")
+            total_count = len(all_columns)
             progress = round((filled_count / total_count) * 100, 1) if total_count else 0
+
             job_progress.append({"공고 이름": row["company_name"], "진행률 (%)": progress})
+
 
         return job_progress
     except Exception as e:
@@ -327,6 +347,8 @@ def show_dashboard_page():
             total_job_progress = sum(item["진행률 (%)"] for item in job_progress) / len(job_progress)
             show_progress_bar(total_job_progress, "공고관리 진행률")
             show_bar_chart(job_progress, "공고 이름", "진행률 (%)", "공고별 진행률")
+        else:
+            st.warning("공고관리 데이터를 불러올 수 없습니다.")
 
 # 대시보드 페이지 표시
 if __name__ == "__main__":
