@@ -24,12 +24,12 @@ def connect_to_db():
         return None
 
 # Google 로그인 인증 정보를 Streamlit 세션 상태로 저장
-if 'login_email' not in st.session_state or 'login_name' not in st.session_state:
-    st.warning("로그인이 필요합니다.")
+if st.user.name:
+    st.write(f"환영합니다, {st.user.name}님!")
+    login_email = st.user.email
 else:
-    login_email = st.session_state['login_email']
-    login_name = st.session_state['login_name']
-    st.success(f"환영합니다, {login_name}님!")
+    st.write("환영합니다, 사용자님!")
+    login_email = ""
     
 def show_gauge_chart(progress, title):
     fig = go.Figure(go.Pie(
