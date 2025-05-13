@@ -30,28 +30,10 @@ if st.user.name:
 else:
     st.write("환영합니다, 사용자님!")
     login_email = ""
-    
-def show_half_gauge_chart(progress, title):
-    fig = go.Figure(go.Pie(
-        values=[progress, 100 - progress],
-        labels=["✅ 완료", "❌ 미완료"],
-        hole=0.7,
-        direction="clockwise",
-        sort=False,
-        textinfo="label+percent",
-        textposition="inside",
-        marker=dict(colors=["#4285F4", "lightgray"]),
-        showlegend=False
-    ))
-    fig.update_traces(marker=dict(line=dict(color="#000000", width=0.5)))
-    fig.update_layout(
-        title=title,
-        height=300,
-        margin=dict(t=0, b=20, l=0, r=0)
-    )
-    st.plotly_chart(fig)
 
 def show_progress_bar(progress, title):
+    st.markdown(f"#### {title} ({progress}%)")
+    st.progress(progress / 100)
     st.markdown(f"#### {title}")
     st.progress(progress / 100)
 
@@ -331,33 +313,25 @@ def display_progress_section(title, progress_data):
 def show_dashboard_page():
     st.title("대시보드")
     # 컬럼 구조 설정
-    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+    col1, col2 = st.columns([1, 1])
 
     # 이력관리 진행률 표시
     with col1:
         st.markdown("### 이력관리 진행사항")
         tab_progress = get_resume_progress(login_email)
         total_progress = sum(item['진행률 (%)'] for item in tab_progress) / len(tab_progress)
-        show_half_gauge_chart(total_progress, "이력관리 진행률")
-        show_progress_bar(total_progress, "이력관리 진행률")
-
-    with col2:
-        st.markdown("### 이력관리 탭별 진행률")
-        show_bar_chart(tab_progress, "이력관리 탭별 진행률")
+        show_progress_bar(total_progress, "진행률")
+        show_bar_chart(tab_progress, "탭별 진행률")
         show_empty_fields_table(tab_progress, "이력관리 비어있는 필드")
-
+    
     # 공고관리 진행률 표시
-    with col3:
+    with col2:
         st.markdown("### 공고관리 진행사항")
         job_progress = get_job_posting_progress(login_email)
-        total_job_progress = job_progress[0]["진행률 (%)"] if job_progress else 0
-        show_half_gauge_chart(total_job_progress, "공고관리 진행률")
-        show_progress_bar(total_job_progress, "공고관리 진행률")
-    
-    with col4:
-        st.markdown("### 공고별 진행률")
         add_job_progress = get_additional_job_posting_progress(login_email)
-        show_job_progress_table(add_job_progress, "공고별 진행률")
+        combined_progress = job_progress + add_job_progress
+        total_job_progress = sum(item["진행률 (%)"] for item in combined_progress) / len(combined_progress) if combined_progress else 0
+        show_progress_bar(total_job_progress, "진행률")
 
 # 대시보드 페이지 표시
 if __name__ == "__main__":
