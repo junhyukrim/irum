@@ -5,6 +5,8 @@ import pymysql
 import pandas as pd
 from datetime import datetime
 
+st.set_page_config(layout="wide")
+
 def connect_to_db():
     try:
         connection = pymysql.connect(
