@@ -34,7 +34,7 @@ else:
 def show_half_gauge_chart(progress, title):
     fig = go.Figure(go.Pie(
         values=[progress, 100 - progress],
-        labels=["완료", "미완료"],
+        labels=["✅ 완료", "❌ 미완료"],
         hole=0.7,
         direction="clockwise",
         sort=False,
@@ -50,6 +50,10 @@ def show_half_gauge_chart(progress, title):
         margin=dict(t=0, b=20, l=0, r=0)
     )
     st.plotly_chart(fig)
+
+def show_progress_bar(progress, title):
+    st.markdown(f"#### {title}")
+    st.progress(progress / 100)
 
 def show_bar_chart(data, title):
     df = pd.DataFrame(data)
@@ -296,7 +300,7 @@ def get_additional_job_posting_progress(login_email):
 
         for row in results:
             for col in additional_columns:
-                status = "✅ 입력됨" if row[col] and str(row[col]).strip() != "" else "❌ 입력 안 됨"
+                status = "✅ 완료" if row[col] and str(row[col]).strip() != "" else "❌ 미완료"
                 additional_progress.append({"필드명": map_column_to_field("tb_job_postings", col), "입력 상태": status})
 
         return additional_progress
@@ -335,6 +339,7 @@ def show_dashboard_page():
         tab_progress = get_resume_progress(login_email)
         total_progress = sum(item['진행률 (%)'] for item in tab_progress) / len(tab_progress)
         show_half_gauge_chart(total_progress, "이력관리 진행률")
+        show_progress_bar(total_progress, "이력관리 진행률")
 
     with col2:
         st.markdown("### 이력관리 탭별 진행률")
@@ -347,6 +352,7 @@ def show_dashboard_page():
         job_progress = get_job_posting_progress(login_email)
         total_job_progress = job_progress[0]["진행률 (%)"] if job_progress else 0
         show_half_gauge_chart(total_job_progress, "공고관리 진행률")
+        show_progress_bar(total_job_progress, "공고관리 진행률")
     
     with col4:
         st.markdown("### 공고별 진행률")
