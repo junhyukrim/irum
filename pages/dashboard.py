@@ -42,6 +42,15 @@ def show_bar_chart(data, title):
     fig = px.bar(df, x='탭 이름', y='진행률 (%)', title=title)
     st.plotly_chart(fig)
 
+def combine_job_progress(job_progress, add_job_progress):
+    combined = []
+    for item in job_progress:
+        combined.append({"공고관리 탭": item["공고관리 탭"], "진행률 (%)": item["진행률 (%)"]})
+    for item in add_job_progress:
+        status = 100 if "✅" in item["입력 상태"] else 0
+        combined.append({"공고관리 탭": item["필드명"], "진행률 (%)": status})
+    return combined
+
 def show_job_progress_table(data, title):
     df = pd.DataFrame(data)
     st.markdown(f"#### {title}")
@@ -310,9 +319,10 @@ def display_progress_section(title, progress_data):
     else:
         st.markdown(f"##### {title} 진행률 데이터를 가져올 수 없습니다.")
 
-def show_dashboard_page():
+# 대시보드 페이지 표시
+if __name__ == "__main__":
     st.title("대시보드")
-    # 컬럼 구조 설정
+
     col1, col2 = st.columns([1, 1])
 
     # 이력관리 진행률 표시
@@ -329,10 +339,7 @@ def show_dashboard_page():
         st.markdown("### 공고관리 진행사항")
         job_progress = get_job_posting_progress(login_email)
         add_job_progress = get_additional_job_posting_progress(login_email)
-        combined_progress = job_progress + add_job_progress
+        combined_progress = combine_job_progress(job_progress, add_job_progress)
         total_job_progress = sum(item["진행률 (%)"] for item in combined_progress) / len(combined_progress) if combined_progress else 0
         show_progress_bar(total_job_progress, "진행률")
-
-# 대시보드 페이지 표시
-if __name__ == "__main__":
-    show_dashboard_page()
+        show_bar_chart(combined_progress, "공고별 진행률")
