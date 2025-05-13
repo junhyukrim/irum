@@ -35,12 +35,17 @@ def show_progress_bar(progress, title):
     st.markdown(f"#### {title} ({progress}%)")
     st.progress(progress / 100)
 
-def show_bar_chart(data, title, x_column, y_column):
-    st.write(title)
+def show_bar_chart(data, x_column, y_column, title):
     df = pd.DataFrame(data)
     fig = px.bar(df, x=x_column, y=y_column, title=title)
     fig.update_layout(showlegend=False)
     st.plotly_chart(fig)
+
+def show_empty_fields_table(data, title):
+    empty_fields = [{"탭 이름": item['탭 이름'], "비어있는 필드": item['비어있는 필드']} for item in data]
+    df = pd.DataFrame(empty_fields)
+    st.markdown(f"#### {title}")
+    st.dataframe(df)
 
 def combine_job_progress(job_progress, add_job_progress):
     combined = []
@@ -53,12 +58,6 @@ def combine_job_progress(job_progress, add_job_progress):
 
 def show_job_progress_table(data, title):
     df = pd.DataFrame(data)
-    st.markdown(f"#### {title}")
-    st.dataframe(df)
-
-def show_empty_fields_table(data, title):
-    empty_fields = [{"탭 이름": item['탭 이름'], "비어있는 필드": item['비어있는 필드']} for item in data]
-    df = pd.DataFrame(empty_fields)
     st.markdown(f"#### {title}")
     st.dataframe(df)
 
@@ -243,24 +242,19 @@ def get_job_posting_progress(login_email):
         ]
 
         # 데이터 가져오기
-        query = f"SELECT {", ".join(essential_columns)} FROM {table_name} {where_clause}"
+        query = f"SELECT id, company_name, {', '.join(essential_columns)} FROM {table_name} {where_clause}"
         cursor.execute(query, where_values)
         results = cursor.fetchall()
 
-        filled_count = 0
-        total_count = len(essential_columns)
-        empty_fields = []
+        job_progress = []
 
         for row in results:
-            for col in essential_columns:
-                if row[col] is not None and str(row[col]).strip() != "":
-                    filled_count += 1
-                else:
-                    empty_fields.append(map_column_to_field("tb_job_postings", col))
+            filled_count = sum(1 for col in essential_columns if row[col] and str(row[col]).strip() != "")
+            total_count = len(essential_columns)
+            progress = round((filled_count / total_count) * 100, 1) if total_count else 0
+            job_progress.append({"공고 이름": row["company_name"], "진행률 (%)": progress})
 
-        progress = round((filled_count / total_count) * 100, 1) if total_count else 0
-        empty_fields_str = ", ".join(empty_fields) if empty_fields else "없음"
-        return [{"공고관리 탭": "공고관리", "진행률 (%)": progress, "비어있는 필드": empty_fields_str}]
+        return job_progress
     except Exception as e:
         st.error(f"공고관리 진행률 계산 오류: {str(e)}")
         return []
@@ -322,18 +316,17 @@ def show_dashboard_page():
         tab_progress = get_resume_progress(login_email)
         total_progress = sum(item['진행률 (%)'] for item in tab_progress) / len(tab_progress)
         show_progress_bar(total_progress, "진행률")
-        show_bar_chart(tab_progress, "탭 이름", "진행률 (%)", "진행률 (%)")
+        show_bar_chart(tab_progress, "탭 이름", "진행률 (%)", "탭별 진행률")
         show_empty_fields_table(tab_progress, "이력관리 비어있는 필드")
     
     # 공고관리 진행률 표시
     with col2:
         st.markdown("### 공고관리 진행사항")
         job_progress = get_job_posting_progress(login_email)
-        add_job_progress = get_additional_job_posting_progress(login_email)
-        combined_progress = combine_job_progress(job_progress, add_job_progress)
-        total_job_progress = sum(item["진행률 (%)"] for item in combined_progress) / len(combined_progress) if combined_progress else 0
-        show_progress_bar(total_job_progress, "진행률")
-        show_bar_chart(tab_progress, "공고이름", "진행률 (%)", "진행률 (%)")
+        if job_progress:
+            total_job_progress = sum(item["진행률 (%)"] for item in job_progress) / len(job_progress)
+            show_progress_bar(total_job_progress, "공고관리 진행률")
+            show_bar_chart(job_progress, "공고 이름", "진행률 (%)", "공고별 진행률")
 
 # 대시보드 페이지 표시
 if __name__ == "__main__":
