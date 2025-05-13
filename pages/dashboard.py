@@ -322,7 +322,7 @@ def show_dashboard_page():
         tab_progress = get_resume_progress(login_email)
         total_progress = sum(item['진행률 (%)'] for item in tab_progress) / len(tab_progress)
         show_progress_bar(total_progress, "진행률")
-        show_bar_chart(tab_progress, "탭 이름", "진행률", "진행률 (%)")
+        show_bar_chart(tab_progress, "탭 이름", "진행률 (%)", "진행률 (%)")
         show_empty_fields_table(tab_progress, "이력관리 비어있는 필드")
     
     # 공고관리 진행률 표시
@@ -333,7 +333,7 @@ def show_dashboard_page():
         combined_progress = combine_job_progress(job_progress, add_job_progress)
         total_job_progress = sum(item["진행률 (%)"] for item in combined_progress) / len(combined_progress) if combined_progress else 0
         show_progress_bar(total_job_progress, "진행률")
-        show_bar_chart(tab_progress, "공고이름", "진행률", "진행률 (%)")
+        show_bar_chart(tab_progress, "공고이름", "진행률 (%)", "진행률 (%)")
 
 # 대시보드 페이지 표시
 if __name__ == "__main__":
